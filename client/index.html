@@ -20,7 +20,6 @@
     <!-- build:css({.tmp,client}) app/app.css -->
     <link rel="stylesheet" href="app/app.css">
       <!-- injector:css -->
-      <link rel="stylesheet" href="app/app.css">
       <!-- endinjector -->
     <!-- endbuild -->
   </head>
@@ -29,8 +28,10 @@
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
 
+	 <p> hello !! </p>
+	 
     <!-- Add your site or application content here -->
-    <div ui-view=""></div>
+    <div ui-view></div>
 
 
     <!--[if lt IE 9]>
@@ -53,6 +54,7 @@
         <!-- build:js({.tmp,client}) app/app.js -->
         <script src="app/app.js"></script>
           <!-- injector:js -->
+          <script src="app/controller.js"></script>
           <!-- endinjector -->
         <!-- endbuild -->
 </body>
