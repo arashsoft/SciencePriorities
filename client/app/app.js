@@ -11,5 +11,13 @@ angular.module('sciencePriorities2App', [
     $urlRouterProvider
       .otherwise('/');
 
+		
+	$stateProvider
+     .state('stage1', {
+        url: '/',
+        templateUrl: 'app/main/main.html',
+        //controller: 'MainCtrl'
+      });
+		
     $locationProvider.html5Mode(true);
   });
