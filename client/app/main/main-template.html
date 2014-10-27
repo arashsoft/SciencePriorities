@@ -1,8 +1,34 @@
+<script type="text/javascript">
+$(document).ready(function () {
+	$('#layoutDiv').layout({ applyDemoStyles: true });
+});
+</script>
 
-<div class="ui-layout-center">
-	<p>it is just a test</p>
+<div id="layoutDiv" style="position:absolute; width:100%; height:100%;">
+	
+	<div class="ui-layout-north">
+		<h4 style="color:rgb(107,76,155)"><big>Science Priorities</big></h4>
+	</div>
+	
+	<div  class="ui-layout-center" ng-controller="CenterController" >
+		<div x-lvl-drop-target='true' x-on-drop='dropped(dragEl, dropEl)' style="height:100%;overflow:hidden;">
+		</div>
+	</div>
+	
+	
+	<div class="ui-layout-east">
+		<h6 align="center" >Benchmarking</h6>
+		<div class="benchmarkBox" ng-repeat="benchmarkingEntity in benchmarkingEntities" >
+			<h4 align="center" >{{benchmarkingEntity.name}}</h5>
+			<hr style= " margin :0px; border-width: 1px; border-color:#443266">
+			<button type="button" class="btn btn-default" x-lvl-draggable='true' ng-repeat="property in benchmarkingEntity.properties">{{property}}</h6>
+		</div>	
+	</div>
+	
+	<div class="ui-layout-west">Advanced Visualization</div>
+	
+	<div class="ui-layout-south" align="center">
+		<img src="assets/images/science_logo.png">
+	</div>
+
 </div>
-<div class="ui-layout-north">North</div>
-<div class="ui-layout-south">South</div>
-<div class="ui-layout-east">East</div>
-<div class="ui-layout-west">West</div>

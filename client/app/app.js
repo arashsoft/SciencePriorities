@@ -5,7 +5,8 @@ angular.module('sciencePriorities2App', [
   'ngResource',
   'ngSanitize',
   'ui.router',
-  'ui.bootstrap'
+  'ui.bootstrap',
+  'lvl.directives.dragdrop'
 ])
   .config(function ($stateProvider, $urlRouterProvider, $locationProvider) {
     $urlRouterProvider
@@ -15,8 +16,8 @@ angular.module('sciencePriorities2App', [
 	$stateProvider
      .state('stage1', {
         url: '/',
-        templateUrl: 'app/main/main.html',
-        //controller: 'MainCtrl'
+        templateUrl: 'app/main/main-template.html',
+        controller: 'MainCtrl'
       });
 		
     $locationProvider.html5Mode(true);
