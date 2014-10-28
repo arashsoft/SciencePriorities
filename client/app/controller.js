@@ -12,10 +12,11 @@ angular.module('sciencePriorities2App')
 		"properties":["Academic Level","Department"]
 		}
 	 ];
-	
+	 
 }]);
 
 angular.module('sciencePriorities2App').controller("CenterController" , ["$scope",function($scope){
+	$scope.multiViewModel="single"
 	$scope.dropped= function (dragEl, dropEl ){
 		console.log("Object "+dragEl+" Droped on " + dropEl);
 	}
