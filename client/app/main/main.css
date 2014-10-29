@@ -6,3 +6,22 @@
 	padding:5px;
 	border-radius:10px;
 }
+
+
+.niceScroll::-webkit-scrollbar {
+    width: 12px;
+}
+
+.niceScroll::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 0px rgba(0,0,0,0); 
+	 border-radius:10px;
+}
+ 
+.niceScroll::-webkit-scrollbar-thumb {
+    -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.8); 
+	 border-radius: 10px;
+}
+
+.niceScroll::-webkit-scrollbar {
+    width: 8px;
+}

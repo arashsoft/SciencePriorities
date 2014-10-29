@@ -2,12 +2,12 @@
 
 		$(document).ready(function () {
 			// main layout
-			$('#layoutDiv').layout({south__size:"58"});
+			$('#layoutDiv').layout({south__size:"58",east__size:"210"});
 			// west and east representation area			
 			westRepresentationLayout = $('#representationDiv').layout({west__size:"50%"}); 
 			// north and south representatin areas
-			southRepresentationLayout = $('#eastRepresentationDiv').layout({south__size:"50%"});
-			$('#westRepresentationDiv').layout({south__size:"50%"});
+			southRepresentationLayout = $('#eastRepresentationDiv').layout({south__size:"50%", resizable:"true"});
+			$('#westRepresentationDiv').layout({south__size:"50%", resizable:"true"});
 			// hide multi view
 			westRepresentationLayout.hide('west');
 			southRepresentationLayout.hide('south')
@@ -21,33 +21,36 @@
 		<h4 style="color:rgb(107,76,155)"><big>Science Priorities</big></h4>
 	</div>
 	
-	<div  class="ui-layout-center" ng-controller="CenterController" style="padding:0px;">
-	<!--use another div beacuse of ng-controller and lvl-dragdrop conflict -->
-		<div id="representationDiv" x-lvl-drop-target='true' x-on-drop='dropped(dragEl, dropEl)' style="height:100%;overflow:hidden;">
-			<div id="eastRepresentationDiv" class="ui-layout-center">
-				<div class="ui-layout-center"></div>
-				<div class="ui-layout-south"></div>
-			</div>
-			<div id="westRepresentationDiv" class="ui-layout-west">
-				<div class="ui-layout-center"></div>
-				<div class="ui-layout-south"></div>
-			</div>
-			
-			<div class="btn-group" style="position:absolute; bottom:5px; left:5px">
-				<label class="btn btn-primary" ng-model="multiViewModel" btn-radio="'single'" uncheckable onclick="westRepresentationLayout.hide('west');southRepresentationLayout.hide('south')" >Single View</label>
-				<label class="btn btn-primary" ng-model="multiViewModel" btn-radio="'multi'" uncheckable onclick="westRepresentationLayout.show('west');southRepresentationLayout.show('south')">Multi View</label>
-			</div>
+	<div  id="representationDiv" class="ui-layout-center" ng-controller="CenterController" style="padding:0px;">
+		
+		<div id="eastRepresentationDiv" class="ui-layout-center" style="padding:0px;">
+			<div class="ui-layout-center " x-lvl-drop-target='true' x-on-drop='dropped(dragEl, dropEl)' ></div>
+			<div class="ui-layout-south" x-lvl-drop-target='true' x-on-drop='dropped(dragEl, dropEl)'></div>
 		</div>
+		<div id="westRepresentationDiv" class="ui-layout-west" style="padding:0px;">
+			<div class="ui-layout-center" x-lvl-drop-target='true' x-on-drop='dropped(dragEl, dropEl)' ></div>
+			<div class="ui-layout-south" x-lvl-drop-target='true' x-on-drop='dropped(dragEl, dropEl)' ></div>
+		</div>
+		
+		<div class="btn-group" style="position:absolute; bottom:5px; left:5px">
+			<label class="btn btn-primary" ng-model="multiViewModel" btn-radio="'single'" uncheckable onclick="westRepresentationLayout.hide('west');southRepresentationLayout.hide('south')" >Single View</label>
+			<label class="btn btn-primary" ng-model="multiViewModel" btn-radio="'multi'" uncheckable onclick="westRepresentationLayout.show('west');southRepresentationLayout.show('south')">Multi View</label>
+		</div>
+	
 	</div>
 	
 	
-	<div class="ui-layout-east">
+	<div class="ui-layout-east niceScroll" >
 		<h6 align="center" >Benchmarking</h6>
-		<div class="benchmarkBox" ng-repeat="benchmarkingEntity in benchmarkingEntities" >
-			<h4 align="center" >{{benchmarkingEntity.name}}</h5>
-			<hr style= " margin :0px; border-width: 1px; border-color:#443266">
-			<button type="button" class="btn btn-default" x-lvl-draggable='true' ng-repeat="property in benchmarkingEntity.properties">{{property}}</h6>
-		</div>	
+		<accordion close-others="0">
+			<accordion-group ng-repeat="benchmarkingEntity in benchmarkingEntities" is-open="benchmarkingEntity.isOpen" >
+				<accordion-heading>
+					{{benchmarkingEntity.name}} <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': benchmarkingEntity.isOpen, 'glyphicon-chevron-left': !benchmarkingEntity.isOpen}"></i>
+				</accordion-heading>
+		  
+				<label class="btn btn-default" x-lvl-draggable='true' ng-repeat="property in benchmarkingEntity.properties">{{property}}</label>
+			</accordion-group>
+		</accordion>
 	</div>
 	
 	<div class="ui-layout-west">Advanced Visualization</div>
