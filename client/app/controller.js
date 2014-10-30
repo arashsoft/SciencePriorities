@@ -29,6 +29,8 @@ angular.module('sciencePriorities2App')
 angular.module('sciencePriorities2App').controller("CenterController" , ["$scope",function($scope){
 	$scope.multiViewModel="single"
 	$scope.dropped= function (dragEl, dropEl ){
-		console.log("Object "+dragEl+" Droped on " + dropEl);
+		//console.log("Object "+dragEl+" Droped on " + dropEl);
+		drag= $("#"+dragEl);
+		createBarchart(dropEl,"test","test");
 	}
 }]);

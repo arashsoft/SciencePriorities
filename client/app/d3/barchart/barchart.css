@@ -1,0 +1,24 @@
+.barchart.bar {
+  fill: steelblue;
+}
+
+.barchart.bar:hover {
+  fill: brown;
+}
+
+.barchart.axis {
+  font: 10px sans-serif;
+}
+
+.barchart.axis path,
+.barchart.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.barchart.x.axis path {
+  display: none;
+}
+
+
