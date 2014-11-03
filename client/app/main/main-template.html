@@ -24,12 +24,28 @@
 	<div  id="representationDiv" class="ui-layout-center" ng-controller="CenterController" style="padding:0px;">
 		
 		<div id="eastRepresentationDiv" class="ui-layout-center" style="padding:0px;">
-			<div class="ui-layout-center " x-lvl-drop-target='true' x-on-drop='dropped(dragEl, dropEl)' ></div>
-			<div class="ui-layout-south" x-lvl-drop-target='true' x-on-drop='dropped(dragEl, dropEl)'></div>
+			<div class="ui-layout-center " x-lvl-drop-target='true' x-on-drop='dropped(dragEl, dropEl)' >
+				<div ng-controller="layoutController" >
+			
+				</div>
+			</div>
+			<div class="ui-layout-south" x-lvl-drop-target='true' x-on-drop='dropped(dragEl, dropEl)' >
+				<div ng-controller="layoutController" >
+			
+				</div>
+			</div>
 		</div>
 		<div id="westRepresentationDiv" class="ui-layout-west" style="padding:0px;">
-			<div class="ui-layout-center" x-lvl-drop-target='true' x-on-drop='dropped(dragEl, dropEl)' ></div>
-			<div class="ui-layout-south" x-lvl-drop-target='true' x-on-drop='dropped(dragEl, dropEl)' ></div>
+			<div class="ui-layout-center" x-lvl-drop-target='true' x-on-drop='dropped(dragEl, dropEl)' >
+				<div ng-controller="layoutController" >
+			
+				</div>
+			</div>
+			<div class="ui-layout-south" x-lvl-drop-target='true' x-on-drop='dropped(dragEl, dropEl)' >
+				<div ng-controller="layoutController" >
+			
+				</div>
+			</div>
 		</div>
 		
 		<div class="btn-group" style="position:absolute; bottom:2px; left:3px; opacity: 0.8;">
@@ -48,7 +64,7 @@
 					{{benchmarkingEntity.name}} <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': benchmarkingEntity.isOpen, 'glyphicon-chevron-left': !benchmarkingEntity.isOpen}"></i>
 				</accordion-heading>
 		  
-				<label class="btn btn-default" x-lvl-draggable='true' ng-repeat="property in benchmarkingEntity.properties">{{property}}</label>
+				<label class="btn btn-default" x-lvl-draggable='true' ng-repeat="property in benchmarkingEntity.properties" selectedEntity="{{benchmarkingEntity.name}}" selectedProperty="{{property}}">{{property}}</label>
 			</accordion-group>
 		</accordion>
 	</div>
