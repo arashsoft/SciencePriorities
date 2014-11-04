@@ -18,26 +18,29 @@
       <!-- endbower -->
     <!-- endbuild -->
     <!-- build:css({.tmp,client}) app/app.css -->
-    <link rel="stylesheet" href="app/app.css">
       <!-- injector:css -->
+      <link rel="stylesheet" href="app/app.css">
+      <link rel="stylesheet" href="app/css/layout-default.css">
+      <link rel="stylesheet" href="app/d3/barchart/barchart.css">
+      <link rel="stylesheet" href="app/main/main.css">
       <!-- endinjector -->
     <!-- endbuild -->
   </head>
-  <body ng-app="sciencePriorities2App">
+  <body ng-app="sciencePriorities2App" style="overflow:hidden;">
     <!--[if lt IE 7]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
 
-	 <p> hello !! </p>
-	 
     <!-- Add your site or application content here -->
-    <div ui-view></div>
+    <div ui-view style="overflow:hidden;"></div>
 
 
     <!--[if lt IE 9]>
     <script src="bower_components/es5-shim/es5-shim.js"></script>
     <script src="bower_components/json3/lib/json3.min.js"></script>
     <![endif]-->
+	 
+	 
     <!-- build:js({client,node_modules}) app/vendor.js -->
       <!-- bower:js -->
       <script src="bower_components/jquery/dist/jquery.js"></script>
@@ -48,13 +51,20 @@
       <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
       <script src="bower_components/lodash/dist/lodash.compat.js"></script>
       <script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+      <script src="bower_components/jquery-ui-layout-bower/source/stable/jquery.layout.js"></script>
+      <script src="bower_components/jquery-ui-layout-bower/source/stable/jquery.layout.min.js"></script>
+      <script src="bower_components/d3/d3.js"></script>
       <!-- endbower -->
     <!-- endbuild -->
-
+	<script src="bower_components/jquery.ui/ui/core.js"></script>
+ 
         <!-- build:js({.tmp,client}) app/app.js -->
         <script src="app/app.js"></script>
           <!-- injector:js -->
           <script src="app/controller.js"></script>
+          <script src="app/d3/barchart/barchart.js"></script>
+          <script src="components/lvldragdrop/lvl-drag-drop.js"></script>
+          <script src="components/lvldragdrop/lvl-uuid.js"></script>
           <!-- endinjector -->
         <!-- endbuild -->
 </body>
