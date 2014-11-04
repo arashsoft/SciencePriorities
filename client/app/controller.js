@@ -33,7 +33,6 @@ angular.module('sciencePriorities2App').controller("CenterController" , ["$scope
 		var dropDiv = $("#"+dropEl+ " > div");
 		
 		// pass drag parameter to associated controller scope
-		console.log(drag[0].attributes.selectedEntity);
 		angular.element(dropDiv[0]).scope().selectedEntity= drag[0].attributes.selectedEntity.value;
 		angular.element(dropDiv[0]).scope().selectedProperty= drag[0].attributes.selectedProperty.value;
 			
@@ -52,9 +51,13 @@ angular.module('sciencePriorities2App').controller("CenterController" , ["$scope
 }]);
 
 angular.module('sciencePriorities2App').controller("layoutController" , ["$scope",function($scope){
-	// handle d3 animation
+	// $scope.selectedProperty and $scope.selectedEntity set by drag&drop controller
+	
+	// handle benchmark selection
 	$scope.layoutTypeClicked = function(selectedLayout){
-		//console.log("btn click: "+ selectedLayout + "pro: "+$scope.selectedProperty+"ent: "+$scope.selectedEntity);
+		$.get("/jsonrequest/"+$scope.selectedEntity+"/"+$scope.selectedProperty, function (jsonFile){
+			
+		});
 	};
 }]);
 

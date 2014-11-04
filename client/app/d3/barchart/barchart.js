@@ -1,3 +1,5 @@
+// sample data : data = [{"name":"ads","value":8},{"name":"asdfg","value":2},{"name":"gfhgfhgf","value":5},{"name":"oiloi","value":10}]
+
 function createBarchart(parrentDivID, entityName, propertyName){
 	
 	var parrentObject = $("#"+parrentDivID);
