@@ -4,7 +4,7 @@ angular.module('sciencePriorities2App')
 	 $scope.benchmarkingEntities=[
 		{
 			"name":"Awards",
-			"properties":["Departments","Sponsors-Programs","Source of funding"],
+			"properties":["Universities","Departments","Sponsors-Programs","Source of funding"],
 			"isOpen":"true"
 		},		
 		{
