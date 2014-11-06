@@ -2,7 +2,7 @@
 
 		$(document).ready(function () {
 			// main layout
-			$('#layoutDiv').layout({south__size:"58",east__size:"210"});
+			$('#layoutDiv').layout({south__size:"58",east__size:"210",});
 			// west and east representation area			
 			westRepresentationLayout = $('#representationDiv').layout({west__size:"50%"}); 
 			// north and south representatin areas
@@ -24,25 +24,25 @@
 	<div  id="representationDiv" class="ui-layout-center" ng-controller="CenterController" style="padding:0px;">
 		
 		<div id="eastRepresentationDiv" class="ui-layout-center" style="padding:0px;">
-			<div class="ui-layout-center " x-lvl-drop-target='true' x-on-drop='dropped(dragEl, dropEl)' >
-				<div ng-controller="layoutController" >
+			<div class="ui-layout-center " x-lvl-drop-target='true' x-on-drop='dropped(dragEl, dropEl)' style="padding:0px;">
+				<div class="max-screen" id="screen1" ng-controller="layoutController" >
 			
 				</div>
 			</div>
-			<div class="ui-layout-south" x-lvl-drop-target='true' x-on-drop='dropped(dragEl, dropEl)' >
-				<div ng-controller="layoutController" >
+			<div class="ui-layout-south" x-lvl-drop-target='true' x-on-drop='dropped(dragEl, dropEl)' style="padding:0px;">
+				<div class="max-screen" id="screen2" ng-controller="layoutController" >
 			
 				</div>
 			</div>
 		</div>
 		<div id="westRepresentationDiv" class="ui-layout-west" style="padding:0px;">
-			<div class="ui-layout-center" x-lvl-drop-target='true' x-on-drop='dropped(dragEl, dropEl)' >
-				<div ng-controller="layoutController" >
+			<div class="ui-layout-center" x-lvl-drop-target='true' x-on-drop='dropped(dragEl, dropEl)' style="padding:0px;">
+				<div class="max-screen" id="screen3" ng-controller="layoutController" >
 			
 				</div>
 			</div>
-			<div class="ui-layout-south" x-lvl-drop-target='true' x-on-drop='dropped(dragEl, dropEl)' >
-				<div ng-controller="layoutController" >
+			<div class="ui-layout-south" x-lvl-drop-target='true' x-on-drop='dropped(dragEl, dropEl)' style="padding:0px;">
+				<div class="max-screen" id="screen4" ng-controller="layoutController" >
 			
 				</div>
 			</div>
@@ -56,7 +56,7 @@
 	</div>
 	
 	
-	<div class="ui-layout-east niceScroll" >
+	<div class="ui-layout-east niceScroll"style="padding:0px;">
 		<h6 align="center" >Benchmarking</h6>
 		<accordion close-others="0">
 			<accordion-group ng-repeat="benchmarkingEntity in benchmarkingEntities" is-open="benchmarkingEntity.isOpen" >

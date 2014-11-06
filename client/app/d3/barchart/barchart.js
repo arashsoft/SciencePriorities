@@ -1,10 +1,10 @@
 // sample data : data = [{"name":"ads","value":8},{"name":"asdfg","value":2},{"name":"gfhgfhgf","value":5},{"name":"oiloi","value":10}]
 
-function createBarchart(parrentDivID, entityName, propertyName){
+function createBarchart(parrentDivID, entityName, propertyName, data){
 	
 	var parrentObject = $("#"+parrentDivID);
 	
-	var margin = {top: 20, right: 20, bottom: 30, left: 40},
+	var margin = {top: 20, right: 20, bottom: 40, left: 80},
 		 width = parrentObject[0].clientWidth - margin.left - margin.right-50,
 		 height = parrentObject[0].clientHeight - margin.top - margin.bottom-25;
 
@@ -30,10 +30,11 @@ function createBarchart(parrentDivID, entityName, propertyName){
 	  .append("g")
 		 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-	// TODO : add real data
-	data = [{"name":"ads","value":8},{"name":"asdfg","value":2},{"name":"gfhgfhgf","value":5},{"name":"oiloi","value":10}]
+	// Done : add real data
+	//data = [{"name":"ads","value":8},{"name":"asdfg","value":2},{"name":"gfhgfhgf","value":5},{"name":"oiloi","value":10}]
 	
-	x.domain(data.map(function(d) { return d.name; }));
+	// fix long name problem with .substring(0,8)
+	x.domain(data.map(function(d) { return d.name.substring(0,8); }));
 	y.domain([0, d3.max(data, function(d) { return d.value; })]);
 		
 	
@@ -41,7 +42,7 @@ function createBarchart(parrentDivID, entityName, propertyName){
 		.data(data)
 	 .enter().append("rect")
 		.attr("class", "barchart bar")
-		.attr("x", function(d) { return x(d.name); })
+		.attr("x", function(d) { return x(d.name.substring(0,8)); })
 		.attr("width", x.rangeBand())
 		.attr("y", function(d) { return y(d.value); })
 		.attr("height", function(d) { return height - y(d.value); });
@@ -52,8 +53,8 @@ function createBarchart(parrentDivID, entityName, propertyName){
 		.call(xAxis)
 		.append("text")
 		.attr("x", width/2)
-		.attr("dy", "1.5em")
-		.attr ("font-size","15px")
+		.attr("dy", "2.2em")
+		.attr ("font-size","14px")
 		.style("text-anchor", "end")
 		.text(propertyName);
 
@@ -65,7 +66,7 @@ function createBarchart(parrentDivID, entityName, propertyName){
 		.attr("y", 6)
 		.attr("dy", ".71em")
 		.style("text-anchor", "end")
-		.text("Number of "+entityName);
+		.text(entityName);
 
 
 }

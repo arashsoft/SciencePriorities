@@ -4,7 +4,7 @@ angular.module('sciencePriorities2App')
 	 $scope.benchmarkingEntities=[
 		{
 			"name":"Awards",
-			"properties":["Universities","Departments","Sponsors-Programs","Source of funding"],
+			"properties":["Universities","Departments","Top Sponsors","Source of funding"],
 			"isOpen":"true"
 		},		
 		{
@@ -32,10 +32,11 @@ angular.module('sciencePriorities2App').controller("CenterController" , ["$scope
 		var drag= $("#"+dragEl);
 		var dropDiv = $("#"+dropEl+ " > div");
 		
-		// pass drag parameter to associated controller scope
+		// pass drag parameters and drop-div id to associated controller scope
 		angular.element(dropDiv[0]).scope().selectedEntity= drag[0].attributes.selectedEntity.value;
 		angular.element(dropDiv[0]).scope().selectedProperty= drag[0].attributes.selectedProperty.value;
-			
+		angular.element(dropDiv[0]).scope().dropID = dropDiv[0].id;
+		
 		// load select benchmark template
 		$.get("app/benchmarkMenu/benchmarkMenu.html", function(htmlFile) {	
 		
@@ -51,11 +52,14 @@ angular.module('sciencePriorities2App').controller("CenterController" , ["$scope
 }]);
 
 angular.module('sciencePriorities2App').controller("layoutController" , ["$scope",function($scope){
-	// $scope.selectedProperty and $scope.selectedEntity set by drag&drop controller
+	// $scope.dropID $scope.selectedProperty and $scope.selectedEntity set by drag&drop controller
 	
 	// handle benchmark selection
 	$scope.layoutTypeClicked = function(selectedLayout){
-		$.get("/jsonrequest/"+$scope.selectedEntity+"/"+$scope.selectedProperty, function (jsonFile){
+		$.get("/jsonrequest/"+$scope.selectedEntity+"/"+$scope.selectedProperty+"/"+ selectedLayout, function (jsonFile){
+			if (selectedLayout=="barChart"){
+				createBarchart($scope.dropID, $scope.selectedEntity, $scope.selectedProperty, jsonFile);
+			}
 			
 		});
 	};

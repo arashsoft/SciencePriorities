@@ -17,9 +17,15 @@ module.exports = function(app) {
    .get(errors[404]);
 
   // json request
-  app.route('/jsonrequest/:entityName/:propertyName')
+  app.route('/jsonrequest/:entityName/:propertyName/:layoutName')
     .get(function(req, res) {
-		res.send(jsonHandler.makeJson(req.params.entityName,req.params.propertyName));
+		jsonHandler.makeJson(req.params.entityName,req.params.propertyName,req.params.layoutName , function (jsonFile){
+			res.send(jsonFile);
+		});
+		/* it is a wrong way to work with event-driven node.js
+		 I just keep it to remember
+		 we should use callback function instead of return value; */
+		//res.send(jsonHandler.makeJson(req.params.entityName,req.params.propertyName));
     });
 	 
   // All other routes should redirect to the index.html
