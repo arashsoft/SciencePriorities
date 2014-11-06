@@ -37,6 +37,13 @@ function createBarchart(parrentDivID, entityName, propertyName, data){
 	x.domain(data.map(function(d) { return d.name.substring(0,8); }));
 	y.domain([0, d3.max(data, function(d) { return d.value; })]);
 		
+	var tip = d3.tip()
+	 .attr('class', 'd3-tip')
+	 .offset([-10, 0])
+	 .html(function(d) {
+		 return "<strong>Name: </strong> <span style='color:red'>" + d.name + "</span><br><strong>Value: </strong> <span style='color:red'>" + d.value + "</span>";
+	 });
+	svg.call(tip);
 	
 	svg.selectAll(".bar")
 		.data(data)
@@ -45,7 +52,11 @@ function createBarchart(parrentDivID, entityName, propertyName, data){
 		.attr("x", function(d) { return x(d.name.substring(0,8)); })
 		.attr("width", x.rangeBand())
 		.attr("y", function(d) { return y(d.value); })
-		.attr("height", function(d) { return height - y(d.value); });
+		.attr("height", function(d) { return height - y(d.value); })
+		.on('mouseover', tip.show)
+      .on('mouseout', tip.hide)
+
+	
 		
 	svg.append("g")
 		.attr("class", "barchart x axis")

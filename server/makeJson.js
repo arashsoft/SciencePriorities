@@ -11,7 +11,7 @@ exports.makeJson = function(entityName, propertyName, layoutName, callback){
 	
 	switch(entityName+"|"+ propertyName+"|"+layoutName) {
 		case "Awards|Universities|barChart":
-			connection.query("select U.Short_Name as name, sum(A.Amount/1000) as value from award as A join department as D on A.Department=D.ID join faculty as F on D.Faculty=F.ID join university as U on F.University=U.ID GROUP BY U.Long_Name", function(err, rows, fields) {
+			connection.query("select U.Short_Name as name, sum(A.Amount) as value from award as A join department as D on A.Department=D.ID join faculty as F on D.Faculty=F.ID join university as U on F.University=U.ID GROUP BY U.Long_Name", function(err, rows, fields) {
 				connection.end();
 				console.log(rows);
 				callback(rows);
