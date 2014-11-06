@@ -38,7 +38,7 @@ function createBarchart(parrentDivID, entityName, propertyName, data){
 	y.domain([0, d3.max(data, function(d) { return d.value; })]);
 		
 	var tip = d3.tip()
-	 .attr('class', 'd3-tip')
+	 .attr('class', 'barchart d3-tip')
 	 .offset([-10, 0])
 	 .html(function(d) {
 		 return "<strong>Name: </strong> <span style='color:red'>" + d.name + "</span><br><strong>Value: </strong> <span style='color:red'>" + d.value + "</span>";
