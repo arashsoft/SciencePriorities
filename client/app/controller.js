@@ -53,7 +53,7 @@ angular.module('sciencePriorities2App').controller("CenterController" , ["$scope
 
 angular.module('sciencePriorities2App').controller("layoutController" , ["$scope",function($scope){
 	// $scope.dropID $scope.selectedProperty and $scope.selectedEntity set by drag&drop controller
-	
+
 	// handle benchmark selection
 	$scope.layoutTypeClicked = function(selectedLayout){
 		$.get("/jsonrequest/"+$scope.selectedEntity+"/"+$scope.selectedProperty+"/"+ selectedLayout, function (jsonFile){

@@ -39,13 +39,25 @@ exports.makeJson = function(entityName, propertyName, layoutName, callback){
 			});
 			break;
 		case "Professors|Research chair|barChart":
-			//code block
+			connection.query("SELECT table1.type as name , count(*) as value FROM (select RCT.type from professor as P join research_chair as RC on P.ResearchChair = RC.ID join research_chair_type as RCT on RC.type = RCT.ID) as table1 GROUP BY type", function(err, rows, fields) {
+				connection.end();
+				console.log(rows);
+				callback(rows);
+			});
 			break;
 		case "Professors|Department|barChart":
-			//code block
+			connection.query("SELECT table1.type as name , count(*) as value FROM ( select D.Name as type from professor as P join department as D on P.Department_Primary=D.ID join faculty as F on D.Faculty=F.ID join university as U on F.University=U.ID where F.Name='Faculty of Science' and U.Short_Name='UWO' ) as table1 GROUP BY type", function(err, rows, fields) {
+				connection.end();
+				console.log(rows);
+				callback(rows);
+			});
 			break;
 		case "Professors|Rank|barChart":
-			//code block
+			connection.query("SELECT table1.type as name , count(*) as value FROM ( select P.Rank as type from professor as P join department as D on P.Department_Primary=D.ID join faculty as F on D.Faculty=F.ID join university as U on F.University=U.ID where F.Name='Faculty of Science' and U.Short_Name='UWO' and  P.Rank != 'null' ) as table1 GROUP BY type", function(err, rows, fields) {
+				connection.end();
+				console.log(rows);
+				callback(rows);
+			});
 			break;
 		case "Publications":
 			//code block
