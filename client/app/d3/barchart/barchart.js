@@ -45,7 +45,7 @@ function createBarchart(parrentDivID, entityName, propertyName, data){
 	 });
 	svg.call(tip);
 	
-	svg.selectAll(".bar")
+	svg.selectAll(".barchart.bar")
 		.data(data)
 	 .enter().append("rect")
 		.attr("class", "barchart bar")

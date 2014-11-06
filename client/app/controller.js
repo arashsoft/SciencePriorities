@@ -59,8 +59,9 @@ angular.module('sciencePriorities2App').controller("layoutController" , ["$scope
 		$.get("/jsonrequest/"+$scope.selectedEntity+"/"+$scope.selectedProperty+"/"+ selectedLayout, function (jsonFile){
 			if (selectedLayout=="barChart"){
 				createBarchart($scope.dropID, $scope.selectedEntity, $scope.selectedProperty, jsonFile);
+			}else if (selectedLayout=="pieChart"){
+				createPiechart($scope.dropID, $scope.selectedEntity, $scope.selectedProperty, jsonFile);
 			}
-			
 		});
 	};
 }]);
