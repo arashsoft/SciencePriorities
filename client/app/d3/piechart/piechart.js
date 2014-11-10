@@ -24,6 +24,7 @@ function createPiechart(parrentDivID, entityName, propertyName, data){
 	  .append("g")
 		 .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
+	// TODO: fix tooltip position
 	var tip = d3.tip()
 		 .attr('class', 'piechart d3-tip')
 		 .offset([-10, 0])
@@ -31,7 +32,7 @@ function createPiechart(parrentDivID, entityName, propertyName, data){
 			 return "<strong>Name: </strong> <span style='color:red'>" + d.name + "</span><br><strong>Value: </strong> <span style='color:red'>" + d.value + "</span>";
 		 });
 		svg.call(tip);
-	
+	tip.direction('e');
 	
   data.forEach(function(d) {
 	 d.value = +d.value;
@@ -41,7 +42,7 @@ function createPiechart(parrentDivID, entityName, propertyName, data){
 		.data(pie(data))
 	 .enter().append("g")
 		.attr("class", "piechart arc")
-		//.on('mouseover', tip.show)
+		.on('mouseover', tip.show)
 		.on('mouseout', tip.hide);
 		
 
@@ -53,7 +54,7 @@ function createPiechart(parrentDivID, entityName, propertyName, data){
 		.attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
 		.attr("dy", ".35em")
 		.style("text-anchor", "middle")
-		.text(function(d) { return d.data.name; });
+		.text(function(d) { return d.data.name.substring(0,12); });
 
 
 }
