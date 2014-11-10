@@ -8,6 +8,8 @@ function createBarchart(parrentDivID, entityName, propertyName, data){
 		 width = parrentObject[0].clientWidth - margin.left - margin.right-50,
 		 height = parrentObject[0].clientHeight - margin.top - margin.bottom-25;
 
+	var color = d3.scale.category20();
+		 
 	var x = d3.scale.ordinal()
 		 .rangeRoundBands([0, width], .1);
 
@@ -33,7 +35,14 @@ function createBarchart(parrentDivID, entityName, propertyName, data){
 	// Done : add real data
 	//data = [{"name":"ads","value":8},{"name":"asdfg","value":2},{"name":"gfhgfhgf","value":5},{"name":"oiloi","value":10}]
 	
+	// todo fix substring problem
 	// fix long name problem with .substring(0,8)
+	/*
+	var xDomainMap = new Array();
+	for (var i = 0; i < data.length; i++){
+		xDomainMap[i]=data[i].name.substring(0,8);
+	}
+	*/
 	x.domain(data.map(function(d) { return d.name.substring(0,8); }));
 	y.domain([0, d3.max(data, function(d) { return d.value; })]);
 		
@@ -55,6 +64,7 @@ function createBarchart(parrentDivID, entityName, propertyName, data){
 		.attr("height", function(d) { return height - y(d.value); })
 		.on('mouseover', tip.show)
       .on('mouseout', tip.hide)
+		.style("fill", function(d) { return color(d.name); });
 
 	
 		
@@ -86,3 +96,4 @@ function type(d) {
   d.frequency = +d.frequency;
   return d;
 }
+

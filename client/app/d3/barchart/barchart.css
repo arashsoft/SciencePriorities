@@ -3,7 +3,8 @@
 }
 
 .barchart.bar:hover {
-  fill: brown;
+  stroke:black;
+  stroke-width:1;
 }
 
 .barchart.axis {
