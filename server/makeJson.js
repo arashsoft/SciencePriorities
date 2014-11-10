@@ -1,3 +1,5 @@
+// hard code awards based on their ID <= 20074 because of data problem
+
 exports.makeJson = function(entityName, propertyName, layoutName, callback){
 		
 	var mysql = require('mysql');
@@ -12,7 +14,7 @@ exports.makeJson = function(entityName, propertyName, layoutName, callback){
 	switch(entityName+"|"+ propertyName+"|"+layoutName) {
 		case "Awards|Universities|barChart":
 		case "Awards|Universities|pieChart":
-			connection.query("select U.Short_Name as name, sum(A.Amount) as value from award as A join department as D on A.Department=D.ID join faculty as F on D.Faculty=F.ID join university as U on F.University=U.ID GROUP BY U.Long_Name", function(err, rows, fields) {
+			connection.query("select U.Short_Name as name, sum(A.Amount) as value from award as A join department as D on A.Department=D.ID join faculty as F on D.Faculty=F.ID join university as U on F.University=U.ID where A.ID <=20074 GROUP BY U.Long_Name", function(err, rows, fields) {
 				connection.end();
 				console.log(rows);
 				callback(rows);
@@ -20,7 +22,7 @@ exports.makeJson = function(entityName, propertyName, layoutName, callback){
 			break;
 		case "Awards|Departments|barChart":
 		case "Awards|Departments|pieChart":
-			connection.query("select D.Name as name, sum(A.Amount) as value from award as A join department as D on A.Department=D.ID join faculty as F on D.Faculty=F.ID join university as U on F.University=U.ID where U.Short_Name='UWO' GROUP BY A.Department", function(err, rows, fields) {
+			connection.query("select D.Name as name, sum(A.Amount) as value from award as A join department as D on A.Department=D.ID join faculty as F on D.Faculty=F.ID join university as U on F.University=U.ID where A.ID > 20074 and U.Short_Name='UWO'  GROUP BY A.Department", function(err, rows, fields) {
 				connection.end();
 				console.log(rows);
 				callback(rows);
@@ -28,7 +30,7 @@ exports.makeJson = function(entityName, propertyName, layoutName, callback){
 			break;
 		case "Awards|Top Sponsors|barChart":
 		case "Awards|Top Sponsors|pieChart":
-			connection.query("select S.Name as name, sum(A.Amount) as value from award as A join program as P on A.Program = P.ID join sponsor as S on P.Sponsor = S.ID GROUP BY S.Name ORDER BY value DESC limit 10", function(err, rows, fields) {
+			connection.query("select S.Name as name, sum(A.Amount) as value from award as A join program as P on A.Program = P.ID join sponsor as S on P.Sponsor = S.ID where A.ID > 20074 GROUP BY S.Name ORDER BY value DESC limit 10", function(err, rows, fields) {
 				connection.end();
 				console.log(rows);
 				callback(rows);
