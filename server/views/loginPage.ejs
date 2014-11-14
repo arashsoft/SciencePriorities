@@ -1,0 +1,40 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>Simple Login Form</title>
+	<meta charset="UTF-8" />
+	<meta name="Designer" content="PremiumPixels.com">
+	<meta name="Author" content="$hekh@r d-Ziner, CSSJUNTION.com">
+	<link rel="stylesheet" type="text/css" href="app/css/loginPageReset.css">
+	<link rel="stylesheet" type="text/css" href="app/css/loginPageStructure.css">
+</head>
+	
+<body>
+	<script src="bower_components/jquery/dist/jquery.js"></script>
+	
+	<% if (message.length > 0) { %>
+        <div id="errorDiv" class="alert alert-danger alert-dismissible"><%= message %>
+				<span style="float:right; border: 1px solid #a94442; padding:1px; cursor:pointer; border-radius: 4px;" onclick="$('#errorDiv').hide(1000);">X</span>
+		  </div>
+    <% } %>
+	
+	<form class="box login" action="/" method="post" >
+		<fieldset class="boxBody">
+			<h2 align="center" style="color:rgb(107,76,155);">Login Science Priorities</h2>
+			<br>
+		  <label>Username:</label>
+		  <input name="username" type="text" tabindex="1" placeholder="" required>
+		  <label><a href="#" class="rLink" tabindex="5">Forget your password?</a>Password</label>
+		  <input name="password" type="password" tabindex="2" required>
+		</fieldset>
+		<footer>
+		  <!-- <label><input type="checkbox" tabindex="3">Keep me logged in</label> -->
+		  <input type="submit" class="btnLogin" value="Login" tabindex="4">
+		</footer>
+	</form>
+	<footer id="main">
+	  If you have any problem with the Science-Priorities tool please contact akhosra3@uwo.ca
+	</footer>
+	</body>
+</html>
+

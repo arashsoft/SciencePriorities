@@ -14,18 +14,23 @@ var cookieParser = require('cookie-parser');
 var errorHandler = require('errorhandler');
 var path = require('path');
 var config = require('./environment');
+var passport = require('passport');
+var flash = require('connect-flash');
+var session = require('express-session')
 
 module.exports = function(app) {
   var env = app.get('env');
 
-  app.set('views', config.root + '/server/views');
-  app.engine('html', require('ejs').renderFile);
-  app.set('view engine', 'html');
-  app.use(compression());
-  app.use(bodyParser.urlencoded({ extended: false }));
-  app.use(bodyParser.json());
-  app.use(methodOverride());
-  app.use(cookieParser());
+	app.set('views', config.root + '/server/views');
+	app.engine('ejs', require('ejs').renderFile);
+	app.set('view engine', 'ejs');
+	app.use(compression());
+	app.use(bodyParser.urlencoded({ extended: false }));
+	app.use(bodyParser.json());
+	app.use(methodOverride());
+	app.use(cookieParser('catkeyboard2'));
+	app.use(session({ maxAge: 60000 }))
+	app.use(flash());
   
   if ('production' === env) {
     app.use(favicon(path.join(config.root, 'public', 'favicon.ico')));

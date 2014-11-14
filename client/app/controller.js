@@ -57,6 +57,11 @@ angular.module('sciencePriorities2App').controller("layoutController" , ["$scope
 	// handle benchmark selection
 	$scope.layoutTypeClicked = function(selectedLayout){
 		$.get("/jsonrequest/"+$scope.selectedEntity+"/"+$scope.selectedProperty+"/"+ selectedLayout, function (jsonFile){
+			if (typeof jsonFile.redirect == 'string'){
+				window.location = jsonFile.redirect;
+			};
+           
+						  
 			if (selectedLayout=="barChart"){
 				createBarchart($scope.dropID, $scope.selectedEntity, $scope.selectedProperty, jsonFile);
 			}else if (selectedLayout=="pieChart"){
