@@ -79,11 +79,15 @@ module.exports = function(app) {
 	app.get('/jsonrequest/:entityName/:propertyName/:layoutName',function(req, res) {
 		if (req.isAuthenticated()){
 			jsonHandler.makeJson(req.params.entityName,req.params.propertyName,req.params.layoutName , function (jsonFile){
-				res.send(jsonFile);
+				if (jsonFile=="mysql connection error"){
+					res.send({"error":'Error: cannot connect to the database please contact with your server administrator'});
+				}else{
+					res.send(jsonFile);
+				}
 			});
 		}else{
 			req.flash('loginMessage', 'Please sign in!');
-			res.send({redirect: '/'});
+			res.send({"redirect": '/'});
 		}
 		
 		/* it is a wrong way to work with event-driven node.js
@@ -97,7 +101,8 @@ module.exports = function(app) {
   
   // main page
 	app.get('/main' , function(req, res) {
-		if (req.isAuthenticated()){
+		if (req.isAuthenticated()){  
+			//res.render('mainPage.html.ejs', { message: req.flash('loginMessage') });
 			res.sendfile(app.get('appPath') + '/mainPage.html');
 		}else{
 			req.flash('loginMessage', 'Please sign in!');
@@ -113,6 +118,7 @@ module.exports = function(app) {
 	 
 	app.get('/' , function(req, res) {
 		if (req.isAuthenticated()){
+			//res.render('mainPage.html.ejs', { message: req.flash('loginMessage') });
 			res.sendfile(app.get('appPath') + '/mainPage.html');
 		}else{
 			res.render('loginPage.ejs', { message: req.flash('loginMessage') });

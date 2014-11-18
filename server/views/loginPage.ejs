@@ -1,10 +1,10 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-	<title>Simple Login Form</title>
+	<title>Science Priorities - Login Page</title>
 	<meta charset="UTF-8" />
-	<meta name="Designer" content="PremiumPixels.com">
-	<meta name="Author" content="$hekh@r d-Ziner, CSSJUNTION.com">
+	<meta name="Designer" content="Arash Khosravi">
+	<meta name="Author" content="akhosra3[at]uwo.ca">
 	<link rel="stylesheet" type="text/css" href="app/css/loginPageReset.css">
 	<link rel="stylesheet" type="text/css" href="app/css/loginPageStructure.css">
 </head>
@@ -13,8 +13,8 @@
 	<script src="bower_components/jquery/dist/jquery.js"></script>
 	
 	<% if (message.length > 0) { %>
-        <div id="errorDiv" class="alert alert-danger alert-dismissible"><%= message %>
-				<span style="float:right; border: 1px solid #a94442; padding:1px; cursor:pointer; border-radius: 4px;" onclick="$('#errorDiv').hide(1000);">X</span>
+        <div class="alert alert-danger alert-dismissible"><%= message %>
+				<span style="float:right; border: 1px solid #a94442; padding:1px; cursor:pointer; border-radius: 4px;" onclick="$(this).parent().hide(1000);">X</span>
 		  </div>
     <% } %>
 	
