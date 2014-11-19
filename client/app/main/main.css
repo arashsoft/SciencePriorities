@@ -31,3 +31,20 @@
 	height: 100%;
 	overflow:hidden;
 }
+
+/* add new color to bootstrap primary */
+
+.label-primary{
+	background-color : rgb(107,76,155);
+}
+
+.btn-primary{
+	color: #fff;
+	background-color: rgb(107,76,155);
+	border-color: #3a1675;
+}
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open .dropdown-toggle.btn-primary {
+	color: #fff;
+	background-color: #4F2D84;
+	border-color: #3a1675;
+}

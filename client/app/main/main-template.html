@@ -64,7 +64,9 @@
 					{{benchmarkingEntity.name}} <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': benchmarkingEntity.isOpen, 'glyphicon-chevron-left': !benchmarkingEntity.isOpen}"></i>
 				</accordion-heading>
 		  
-				<label class="btn btn-default" x-lvl-draggable='true' ng-repeat="property in benchmarkingEntity.properties" selectedEntity="{{benchmarkingEntity.name}}" selectedProperty="{{property}}">{{property}}</label>
+				<h4  style="margin-top:5px;" x-lvl-draggable='true' ng-repeat="property in benchmarkingEntity.properties" selectedEntity="{{benchmarkingEntity.name}}" selectedProperty="{{property}}">
+					<span class="label label-primary">{{property}}</span>
+				</h3>
 			</accordion-group>
 		</accordion>
 	</div>
