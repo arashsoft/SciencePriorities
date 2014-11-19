@@ -31,7 +31,14 @@
 	height: 100%;
 	overflow:hidden;
 }
+.h4-big-margin{
+	margin-top:5px;
+	margin-bottom: 18px;
+}
 
+.label-bigPadding{
+	padding: .7em .6em;
+}
 /* add new color to bootstrap primary */
 
 .label-primary{
