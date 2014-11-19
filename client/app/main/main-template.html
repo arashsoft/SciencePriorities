@@ -2,9 +2,9 @@
 
 		$(document).ready(function () {
 			// main layout
-			$('#layoutDiv').layout({south__size:"58",east__size:"210",});
+			$('#layoutDiv').layout({south__size:"58",east__size:"210",resizable:false});
 			// west and east representation area			
-			westRepresentationLayout = $('#representationDiv').layout({west__size:"50%"}); 
+			westRepresentationLayout = $('#representationDiv').layout({west__size:"50%",resizable:true}); 
 			// north and south representatin areas
 			southRepresentationLayout = $('#eastRepresentationDiv').layout({south__size:"50%", resizable:true});
 			$('#westRepresentationDiv').layout({south__size:"50%",resizable:true});
