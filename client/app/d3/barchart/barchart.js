@@ -1,12 +1,16 @@
 // sample data : data = [{"name":"ads","value":8},{"name":"asdfg","value":2},{"name":"gfhgfhgf","value":5},{"name":"oiloi","value":10}]
 
-function createBarchart(parrentDivID, entityName, propertyName, data){
+/* TODO: multi layer system only support one level of hierarcy
+it is easy to fix with creating arrays of parentData
+*/
+
+function createBarchart(parentDivID, entityName, propertyName, data , parentData, parentPropertyName){
 	
-	var parrentObject = $("#"+parrentDivID);
+	var parentObject = $("#"+parentDivID);
 	
 	var margin = {top: 20, right: 20, bottom: 40, left: 80},
-		 width = parrentObject[0].clientWidth - margin.left - margin.right-50,
-		 height = parrentObject[0].clientHeight - margin.top - margin.bottom-25;
+		 width = parentObject[0].clientWidth - margin.left - margin.right-50,
+		 height = parentObject[0].clientHeight - margin.top - margin.bottom-25;
 
 	var color = d3.scale.category20();
 		 
@@ -24,15 +28,33 @@ function createBarchart(parrentDivID, entityName, propertyName, data){
 		 .scale(y)
 		 .orient("left");
 		 
-
-	parrentObject.empty();
-	var svg = d3.select("#"+parrentDivID).append("svg")
+	parentObject.empty();
+	var svg = d3.select("#"+parentDivID).append("svg")
 		 .attr("width", width + margin.left + margin.right)
 		 .attr("height", height + margin.top + margin.bottom)
 	  .append("g")
 		 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
 	
+	// add return buttton for multi layer barcharts
+	if (typeof(parentData) != "undefined"){
+		var tempG = svg.append("g");
+		tempG.on('click', function() {createBarchart(parentDivID, entityName, parentPropertyName, parentData)})
+		 .append("rect")
+			.attr("x", width-60)
+			.attr("y",1)
+			.attr("width",60)
+			.attr("height",30)
+			.attr("rx", 3)
+			.attr("ry", 3)
+			.style("fill", "rgb(107,76,155)");
+		tempG.append("text")
+		 .attr("x", width-45)
+		 .attr("y", 20)
+		 .attr ("fill","white")
+		 .attr ("font-size","14px")
+		 .attr("class", "clickableText")
+		 .text("Back");
+	}
 	
 	// fix long name problem with .substring(0,8)
 	var xDomainMap = new Array();
@@ -67,11 +89,16 @@ function createBarchart(parrentDivID, entityName, propertyName, data){
 		.attr("width", x.rangeBand())
 		.attr("y", function(d) { return y(d.value); })
 		.attr("height", function(d) { return height - y(d.value); })
+		.style("fill", function(d) { return color(xDomainMap[d.name]); })
 		.on('mouseover', tip.show)
       .on('mouseout', tip.hide)
-		.style("fill", function(d) { return color(xDomainMap[d.name]); });
-
-	
+		.on('click', function(d){
+			if (typeof d.child != 'undefined'){
+				createBarchart(parentDivID, entityName, d.name, d.child , data , propertyName);
+			}else{
+				return 0;
+			}
+		});
 		
 	svg.append("g")
 		.attr("class", "barchart x axis")
