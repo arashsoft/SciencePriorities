@@ -32,18 +32,23 @@ function createBarchart(parrentDivID, entityName, propertyName, data){
 	  .append("g")
 		 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-	// Done : add real data
-	//data = [{"name":"ads","value":8},{"name":"asdfg","value":2},{"name":"gfhgfhgf","value":5},{"name":"oiloi","value":10}]
 	
-	// todo fix substring problem
+	
 	// fix long name problem with .substring(0,8)
-	/*
 	var xDomainMap = new Array();
 	for (var i = 0; i < data.length; i++){
-		xDomainMap[i]=data[i].name.substring(0,8);
+		xDomainMap[data[i].name]=data[i].name.substring(0,8);
+	};
+	// rename duplicate names
+	for (var i = 0; i < data.length; i++){
+		for (var j = i+1; j < data.length; j++){
+			if (xDomainMap[data[i].name]==xDomainMap[data[j].name]){
+				xDomainMap[data[j].name] += ".";
+			}
+		}
 	}
-	*/
-	x.domain(data.map(function(d) { return d.name.substring(0,8); }));
+	
+	x.domain(data.map(function(d) { return xDomainMap[d.name] }));
 	y.domain([0, d3.max(data, function(d) { return d.value; })]);
 		
 	var tip = d3.tip()
@@ -58,13 +63,13 @@ function createBarchart(parrentDivID, entityName, propertyName, data){
 		.data(data)
 	 .enter().append("rect")
 		.attr("class", "barchart bar")
-		.attr("x", function(d) { return x(d.name.substring(0,8)); })
+		.attr("x", function(d) { return x(xDomainMap[d.name]); })
 		.attr("width", x.rangeBand())
 		.attr("y", function(d) { return y(d.value); })
 		.attr("height", function(d) { return height - y(d.value); })
 		.on('mouseover', tip.show)
       .on('mouseout', tip.hide)
-		.style("fill", function(d) { return color(d.name); });
+		.style("fill", function(d) { return color(xDomainMap[d.name]); });
 
 	
 		

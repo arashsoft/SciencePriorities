@@ -29,7 +29,7 @@ function createPiechart(parrentDivID, entityName, propertyName, data){
 		 .attr('class', 'piechart d3-tip')
 		 .offset([-10, 0])
 		 .html(function(d) {
-			 return "<strong>Name: </strong> <span style='color:red'>" + d.name + "</span><br><strong>Value: </strong> <span style='color:red'>" + d.value + "</span>";
+			 return "<strong>Name: </strong> <span style='color:red'>" + d.data.name + "</span><br><strong>Value: </strong> <span style='color:red'>" + d.value + "</span>";
 		 });
 		svg.call(tip);
 	tip.direction('e');
@@ -54,7 +54,7 @@ function createPiechart(parrentDivID, entityName, propertyName, data){
 		.attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
 		.attr("dy", ".35em")
 		.style("text-anchor", "middle")
-		.text(function(d) { return d.data.name.substring(0,12); });
+		.text(function(d) { return d.data.name.substring(0,9); });
 
 
 }
