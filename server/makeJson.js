@@ -21,8 +21,31 @@ exports.makeJson = function(entityName, propertyName, layoutName, callback){
 			case "Awards|Universities|barChart":
 			case "Awards|Universities|pieChart":
 				connection.query("select U.Short_Name as name, sum(A.Amount) as value from award as A join department as D on A.Department=D.ID join faculty as F on D.Faculty=F.ID join university as U on F.University=U.ID where A.ID <=20074 GROUP BY U.Long_Name", function(err, rows, fields) {
-					connection.end();
-					callback(rows);
+					connection.query("select U.Short_Name as name, sum(A.Amount) as value , D.name as department from award as A join department as D on A.Department=D.ID join faculty as F on D.Faculty=F.ID join university as U on F.University=U.ID where A.ID <=20074 GROUP BY U.Long_Name, D.name" , function (err2, rows2, fields2) {
+						connection.end();
+						console.log(rows[1].name);
+						// make childs for multi layer bar chart
+						var jsonArray = new Array();
+						for (var i = 0 ; i < rows.length ; i++){
+							jsonArray[rows[i].name] = new Object();
+							jsonArray[rows[i].name].name= rows[i].name;
+							jsonArray[rows[i].name].value = rows[i].value;
+							jsonArray[rows[i].name].child = new Array();
+						}
+						for (var i = 0 ; i < rows2.length ; i++){
+							var tempChild = new Object();
+							tempChild.name = rows2[i].department;
+							tempChild.value = rows2[i].value;
+							jsonArray[rows2[i].name].child.push(tempChild);
+							console.log(jsonArray[rows2[i].name]);
+						}
+						// convert result to accepted json format
+						var jsonFile = new Array();
+						for (var i = 0 ; i < rows.length ; i++){
+							jsonFile.push(jsonArray[rows[i].name])
+						}
+						callback(jsonFile);
+					});
 				});
 				break;
 			case "Awards|Departments|barChart":
