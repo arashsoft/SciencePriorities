@@ -28,27 +28,6 @@ function createPiechart(parentDivID, entityName, propertyName, data , parentData
 		 .attr("height", height)
 	  .append("g")
 		 .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-
-	// add return buttton for multi layer barcharts
-	if (typeof(parentData) != "undefined"){
-		var tempG = svg.append("g");
-		tempG.on('click', function() {createBarchart(parentDivID, entityName, parentPropertyName, parentData)})
-		 .append("rect")
-			.attr("x", width/2 - 100)
-			.attr("y",-( height / 2)+40)
-			.attr("width",60)
-			.attr("height",30)
-			.attr("rx", 3)
-			.attr("ry", 3)
-			.style("fill", "rgb(107,76,155)");
-		tempG.append("text")
-		 .attr("x", width/2 - 87)
-		 .attr("y", -( height / 2)+60)
-		 .attr ("fill","white")
-		 .attr ("font-size","14px")
-		 .attr("class", "clickableText")
-		 .text("Back");
-	}
 	
 	// TODO: fix tooltip position
 	var tip = d3.tip()
@@ -91,5 +70,24 @@ function createPiechart(parentDivID, entityName, propertyName, data , parentData
 		.style("text-anchor", "middle")
 		.text(function(d) { return d.data.name.substring(0,9); });
 
-
+	// add return buttton for multi layer barcharts
+	if (typeof(parentData) != "undefined"){
+		var tempG = svg.append("g");
+		tempG.on('click', function() {createPiechart(parentDivID, entityName, parentPropertyName, parentData)})
+		 .append("rect")
+			.attr("x", width/2 - 100)
+			.attr("y",-( height / 2)+40)
+			.attr("width",60)
+			.attr("height",30)
+			.attr("rx", 3)
+			.attr("ry", 3)
+			.style("fill", "rgb(107,76,155)");
+		tempG.append("text")
+		 .attr("x", width/2 - 87)
+		 .attr("y", -( height / 2)+60)
+		 .attr ("fill","white")
+		 .attr ("font-size","14px")
+		 .attr("class", "clickableText")
+		 .text("Back");
+	}
 }

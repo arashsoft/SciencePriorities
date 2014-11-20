@@ -23,7 +23,6 @@ exports.makeJson = function(entityName, propertyName, layoutName, callback){
 				connection.query("select U.Short_Name as name, sum(A.Amount) as value from award as A join department as D on A.Department=D.ID join faculty as F on D.Faculty=F.ID join university as U on F.University=U.ID where A.ID <=20074 GROUP BY U.Long_Name", function(err, rows, fields) {
 					connection.query("select U.Short_Name as name, sum(A.Amount) as value , D.name as department from award as A join department as D on A.Department=D.ID join faculty as F on D.Faculty=F.ID join university as U on F.University=U.ID where A.ID <=20074 GROUP BY U.Long_Name, D.name" , function (err2, rows2, fields2) {
 						connection.end();
-						console.log(rows[1].name);
 						// make childs for multi layer bar chart
 						var jsonArray = new Array();
 						for (var i = 0 ; i < rows.length ; i++){
@@ -37,7 +36,6 @@ exports.makeJson = function(entityName, propertyName, layoutName, callback){
 							tempChild.name = rows2[i].department;
 							tempChild.value = rows2[i].value;
 							jsonArray[rows2[i].name].child.push(tempChild);
-							console.log(jsonArray[rows2[i].name]);
 						}
 						// convert result to accepted json format
 						var jsonFile = new Array();

@@ -35,27 +35,6 @@ function createBarchart(parentDivID, entityName, propertyName, data , parentData
 	  .append("g")
 		 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 	
-	// add return buttton for multi layer barcharts
-	if (typeof(parentData) != "undefined"){
-		var tempG = svg.append("g");
-		tempG.on('click', function() {createBarchart(parentDivID, entityName, parentPropertyName, parentData)})
-		 .append("rect")
-			.attr("x", width-60)
-			.attr("y",1)
-			.attr("width",60)
-			.attr("height",30)
-			.attr("rx", 3)
-			.attr("ry", 3)
-			.style("fill", "rgb(107,76,155)");
-		tempG.append("text")
-		 .attr("x", width-45)
-		 .attr("y", 20)
-		 .attr ("fill","white")
-		 .attr ("font-size","14px")
-		 .attr("class", "clickableText")
-		 .text("Back");
-	}
-	
 	// fix long name problem with .substring(0,8)
 	var xDomainMap = new Array();
 	for (var i = 0; i < data.length; i++){
@@ -90,7 +69,10 @@ function createBarchart(parentDivID, entityName, propertyName, data , parentData
 		.attr("y", function(d) { return y(d.value); })
 		.attr("height", function(d) { return height - y(d.value); })
 		.style("fill", function(d) { return color(xDomainMap[d.name]); })
-		.on('mouseover', tip.show)
+		.on('mouseover', function(d){
+			tip.hide(d);
+			tip.show(d);
+		})
       .on('mouseout', tip.hide)
 		.on('click', function(d){
 			if (typeof d.child != 'undefined'){
@@ -120,7 +102,27 @@ function createBarchart(parentDivID, entityName, propertyName, data , parentData
 		.attr("dy", ".71em")
 		.style("text-anchor", "end")
 		.text(entityName);
-
+	
+	// add return buttton for multi layer barcharts
+	if (typeof(parentData) != "undefined"){
+		var tempG = svg.append("g");
+		tempG.on('click', function() {createBarchart(parentDivID, entityName, parentPropertyName, parentData)})
+		 .append("rect")
+			.attr("x", width-60)
+			.attr("y",1)
+			.attr("width",60)
+			.attr("height",30)
+			.attr("rx", 3)
+			.attr("ry", 3)
+			.style("fill", "rgb(107,76,155)");
+		tempG.append("text")
+		 .attr("x", width-45)
+		 .attr("y", 20)
+		 .attr ("fill","white")
+		 .attr ("font-size","14px")
+		 .attr("class", "clickableText")
+		 .text("Back");
+	}
 
 }
 
