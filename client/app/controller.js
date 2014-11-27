@@ -70,9 +70,9 @@ angular.module('sciencePriorities2App').controller("layoutController" , ["$scope
 				$($element).append('<div class="alert alert-danger alert-dismissible" style="margin:10px;">'+jsonFile.error +'<span style="float:right; border: 1px solid #a94442; padding:1px; cursor:pointer; border-radius: 4px;" onclick="$(this).parent().hide(1000);">X</span> </div>');
 				return;
 			}
-			
+			clearInterval($scope.intervalID);
 			if (selectedLayout=="barChart"){
-				createBarchart($scope.dropID, $scope.selectedEntity, $scope.selectedProperty, jsonFile);
+				$scope.intervalID = createBarchart($scope.dropID, $scope.selectedEntity, $scope.selectedProperty, jsonFile);
 			}else if (selectedLayout=="pieChart"){
 				createPiechart($scope.dropID, $scope.selectedEntity, $scope.selectedProperty, jsonFile);
 			}
