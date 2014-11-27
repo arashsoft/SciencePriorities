@@ -15,7 +15,7 @@ function createPiechart(parentDivID, entityName, propertyName, data , parentData
 	var color = d3.scale.category20();
 
 	var arc = d3.svg.arc()
-		 .outerRadius(radius - 10)
+		 .outerRadius(radius - 20)
 		 .innerRadius(0);
 
 	var pie = d3.layout.pie()
@@ -60,12 +60,19 @@ function createPiechart(parentDivID, entityName, propertyName, data , parentData
 				}
 		});
 		
-
-  g.append("path")
+	// add property name
+	var chartText = svg.append("text")
+	 .attr("y", (height/2) - 5)
+	 .attr("x", "0px")
+	 .attr ("font-size","14px")
+	 .style("text-anchor", "middle")
+	 .text(entityName + " - " + propertyName);
+	
+	g.append("path")
 		.attr("d", arc)
 		.style("fill", function(d) { return color(d.data.name); });
 		
-  g.append("text")
+	g.append("text")
 		.attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
 		.attr("dy", ".35em")
 		.style("text-anchor", "middle")
@@ -96,13 +103,13 @@ function createPiechart(parentDivID, entityName, propertyName, data , parentData
 		 .text("Back");
 	}
 	function resizePiechart(){
-		// skip resize for screens smaller than 40px * 40px
-		if (height < 40 || width < 40){
+		// skip resize for screens smaller than 150px * 150px
+		if (height < 150 || width < 150){
 			return;
 		}
 		
 		radius = Math.min(width, height) / 2;
-		arc.outerRadius(radius - 10);
+		arc.outerRadius(radius - 20);
 		d3.select("#"+parentDivID).select("svg")
 		 .attr("width", width)
 		 .attr("height", height);
@@ -111,6 +118,7 @@ function createPiechart(parentDivID, entityName, propertyName, data , parentData
 		g.select("path").attr("d", arc);
 		g.select("text").attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; });
 		
+		chartText.attr("y", (height/2) - 5);
 		// move back button
 		if (typeof(parentData) != "undefined"){
 			backButtonG.select("rect")

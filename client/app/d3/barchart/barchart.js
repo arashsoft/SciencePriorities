@@ -94,7 +94,7 @@ function createBarchart(parentDivID, entityName, propertyName, data , parentData
 		.attr("x", width/2)
 		.attr("dy", "2.2em")
 		.attr ("font-size","14px")
-		.style("text-anchor", "end")
+		.style("text-anchor", "middle")
 		.text(propertyName);
 
 	svg.append("g")
