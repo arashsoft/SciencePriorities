@@ -74,7 +74,7 @@ angular.module('sciencePriorities2App').controller("layoutController" , ["$scope
 			if (selectedLayout=="barChart"){
 				$scope.intervalID = createBarchart($scope.dropID, $scope.selectedEntity, $scope.selectedProperty, jsonFile);
 			}else if (selectedLayout=="pieChart"){
-				createPiechart($scope.dropID, $scope.selectedEntity, $scope.selectedProperty, jsonFile);
+				$scope.intervalID = createPiechart($scope.dropID, $scope.selectedEntity, $scope.selectedProperty, jsonFile);
 			}
 		});
 	};
