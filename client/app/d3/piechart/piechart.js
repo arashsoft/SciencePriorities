@@ -73,6 +73,7 @@ function createPiechart(parentDivID, entityName, propertyName, data , parentData
 		.style("fill", function(d) { return color(d.data.name); });
 		
 	g.append("text")
+		.attr("class","notSelectable")
 		.attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
 		.attr("dy", ".35em")
 		.style("text-anchor", "middle")
