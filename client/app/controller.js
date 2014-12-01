@@ -38,29 +38,37 @@ angular.module('sciencePriorities2App').controller("CenterController" , ["$scope
 		angular.element(dropDiv[0]).scope().selectedProperty= drag[0].attributes.selectedProperty.value;
 		angular.element(dropDiv[0]).scope().dropID = dropDiv[0].id;
 		
+		//remove old benchmarkSelect
+		/*
+		var oldBenchmarkSelect = dropDiv.select(".benchmarkSelect");
+		if (typeof oldBenchmarkSelect != "undefined" ){
+			oldBenchmarkSelect.remove();
+		}*/
+		
 		// load select benchmark template
 		$.get("app/benchmarkMenu/benchmarkMenu.html", function(htmlFile) {	
 		
-			//angular.element(dropDiv[0]).scope().HTMLplace= htmlFile;
-			var $el= $("#"+dropEl+ " > div").empty().append(htmlFile);
-			// compile the code to angular scope so call methods works properly
+			var $el= $("#"+dropEl+ " > div").append(htmlFile);
+			// compile the html template to angular scope so call methods works properly
 			$compile($el)(angular.element(dropDiv[0]).scope());
 			
-			// jquery code which is not acceptable in angular
-			//$("#"+dropEl+ " > div").empty().append(htmlFile);
+			// the apply function make sure binding values are set
+			angular.element(dropDiv[0]).scope().$apply();
 		});
 	};
 }]);
 
 angular.module('sciencePriorities2App').controller("layoutController" , ["$scope","$element",function($scope , $element){
 	// $scope.dropID $scope.selectedProperty and $scope.selectedEntity set by drag&drop controller
-
+	
 	// handle benchmark selection
 	$scope.layoutTypeClicked = function(selectedLayout){
 		$.get("/jsonrequest/"+$scope.selectedEntity+"/"+$scope.selectedProperty+"/"+ selectedLayout, function (jsonFile){
 			// if the session was expire or user loged out of the tool
 			if (typeof jsonFile.redirect == 'string'){
+				clearInterval($scope.intervalID);
 				window.location = jsonFile.redirect;
+				return;
 			};
 			
 			// if the mysql server was down or any other types of error
@@ -71,6 +79,8 @@ angular.module('sciencePriorities2App').controller("layoutController" , ["$scope
 				return;
 			}
 			clearInterval($scope.intervalID);
+			// Done: layouts empty the div, we should do it here instead of layouts
+			$("#"+$scope.dropID).empty();
 			if (selectedLayout=="barChart"){
 				$scope.intervalID = createBarchart($scope.dropID, $scope.selectedEntity, $scope.selectedProperty, jsonFile);
 			}else if (selectedLayout=="pieChart"){
@@ -79,5 +89,4 @@ angular.module('sciencePriorities2App').controller("layoutController" , ["$scope
 		});
 	};
 }]);
-
 

@@ -1,7 +1,11 @@
-<div align="center" style="top: 45%;position: relative;">
-	<h5>Select one of the available representations:</h5>
-	<br>
-	<button class="btn btn-primary" ng-click="layoutTypeClicked('barChart')" >Bar chart</button>
-	<button class="btn btn-primary" ng-click="layoutTypeClicked('pieChart')" >Pie chart</button>
-	<button class="btn btn-primary" ng-click="layoutTypeClicked('lineGraph')" >Line Graph</button>
+<div class="benchmarkSelect">
+	<div align="center" class="benchmarkSelectDiv">
+		<div class="btn btn-danger" style="position:absolute;top:0px;right:5px; padding: 3px 8px;" onclick="var tempObject = $(this).parent().parent(); tempObject.hide(1000,function(){tempObject.remove()});">X</div>
+		<h5>{{selectedEntity}} -- {{selectedProperty}}</h5>
+		<h5 class="notSelectable" >Select one of the available representations:</h5>
+		<br>
+		<button class="btn btn-primary" ng-click="layoutTypeClicked('barChart')" >Bar chart</button>
+		<button class="btn btn-primary" ng-click="layoutTypeClicked('pieChart')" >Pie chart</button>
+		<button class="btn btn-primary" ng-click="layoutTypeClicked('lineGraph')" >Line Graph</button>
+	</div>
 </div>
