@@ -3,11 +3,12 @@
 exports.makeJson = function(entityName, propertyName, layoutName, callback){
 		
 	var mysql = require('mysql');
+	var mysqlConf = require('./config/mysql.config');
 	var connection = mysql.createConnection({
-	  host : 'localhost',
-	  user : 'root',
-	  password : '',
-	  database : 'researchmap'
+	  host : mysqlConf.HOST,
+	  user : mysqlConf.USER,
+	  password : mysqlConf.PASSWORD,
+	  database : mysqlConf.DATABASE
 	});
 	//connection.connect();
 	connection.connect(function(err) {
