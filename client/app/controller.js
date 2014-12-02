@@ -33,6 +33,9 @@ angular.module('sciencePriorities2App').controller("CenterController" , ["$scope
 		// in fact, dropDiv is $($element),
 		var dropDiv = $("#"+dropEl+ " > div");
 		
+		// remove previous benchmark select
+		dropDiv.find(".benchmarkSelect").remove();
+		
 		// pass drag parameters and drop-div id to associated controller scope
 		angular.element(dropDiv[0]).scope().selectedEntity= drag[0].attributes.selectedEntity.value;
 		angular.element(dropDiv[0]).scope().selectedProperty= drag[0].attributes.selectedProperty.value;
@@ -75,7 +78,7 @@ angular.module('sciencePriorities2App').controller("layoutController" , ["$scope
 			if (typeof jsonFile.error == 'string'){
 				// I know its against angular manners but I prefer to manipulate DOM element directly
 				// TODO: rewrite this code with angular
-				$($element).append('<div class="alert alert-danger alert-dismissible" style="margin:10px;">'+jsonFile.error +'<span style="float:right; border: 1px solid #a94442; padding:1px; cursor:pointer; border-radius: 4px;" onclick="$(this).parent().hide(1000);">X</span> </div>');
+				$($element).find(".benchmarkSelect").append('<div class="alert alert-danger alert-dismissible" style="margin:10px; font-size:12px;">'+jsonFile.error +'<span style="float:right; border: 1px solid #a94442; padding:1px; cursor:pointer; border-radius: 4px;" onclick="$(this).parent().hide(1000);">X</span> </div>');
 				return;
 			}
 			clearInterval($scope.intervalID);

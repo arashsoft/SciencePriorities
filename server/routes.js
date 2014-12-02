@@ -81,6 +81,8 @@ module.exports = function(app) {
 			jsonHandler.makeJson(req.params.entityName,req.params.propertyName,req.params.layoutName , function (jsonFile){
 				if (jsonFile=="mysql connection error"){
 					res.send({"error":'Error: cannot connect to the database please contact with your server administrator'});
+				}else if ( jsonFile=="unknown visualizaition request"){
+					res.send({"error":'Your requested visualization is not available.'});
 				}else{
 					res.send(jsonFile);
 				}

@@ -96,8 +96,8 @@ exports.makeJson = function(entityName, propertyName, layoutName, callback){
 				//code block
 				break;
 			default:
-				console.log("unknown visualizaition request");
 				connection.end();
+				callback("unknown visualizaition request");
 		}
 	});
 }
