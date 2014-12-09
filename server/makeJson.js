@@ -95,6 +95,35 @@ exports.makeJson = function(entityName, propertyName, layoutName, callback){
 			case "Students":
 				//code block
 				break;
+			case "Collaboration|Node-Link|null":
+				connection.query("SELECT ap.Grant, GROUP_CONCAT(P.ID SEPARATOR '#')  as Professors, GROUP_CONCAT(P.Department_Primary SEPARATOR '#') as Departments FROM (select CONCAT(award_professor.Grant, award_professor.Professor) as tempColumn, award_professor.Grant, award_professor.Professor, award_professor.ID from award_professor group by tempColumn) as ap join professor as P on P.ID= ap.Professor  GROUP BY ap.Grant having count(ap.grant) > 1" , function (err,rows,fields){
+					connection.query("select P.ID as ID, concat(cast(P.Firstname as char(15)),',',cast(P.Middlename as CHAR(15)),' ',P.Lastname)  as name , D.name as department from award_professor2 as AP2 join professor as P on P.Id=AP2.professor join department as D on D.ID = P.Department_Primary where AP2.Grant in (select multiGrants.* from (select AP.Grant from award_professor2 as AP group by AP.Grant having count(AP.Grant)>1) as multiGrants) group by AP2.Professor", function(err2,rows2,fields2){
+						// rows2 is professors IDs (nodes)					
+						var jsonFile = new Object();
+						jsonFile.nodes = rows2;
+						
+						// make hash table to convert Link IDs to indexes
+						var nodeHash = new Object();
+						for (var i =0; i < rows2.length; i++){
+							nodeHash[rows2[i].ID] = i;
+						}
+						
+						jsonFile.links = new Array();
+						for (var i=0; i < rows.length; i++){
+							var professorIDs = rows[i].Professors.split("#");
+							var departmentIDs = rows[i].Departments.split("#");
+							for (var j1=0; j1 < professorIDs.length; j1++){
+								for (var j2=0; j2 < professorIDs.length; j2++){
+									if (j1 == j2) continue;
+									jsonFile.links.push({source: nodeHash[professorIDs[j1]],target:nodeHash[professorIDs[j2]],type:"award", linkType:(departmentIDs[j1]==departmentIDs[j2] ? 1:0)});
+								}
+							}
+						}
+						connection.end();
+						callback(jsonFile);
+					});
+				});			
+				break;
 			default:
 				connection.end();
 				callback("unknown visualizaition request");

@@ -66,12 +66,25 @@
 		  
 				<h4 class="h4-big-margin" x-lvl-draggable='true' ng-repeat="property in benchmarkingEntity.properties" selectedEntity="{{benchmarkingEntity.name}}" selectedProperty="{{property}}">
 					<span class="label label-primary label-bigPadding">{{property}}</span>
-				</h3>
+				</h4>
 			</accordion-group>
 		</accordion>
 	</div>
 	
-	<div class="ui-layout-west">Advanced Visualization</div>
+	<div class="ui-layout-west">
+		<h6 align="center" >Advanced Visualization</h6>
+		<accordion close-others="0">
+			<accordion-group ng-repeat="advancedLayout in advancedLayouts" is-open="advancedLayout.isOpen" >
+				<accordion-heading>
+					{{advancedLayout.name}} <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': advancedLayout.isOpen, 'glyphicon-chevron-left': !advancedLayout.isOpen}"></i>
+				</accordion-heading>
+				
+				<h4 class="h4-big-margin" x-lvl-draggable='true' ng-repeat="property in advancedLayout.properties" selectedType="Advanced" selectedEntity="{{advancedLayout.name}}" selectedProperty="{{property}}">
+					<span class="label label-primary label-bigPadding">{{property}}</span>
+				</h4>
+			</accordion-group>
+		</accordion>
+	</div>
 	
 	<div class="ui-layout-south" align="center">
 		<img src="assets/images/science_logo.png">

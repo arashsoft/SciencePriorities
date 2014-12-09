@@ -15,3 +15,10 @@
 	background-color:white;
 	padding:3%;
 }
+
+.close-btn{
+	position:absolute;
+	top:0px;
+	right:5px;
+	padding: 3px 8px;
+}
