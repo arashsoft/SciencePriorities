@@ -95,53 +95,60 @@ exports.makeJson = function(entityName, propertyName, layoutName, callback){
 			case "Students":
 				//code block
 				break;
-			case "Collaboration|Node-Link|null":
+			case "Collaboration|Node-Link|null":	
 			case "Collaboration|Matrix-Link|null":
-				
 				// this function runs after queries return
 				function dataIsReady(data){	
-					// rows2 is professors IDs (nodes)					
 					var jsonFile = new Object();
-					jsonFile.nodes = data.rows2;
+					jsonFile.nodes = data.nodes;
+					jsonFile.departments = data.departments;
 					
-					// make hash table to convert Link IDs to indexes
+					// make hash table to convert Link IDs(node names) to their indexes
+					// we have to it because of d3.force bug (it does not support node names as source and target)
 					var nodeHash = new Object();
-					for (var i =0; i < data.rows2.length; i++){
-						nodeHash[data.rows2[i].ID] = i;
+					for (var i =0; i < data.nodes.length; i++){
+						nodeHash[data.nodes[i].ID] = i;
 					}
 					
 					jsonFile.links = new Array();
-					for (var i=0; i < data.rows.length; i++){
-						var professorIDs = data.rows[i].Professors.split("#");
-						var departmentIDs = data.rows[i].Departments.split("#");
-						for (var j1=0; j1 < professorIDs.length; j1++){
-							for (var j2=0; j2 < professorIDs.length; j2++){
-								if (j1 == j2) continue;
-								jsonFile.links.push({source: nodeHash[professorIDs[j1]],target:nodeHash[professorIDs[j2]],type:"award", linkType:(departmentIDs[j1]==departmentIDs[j2] ? 1:0)});
+					for (var i=0 , length =data.links.length ; i < length; i++){
+						var professorIDs = data.links[i].Professors.split("#");
+						var departmentNames = data.links[i].Departments.split("#");
+						for (var j1=0 , j1Length = professorIDs.length; j1 < j1Length; j1++){
+							for (var j2= j1+1; j2 < j1Length; j2++){
+								jsonFile.links.push({source: nodeHash[professorIDs[j1]],target:nodeHash[professorIDs[j2]],type:"award", linkType:(departmentNames[j1]==departmentNames[j2] ? departmentNames[j1]:0)});
 							}
 						}
 					}
 					connection.end();
 					callback(jsonFile);
 				}
-				// we want to run 3 query synchronously and then return their results to dataIsReady
-				var queryNumber = 1;
+				// we want to run 3 query synchronously and then return their results to dataIsReady(data)
+				var queryNumber = 3;
 				var tempData = new Array();
-				connection.query("SELECT ap.Grant, GROUP_CONCAT(P.ID SEPARATOR '#')  as Professors, GROUP_CONCAT(P.Department_Primary SEPARATOR '#') as Departments FROM (select CONCAT(award_professor.Grant, award_professor.Professor) as tempColumn, award_professor.Grant, award_professor.Professor, award_professor.ID from award_professor group by tempColumn) as ap join professor as P on P.ID= ap.Professor  GROUP BY ap.Grant having count(ap.grant) > 1" , function (err,rows,fields){
-					tempData.rows = rows;
+				connection.query("SELECT ap.Grant, GROUP_CONCAT(P.ID SEPARATOR '#')  as Professors, GROUP_CONCAT(D.name SEPARATOR '#') as Departments FROM (select CONCAT(award_professor.Grant, award_professor.Professor) as tempColumn, award_professor.Grant, award_professor.Professor, award_professor.ID from award_professor group by tempColumn) as ap join professor as P on P.ID= ap.Professor join department as D on P.Department_Primary=D.ID GROUP BY ap.Grant having count(ap.grant) > 1" , function (err,rows,fields){
+					tempData.links = rows;
 					// check if other queries already returned or not
-					if (0 == queryNumber--){
+					if (1 == queryNumber--){
 						dataIsReady(tempData);
 					}
 				});
 				
-				connection.query("select P.ID as ID, concat(cast(P.Firstname as char(15)),',',cast(P.Middlename as CHAR(15)),' ',P.Lastname)  as name , D.name as department from award_professor2 as AP2 join professor as P on P.Id=AP2.professor join department as D on D.ID = P.Department_Primary where AP2.Grant in (select multiGrants.* from (select AP.Grant from award_professor2 as AP group by AP.Grant having count(AP.Grant)>1) as multiGrants) group by AP2.Professor", function(err2,rows2,fields2){
-					tempData.rows2 = rows2;
+				connection.query("select P.ID as ID, concat(cast(P.Firstname as char(15)),',',cast(P.Middlename as CHAR(15)),' ',P.Lastname)  as name , D.name as department from award_professor2 as AP2 join professor as P on P.Id=AP2.professor join department as D on D.ID = P.Department_Primary where AP2.Grant in (select multiGrants.* from (select AP.Grant from award_professor2 as AP group by AP.Grant having count(AP.Grant)>1) as multiGrants) group by AP2.Professor", function(err,rows,fields){
+					tempData.nodes = rows;
 					// check if other queries already returned or not
-					if (0 == queryNumber--){
+					if (1 == queryNumber--){
 						dataIsReady(tempData);
 					}
 				});
+				connection.query("select distinct D.name as name from award_professor2 as AP2 join professor as P on P.Id=AP2.professor join department as D on D.ID = P.Department_Primary where AP2.Grant in (select multiGrants.* from (select AP.Grant from award_professor2 as AP group by AP.Grant having count(AP.Grant)>1) as multiGrants) group by AP2.Professor", function(err,rows,fields){
+					tempData.departments = rows;
+					// check if other queries already returned or not
+					if (1 == queryNumber--){
+						dataIsReady(tempData);
+					}
+				});
+				
 				break;
 			default:
 				connection.end();

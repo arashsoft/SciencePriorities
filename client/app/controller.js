@@ -136,6 +136,8 @@ angular.module('sciencePriorities2App').controller("layoutController" , ["$scope
 				$scope.intervalID = createNodeLink($scope.dropID, jsonFile);
 			}else if ($scope.selectedProperty=="Matrix"){
 				$scope.intervalID = createMatrix($scope.dropID, jsonFile);
+			}else if ($scope.selectedProperty=="Matrix-Link"){
+				$scope.intervalID = createMatrixLink($scope.dropID, jsonFile);
 			}
 		});
 	}

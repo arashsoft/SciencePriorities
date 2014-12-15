@@ -1,6 +1,7 @@
 /* sample data:
-nodes: [{name:"abc"},{name:"def"},{name:"123"},{name:546}]
-links : [{source:"abc",target:"123"},{source:"546",target:"def"}]
+nodes: [{name:"abc"},{name:"def"},{name:"123"},{name:546}],
+links : [{source:"adc.id",target:"123.id", type:"award" , linkType:"departmentName or 0" },{source:"546",target:"def", ...}],
+departments : [{chemistry},{computer science},{biology}]
 */
 function  createNodeLink(parentDivID, jsonFile){
 

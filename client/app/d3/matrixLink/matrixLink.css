@@ -1,0 +1,21 @@
+.matrixLink.node {
+	stroke: #fff;
+	stroke-width: 1.5px;
+}
+
+.matrixLink.link {
+	stroke: #999;
+	stroke-opacity: 1;
+	stroke-width: 0.3;
+}
+
+.matrixLink.background{
+	fill: #eee;
+	stroke-width: 1;
+	stroke:black;
+	opacity: 0.9;
+}
+.matrixLink.background.drag{
+	stroke:blue;
+	stroke-width: 2;
+}
