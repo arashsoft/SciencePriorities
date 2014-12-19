@@ -29,7 +29,7 @@ module.exports = function(app) {
 	app.use(bodyParser.json());
 	app.use(methodOverride());
 	app.use(cookieParser('catkeyboard2'));
-	app.use(session({ maxAge: 60000 }))
+	app.use(session({ maxAge: 6000000 }))
 	app.use(flash());
   
   if ('production' === env) {
