@@ -64,7 +64,7 @@
 					{{benchmarkingEntity.name}} <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': benchmarkingEntity.isOpen, 'glyphicon-chevron-left': !benchmarkingEntity.isOpen}"></i>
 				</accordion-heading>
 		  
-				<h4 ng-drag="true" ng-drag-data="obj" ng-drag-success="onDragComplete($data,$event)" class="h4-big-margin" x-lvl-draggable='true' ng-repeat="property in benchmarkingEntity.properties" selectedEntity="{{benchmarkingEntity.name}}" selectedProperty="{{property}}">
+				<h4 ng-drag="true" class="h4-big-margin" x-lvl-draggable='true' ng-repeat="property in benchmarkingEntity.properties" selectedEntity="{{benchmarkingEntity.name}}" selectedProperty="{{property}}">
 					<span class="label label-primary label-bigPadding">{{property}}</span>
 				</h4>
 			</accordion-group>
@@ -79,7 +79,7 @@
 					{{advancedLayout.name}} <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': advancedLayout.isOpen, 'glyphicon-chevron-left': !advancedLayout.isOpen}"></i>
 				</accordion-heading>
 				
-				<h4 class="h4-big-margin" x-lvl-draggable='true' ng-repeat="property in advancedLayout.properties" selectedType="Advanced" selectedEntity="{{advancedLayout.name}}" selectedProperty="{{property}}">
+				<h4 ng-drag="true" class="h4-big-margin" x-lvl-draggable='true' ng-repeat="property in advancedLayout.properties" selectedType="Advanced" selectedEntity="{{advancedLayout.name}}" selectedProperty="{{property}}">
 					<span class="label label-primary label-bigPadding">{{property}}</span>
 				</h4>
 			</accordion-group>
