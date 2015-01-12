@@ -24,24 +24,24 @@
 	<div  id="representationDiv" class="ui-layout-center" ng-controller="CenterController" style="padding:0px;">
 		
 		<div id="eastRepresentationDiv" class="ui-layout-center" style="padding:0px;">
-			<div class="ui-layout-center " x-lvl-drop-target='true' x-on-drop='dropped(dragEl, dropEl)' style="padding:0px;">
+			<div class="ui-layout-center " ng-drop="true" ng-drop-success="onDropComplete('screen1',$event)" x-lvl-drop-target='true' x-on-drop='dropped(dragEl, dropEl)' style="padding:0px;">
 				<div class="max-screen" id="screen1" ng-controller="layoutController" >
 			
 				</div>
 			</div>
-			<div class="ui-layout-south" x-lvl-drop-target='true' x-on-drop='dropped(dragEl, dropEl)' style="padding:0px;">
+			<div class="ui-layout-south" ng-drop="true" ng-drop-success="onDropComplete('screen2',$event)" x-lvl-drop-target='true' x-on-drop='dropped(dragEl, dropEl)' style="padding:0px;">
 				<div class="max-screen" id="screen2" ng-controller="layoutController" >
 			
 				</div>
 			</div>
 		</div>
 		<div id="westRepresentationDiv" class="ui-layout-west" style="padding:0px;">
-			<div class="ui-layout-center" x-lvl-drop-target='true' x-on-drop='dropped(dragEl, dropEl)' style="padding:0px;">
+			<div class="ui-layout-center" ng-drop="true" ng-drop-success="onDropComplete('screen3',$event)" x-lvl-drop-target='true' x-on-drop='dropped(dragEl, dropEl)' style="padding:0px;">
 				<div class="max-screen" id="screen3" ng-controller="layoutController" >
 			
 				</div>
 			</div>
-			<div class="ui-layout-south" x-lvl-drop-target='true' x-on-drop='dropped(dragEl, dropEl)' style="padding:0px;">
+			<div class="ui-layout-south" ng-drop="true" ng-drop-success="onDropComplete('screen4',$event)" x-lvl-drop-target='true' x-on-drop='dropped(dragEl, dropEl)' style="padding:0px;">
 				<div class="max-screen" id="screen4" ng-controller="layoutController" >
 			
 				</div>
@@ -64,7 +64,7 @@
 					{{benchmarkingEntity.name}} <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': benchmarkingEntity.isOpen, 'glyphicon-chevron-left': !benchmarkingEntity.isOpen}"></i>
 				</accordion-heading>
 		  
-				<h4 class="h4-big-margin" x-lvl-draggable='true' ng-repeat="property in benchmarkingEntity.properties" selectedEntity="{{benchmarkingEntity.name}}" selectedProperty="{{property}}">
+				<h4 ng-drag="true" ng-drag-data="obj" ng-drag-success="onDragComplete($data,$event)" class="h4-big-margin" x-lvl-draggable='true' ng-repeat="property in benchmarkingEntity.properties" selectedEntity="{{benchmarkingEntity.name}}" selectedProperty="{{property}}">
 					<span class="label label-primary label-bigPadding">{{property}}</span>
 				</h4>
 			</accordion-group>

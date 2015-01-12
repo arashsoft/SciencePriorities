@@ -36,6 +36,7 @@ angular.module('sciencePriorities2App')
 
 angular.module('sciencePriorities2App').controller("CenterController" , ["$scope","$compile","$templateCache",function($scope, $compile, $templateCache){
 	$scope.multiViewModel="single"
+	// this function handle mouse drag and drop
 	$scope.dropped= function (dragEl, dropEl ){
 		var drag= $("#"+dragEl);
 		// in fact, dropDiv is $($element),
@@ -65,6 +66,48 @@ angular.module('sciencePriorities2App').controller("CenterController" , ["$scope
 			$.get("app/benchmarkMenu/benchmarkMenu.html", function(htmlFile) {	
 			
 				var $el= $("#"+dropEl+ " > div").append(htmlFile);
+				// compile the html template to angular scope so call methods works properly
+				$compile($el)(angular.element(dropDiv[0]).scope());
+				
+				// the apply function make sure binding values are set
+				angular.element(dropDiv[0]).scope().$apply();
+			});
+		}
+		
+	};
+	// this function handle touch drag and drop
+	$scope.onDropComplete = function(data,event){
+		//console.log("drop success, data:", event.element[0].getAttribute("selectedEntity"));
+		var dragEl= event.element[0].getAttribute('id');
+		
+		var drag= $("#"+dragEl);
+		// in fact, dropDiv is $($element),
+		var dropDiv = $("#"+data);
+		
+		// remove previous benchmark select
+		dropDiv.find(".benchmarkSelect").remove();
+		
+		// pass drag parameters and drop-div id to associated controller scope
+		angular.element(dropDiv[0]).scope().selectedEntity= drag[0].attributes.selectedEntity.value;
+		angular.element(dropDiv[0]).scope().selectedProperty= drag[0].attributes.selectedProperty.value;
+		angular.element(dropDiv[0]).scope().dropID = dropDiv[0].id;
+		
+		if (drag.attr("selectedType")=="Advanced"){
+			
+			$.get("app/benchmarkMenu/advancedMenu.html", function(htmlFile) {	
+				var $el= dropDiv.append(htmlFile);
+				// compile the html template to angular scope so call methods works properly
+				$compile($el)(angular.element(dropDiv[0]).scope());
+				
+				// the apply function make sure binding values are set
+				angular.element(dropDiv[0]).scope().$apply();
+			});
+			
+		}else{
+			// load select benchmark template
+			$.get("app/benchmarkMenu/benchmarkMenu.html", function(htmlFile) {	
+			
+				var $el= dropDiv.append(htmlFile);
 				// compile the html template to angular scope so call methods works properly
 				$compile($el)(angular.element(dropDiv[0]).scope());
 				

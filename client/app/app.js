@@ -6,7 +6,8 @@ angular.module('sciencePriorities2App', [
   'ngSanitize',
   'ui.router',
   'ui.bootstrap',
-  'lvl.directives.dragdrop'
+  'lvl.directives.dragdrop',
+	'ngDraggable'
 ])
   .config(function ($stateProvider, $urlRouterProvider, $locationProvider) {
     $urlRouterProvider
