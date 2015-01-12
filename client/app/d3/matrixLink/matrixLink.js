@@ -72,15 +72,31 @@ function  createMatrixLink(parentDivID, jsonFile){
 	}
 	force.stop();
 	
+	var screenDragZoom = d3.behavior.zoom()
+    .scaleExtent([0.5, 5])
+    .on("zoom", function(){
+			container.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+		});
+
 	// empty parentObject and start adding items to it
 	parentObject.empty();
 	var svg = d3.select("#"+parentDivID).append("svg")
 		 .attr("width", width)
-		 .attr("height", height);
-		 
+		 .attr("height", height)
+		 .append("g")
+		 .call(screenDragZoom)
+	
+	var mainRect = svg.append("rect")
+    .attr("width", width)
+    .attr("height", height)
+    .style("fill", "none")
+    .style("pointer-events", "all");
+	
+	var container = svg.append("g");
+	
 	// we do not want to show department nodetrix - we just use it as matrix places
 	
-	var matrixDepartmentlinks = svg.selectAll(".matrixLink.link")
+	var matrixDepartmentlinks = container.selectAll(".matrixLink.link")
 		.data(forceLinks)
 			.enter().append("line")
 			.attr("class", "matrixLink link")
@@ -88,19 +104,6 @@ function  createMatrixLink(parentDivID, jsonFile){
 			.attr("y1", function(d) { return d.source.y + moveToCenter.y; })
 			.attr("x2", function(d) { return d.target.x + moveToCenter.x; })
 			.attr("y2", function(d) { return d.target.y + moveToCenter.y; });
-	/*
-	var matrixDepartments = svg.selectAll(".matrixLink.node")
-		.data(forceNodes)
-			.enter().append("circle")
-			.attr("class", "matrixLink node")
-			.attr("r", 10)
-			.style("fill", function(d) { return color(d.name); })
-			.attr("cx", function(d) { return d.x + moveToCenter.x; })
-			.attr("cy", function(d) { return d.y + moveToCenter.y; });
-			
-	matrixDepartments.append("title")
-		.text(function(d) { return d.name; });
-	*/
 	
 	// its time to show matrixes
 	for (var i=0, length =forceNodes.length; i < length ; i++ ){
@@ -136,9 +139,14 @@ function  createMatrixLink(parentDivID, jsonFile){
 		// The default sort order.
 		xScale.domain(orders.name);
 		
+		// this function(behavior) handles matrix drags
 		var matrixDrag = d3.behavior.drag()
-			.on('dragstart', function() { d3.select(this).select("rect").attr("class", "matrixLink background drag") })
+			.on('dragstart', function() { 
+				d3.event.sourceEvent.stopPropagation();
+				d3.select(this).select("rect").attr("class", "matrixLink background drag")
+			})
 			.on('drag', function() {
+				// d3.event.sourceEvent.stopPropagation();
 				var tempX = parseFloat(d3.select(this).attr('x'));
 				var tempY = parseFloat(d3.select(this).attr('y'));
 				tempX += d3.event.dx;
@@ -159,9 +167,12 @@ function  createMatrixLink(parentDivID, jsonFile){
 				
 				
 			})
-			.on('dragend', function(d) { d3.select(this).select("rect").attr("class", "matrixLink background") });
+			.on('dragend', function(d) {
+				// d3.event.sourceEvent.stopPropagation();
+				d3.select(this).select("rect").attr("class", "matrixLink background")
+			});
 		
-		var departmentG = svg.append("g")
+		var departmentG = container.append("g")
 			.attr("x", 0)
 			.attr("y", 0)
 			.call(matrixDrag);
