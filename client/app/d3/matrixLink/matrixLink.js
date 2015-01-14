@@ -11,6 +11,7 @@ function  createMatrixLink(parentDivID, jsonFile){
 	var minLenght = Math.min(width,height);
 	var moveToCenter = {x: margin.width/2 , y: margin.height/2 }
 	var color = d3.scale.category20();
+	var matrixSize = (minLenght/6);
 	
 	// now we want to make department nodes and links to run a force layout on them
 	// it helps us to find best places for our matrixes
@@ -96,24 +97,35 @@ function  createMatrixLink(parentDivID, jsonFile){
 	
 	// we do not want to show department nodetrix - we just use it as matrix places
 	
+	// move department nodes to center (margin and other stupid things../)
+	for (var i=0, length = forceNodes.length; i < length ; i++ ){
+		forceNodes[i].x += moveToCenter.x;
+		forceNodes[i].y += moveToCenter.y;
+		forceNodes[i].size = matrixSize;
+	}
+	
+	// draw links between departments for first time
 	var matrixDepartmentlinks = container.selectAll(".matrixLink.link")
 		.data(forceLinks)
 			.enter().append("line")
-			.attr("class", "matrixLink link")
-			.attr("x1", function(d) { return d.source.x + moveToCenter.x; })
-			.attr("y1", function(d) { return d.source.y + moveToCenter.y; })
-			.attr("x2", function(d) { return d.target.x + moveToCenter.x; })
-			.attr("y2", function(d) { return d.target.y + moveToCenter.y; });
+			.attr("class" , "matrixLink link")
+			.attr("x1", function(d) { return d.source.x + d.source.size/2})
+			.attr("y1", function(d) { return d.source.y + d.source.size/2})
+			.attr("x2", function(d) { return d.target.x + d.target.size/2})
+			.attr("y2", function(d) { return d.target.y + d.target.size/2});
 	
 	// its time to show matrixes
 	for (var i=0, length =forceNodes.length; i < length ; i++ ){
-		createMatrix(forceNodes[i].x + moveToCenter.x-(minLenght/12), forceNodes[i].y + moveToCenter.y-(minLenght/12), (minLenght/6), departmentMatrixes[i].links, departmentMatrixes[i].nodes , forceNodes[i]);
+		createMatrix(forceNodes[i] , departmentMatrixes[i].links, departmentMatrixes[i].nodes);
 	}
 	
-	function createMatrix(positionX , positionY , size, links, nodes , node){
+	// BAD Name warning! I am too lazy to change it :)
+	// "nodes" and "links" refer to elements inside the current matrix
+	// but the parameter "node" refers to the matrix element itself
+	function createMatrix(node, links, nodes ){
 		var matrix = [];
 		var n = nodes.length;
-		var xScale = d3.scale.ordinal().rangeBands([0, size]);
+		var xScale = d3.scale.ordinal().rangeBands([0, node.size]);
 		
 		// Compute index per node.
 		nodes.forEach(function(node, i) {
@@ -143,74 +155,86 @@ function  createMatrixLink(parentDivID, jsonFile){
 		var matrixDrag = d3.behavior.drag()
 			.on('dragstart', function() { 
 				d3.event.sourceEvent.stopPropagation();
-				d3.select(this).select("rect").attr("class", "matrixLink background drag")
+				d3.select(this).select("rect").classed("drag" , 1);
 			})
 			.on('drag', function() {
 				// d3.event.sourceEvent.stopPropagation();
+				// tempX and tempY are 0 at first move
 				var tempX = parseFloat(d3.select(this).attr('x'));
 				var tempY = parseFloat(d3.select(this).attr('y'));
 				tempX += d3.event.dx;
-            tempY += d3.event.dy;
+				tempY += d3.event.dy;
 				
+				// move matrix
 				d3.select(this)
 					.attr("x", tempX)
 					.attr("y", tempY)
 					.attr("transform" , "translate(" + tempX + "," + tempY +")" );
-				node.x = tempX + positionX -(minLenght/12);
-				node.y = tempY + positionY -(minLenght/12);
+				
+				// move data position
+				node.x += d3.event.dx;
+				node.y += d3.event.dy;
+				
 				// now it is the time to move links
 				matrixDepartmentlinks
-					.attr("x1", function(d) { return d.source.x + moveToCenter.x; })
-					.attr("y1", function(d) { return d.source.y + moveToCenter.y; })
-					.attr("x2", function(d) { return d.target.x + moveToCenter.x; })
-					.attr("y2", function(d) { return d.target.y + moveToCenter.y; });
-				
+					.attr("x1", function(d) { return d.source.x + d.source.size/2; })
+					.attr("y1", function(d) { return d.source.y+ d.source.size/2; })
+					.attr("x2", function(d) { return d.target.x+ d.target.size/2; })
+					.attr("y2", function(d) { return d.target.y+ d.target.size/2; });
 				
 			})
 			.on('dragend', function(d) {
-				// d3.event.sourceEvent.stopPropagation();
-				d3.select(this).select("rect").attr("class", "matrixLink background")
+				d3.event.sourceEvent.stopPropagation();
+				d3.select(this).select("rect").classed("drag", 0);
 			});
 		
 		var departmentG = container.append("g")
 			.attr("x", 0)
 			.attr("y", 0)
+			.attr("class","departmentG")
 			.call(matrixDrag);
 		
 		
-		departmentG.append("rect")
-		.attr("class", "matrixLink background")
-			.attr("x", positionX)
-			.attr("y", positionY)
-			.attr("width", size)
-			.attr("height", size);
+		var departmentRect = departmentG.append("rect")
+			.attr("class", "matrixLink background")
+			.attr("x", node.x)
+			.attr("y", node.y)
+			.attr("width", node.size)
+			.attr("height", node.size)
+			.datum(node)
+			.on("click", function(){
+				if (d3.event.defaultPrevented) return;
+				enlargeMatrix(this);
+			});
 		
 		departmentG.append("text")
-			.attr("x", positionX)
-			.attr("y", positionY)
+			.attr("x", node.x)
+			.attr("y", node.y)
 			.attr("dy", "-2px")
 			.text(node.name);
-		
 		
 		var row = departmentG.selectAll(".matrixLink.row")
 			.data(matrix)
 				.enter().append("g")
 				.attr("class", "matrixLink row")
-				.attr("transform", function(d, i) { return "translate(0," + (xScale(i) + positionY) + ")"; })
+				.attr("transform", function(d, i) {return "translate(0," + (xScale(i) + node.y) + ")"; })
 				.each(function (d){
 					//createRow(d);
-					var cell = d3.select(this).selectAll(".matrixLink.cell")
+					d3.select(this).selectAll(".matrixLink.cell")
 						.data(d.filter(function(d){return d.z;} ))
 						.enter().append("rect")
 							.attr("class", "matrixLink cell")
-							.attr("x", function(d) { return (xScale(d.x) + positionX); })
+							.attr("x", function(d) { return (xScale(d.x) + node.x); })
 							.attr("width", xScale.rangeBand())
 							.attr("height", xScale.rangeBand())
-							.style("fill", "rgb(44, 160, 44)");
+							.style("fill", "rgb(44, 160, 44)")
+							.style("pointer-events", "none");
 				});
 		
-		row.append("line")
-			.attr("x2", size);
+		var rowLines = row.append("line")
+			.attr("x2", node.size)
+			.attr("class", "matrixLink line")
+			.attr("transform","translate("+ node.x + ",0)");
 /*
 		row.append("text")
 			.attr("x", -6 + positionX)
@@ -223,10 +247,12 @@ function  createMatrixLink(parentDivID, jsonFile){
 			.data(matrix)
 		 .enter().append("g")
 			.attr("class", "matrixLink column")
-			.attr("transform", function(d, i) { return "translate(" + (xScale(i) + positionX) + ")rotate(-90)"; });
+			.attr("transform", function(d, i) { return "translate(" + (xScale(i) + node.x) + ")rotate(-90)"; });
 
-	  column.append("line")
-			.attr("x1", -size);
+	  var columnLines = column.append("line")
+			.attr("x1", -node.size)
+			.attr("class", "matrixLink line")
+			.attr("transform","translate("+ -node.y + ",0)");
 /*
 	  column.append("text")
 			.attr("x", 6 + positionX)
@@ -236,9 +262,83 @@ function  createMatrixLink(parentDivID, jsonFile){
 			.text(function(d, i) { return nodes[i].name; });
 */
 	  function createRow(row) {
-		//var tempData = $.grep(row, function(d) {return d.z ? d.z : null;});
-		
+		//var tempData = $.grep(row, function(d) {return d.z ? d.z : null;});	
 	  }
+		function enlargeMatrix(element){
+			// we take 20% as margin (* 0.8)
+			node.size = Math.min(height,width)*0.8;
 
+			d3.select(element)
+				.attr("width", node.size)
+				.attr("height", node.size);
+			xScale = d3.scale.ordinal().rangeBands([0, node.size]);
+			xScale.domain(orders.name);
+			
+			departmentRect.attr("width", node.size)
+			.attr("height", node.size)
+			.on("click", function(){
+				if (d3.event.defaultPrevented) return;
+				shrinkMatrix(this);
+			});
+			row.attr("transform", function(d, i) {
+				return "translate(0," + (xScale(i) + parseFloat(departmentRect.attr('y'))) + ")";
+			})
+			.each(function (d){
+				//createRow(d);
+				d3.select(this).selectAll(".matrixLink.cell")
+						.attr("x", function(d) { return xScale(d.x) + parseFloat((departmentRect.attr('x'))); })
+						.attr("width", xScale.rangeBand())
+						.attr("height", xScale.rangeBand())
+			});
+			
+			column.attr("transform", function(d, i) { return "translate(" + (xScale(i) + parseFloat((departmentRect.attr('x')))) + ")rotate(-90)"; });
+			columnLines.attr("x1", -node.size);
+			rowLines.attr("x2", node.size);
+			
+			row.append("text")
+				.attr("x", -6 + parseFloat((departmentRect.attr('x'))))
+				.attr("y", (xScale.rangeBand() / 2) )
+				.attr("dy", ".32em")
+				.attr("text-anchor", "end")
+				.text(function(d, i) { return nodes[i].name; });
+			
+			column.append("text")
+				.attr("x", 10 - parseFloat((departmentRect.attr('y'))))
+				.attr("y", (xScale.rangeBand() / 2))
+				.attr("dy", ".32em")
+				.attr("text-anchor", "start")
+				.text(function(d, i) { return nodes[i].name; });
+			
+			// now it is the time to move other depratment rects
+			container.selectAll('.departmentG')
+				.attr('x', function(){
+					var currentTranslateX = parseFloat(departmentG.attr('x'));
+					var currentRectX = parseFloat(departmentRect.attr('x'));
+					
+					var elementTranslateX = parseFloat(d3.select(this).attr('x'));
+					var elementRectX = parseFloat(d3.select(this).select('rect').attr('x'));
+					
+					if (elementTranslateX+elementRectX > currentTranslateX+currentRectX){
+						// it means we move the matrix
+						d3.select(this).select('rect').datum().x = elementTranslateX + elementRectX + node.size;
+						return elementTranslateX + node.size;
+					}else{
+						// we do not move the matrix
+						return elementTranslateX;
+					}		
+				})
+				// move matrixes
+				.attr("transform" , function(){
+					return "translate(" + this.attributes.x.value + "," + this.attributes.y.value +")";
+				});
+			// move links
+			matrixDepartmentlinks
+					.attr("x1", function(d) { return d.source.x + d.source.size/2; })
+					.attr("y1", function(d) { return d.source.y + d.source.size/2; })
+					.attr("x2", function(d) { return d.target.x + d.target.size/2; })
+					.attr("y2", function(d) { return d.target.y + d.target.size/2; });
+		
+		
+		} // end of enlargeMatrix function
 	} // end of createMatrix function
 } // end of createMatrixLink function

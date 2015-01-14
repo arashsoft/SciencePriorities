@@ -9,11 +9,16 @@
 	stroke-width: 0.3;
 }
 
+.matrixLink.line{
+	stroke: #fff;
+	stroke-width: 0.8;
+}
+
 .matrixLink.background{
 	fill: #eee;
-	stroke-width: 1;
+	stroke-width: 2;
 	stroke:black;
-	opacity: 0.9;
+	opacity: 0.95;
 }
 .matrixLink.background.drag{
 	stroke:blue;
