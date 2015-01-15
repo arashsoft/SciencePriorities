@@ -6,8 +6,8 @@
 			// west and east representation area			
 			westRepresentationLayout = $('#representationDiv').layout({west__size:"50%",resizable:true}); 
 			// north and south representatin areas
-			southRepresentationLayout = $('#eastRepresentationDiv').layout({south__size:"50%", resizable:true , spacing_open:"12", spacing_closed:"12"});
-			$('#westRepresentationDiv').layout({south__size:"50%",resizable:true , spacing_open:"12", spacing_closed:"12"});
+			southRepresentationLayout = $('#eastRepresentationDiv').layout({south__size:"50%", resizable:true});
+			$('#westRepresentationDiv').layout({south__size:"50%",resizable:true });
 			// hide multi view
 			westRepresentationLayout.hide('west');
 			southRepresentationLayout.hide('south')
@@ -24,7 +24,7 @@
 	<div  id="representationDiv" class="ui-layout-center" ng-controller="CenterController" style="padding:0px;">
 		
 		<div id="eastRepresentationDiv" class="ui-layout-center" style="padding:0px;">
-			<div class="ui-layout-center " ng-drop="true" ng-drop-success="onDropComplete('screen1',$event)" x-lvl-drop-target='true' x-on-drop='dropped(dragEl, dropEl)' style="padding:0px;">
+			<div class="ui-layout-center" ng-drop="true" ng-drop-success="onDropComplete('screen1',$event)" x-lvl-drop-target='true' x-on-drop='dropped(dragEl, dropEl)' style="padding:0px;">
 				<div class="max-screen" id="screen1" ng-controller="layoutController" >
 			
 				</div>

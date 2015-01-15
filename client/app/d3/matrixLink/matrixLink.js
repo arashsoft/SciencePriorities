@@ -94,8 +94,11 @@ function  createMatrixLink(parentDivID, jsonFile){
 	parentObject.empty();
 	var svg = d3.select("#"+parentDivID).append("svg")
 		 .attr("width", width)
-		 .attr("height", height)
-		 .append("g")
+		 .attr("height", height);
+	
+	var mainSvg = svg;
+	
+	svg = svg.append("g")
 		 .call(screenDragZoom)
 	
 	var mainRect = svg.append("rect")
@@ -461,4 +464,24 @@ function  createMatrixLink(parentDivID, jsonFile){
 
 		} // end of shrinkMatrix
 	} // end of createMatrix function
+	function matrixLinkResize(){
+		mainSvg.attr("width", width)
+		 .attr("height", height);
+	
+		mainRect.attr("width", width)
+    .attr("height", height);
+		
+	}
+	
+	// set resizer function every 1 sec
+	var intervalID = setInterval(function () {
+		if ( width != parentObject[0].clientWidth || height != parentObject[0].clientHeight) {
+			width = parentObject[0].clientWidth;
+			height = parentObject[0].clientHeight;
+			matrixLinkResize();
+		}			
+	}, 1000);
+	
+	return intervalID;
+	
 } // end of createMatrixLink function
