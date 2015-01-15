@@ -23,6 +23,8 @@ function  createMatrixLink(parentDivID, jsonFile){
 	
 	var nodeHash = new Object();
 	for (var i =0 , length = forceNodes.length; i < length; i++){
+		forceNodes[i].relatedNodes = [];
+		
 		nodeHash[forceNodes[i].name] = i;
 		
 		// make empty links and nodes for each department metrix
@@ -44,8 +46,13 @@ function  createMatrixLink(parentDivID, jsonFile){
 			var tempLink = new Object();
 			tempLink.source = nodeHash[jsonFile.nodes[jsonFile.links[i].source].department];
 			tempLink.target = nodeHash[jsonFile.nodes[jsonFile.links[i].target].department];
+			tempLink.width = 1;
 			// we remove dublicate links with this method
-			forceLinkObjects[tempLink.source+"-"+tempLink.target]=tempLink;
+			if ($.isEmptyObject(forceLinkObjects[tempLink.source+"-"+tempLink.target])){
+				forceLinkObjects[tempLink.source+"-"+tempLink.target]=tempLink;
+			}else{
+				forceLinkObjects[tempLink.source+"-"+tempLink.target].width++;
+			}
 		} else{
 			// link inside a department
 			departmentMatrixes[nodeHash[jsonFile.links[i].linkType]].links.push({source: jsonFile.nodes[jsonFile.links[i].source].departmentMatrixesPlace, target: jsonFile.nodes[jsonFile.links[i].target].departmentMatrixesPlace });
@@ -54,6 +61,9 @@ function  createMatrixLink(parentDivID, jsonFile){
 	// convert forceLinkObjects to forceLinks (object to array)
 	for (var tempLink in forceLinkObjects){
 		forceLinks.push(forceLinkObjects[tempLink]);
+		// we add related nodes here to use when user enlarge one of matrixes (departments)
+		forceNodes[forceLinkObjects[tempLink].source].relatedNodes.push(forceNodes[forceLinkObjects[tempLink].target]);
+		forceNodes[forceLinkObjects[tempLink].target].relatedNodes.push(forceNodes[forceLinkObjects[tempLink].source]);
 	}
 	
 	var force = d3.layout.force()
@@ -105,6 +115,10 @@ function  createMatrixLink(parentDivID, jsonFile){
 		forceNodes[i].size = matrixSize;
 	}
 	
+	// scale for links width
+	var lineScale = d3.scale.linear()
+    .domain([1, 100])
+    .range([0.3,10]);
 	// draw links between departments for first time
 	var matrixDepartmentlinks = container.selectAll(".matrixLink.link")
 		.data(forceLinks)
@@ -113,7 +127,8 @@ function  createMatrixLink(parentDivID, jsonFile){
 			.attr("x1", function(d) { return d.source.x + d.source.size/2})
 			.attr("y1", function(d) { return d.source.y + d.source.size/2})
 			.attr("x2", function(d) { return d.target.x + d.target.size/2})
-			.attr("y2", function(d) { return d.target.y + d.target.size/2});
+			.attr("y2", function(d) { return d.target.y + d.target.size/2})
+			.style("stroke-width", function(d){return lineScale(d.width)});
 	
 	// its time to show matrixes
 	for (var i=0, length =forceNodes.length; i < length ; i++ ){
@@ -228,8 +243,7 @@ function  createMatrixLink(parentDivID, jsonFile){
 							.attr("x", function(d) { return (xScale(d.x) + node.x); })
 							.attr("width", xScale.rangeBand())
 							.attr("height", xScale.rangeBand())
-							.style("fill", "rgb(44, 160, 44)")
-							.style("pointer-events", "none");
+							.style("fill", "rgb(44, 160, 44)");
 				});
 		
 		var rowLines = row.append("line")
@@ -329,31 +343,14 @@ function  createMatrixLink(parentDivID, jsonFile){
 					
 					}else if (tempIf < 0){
 						// we  move  matrixes a bit left
-						d3.select(this).select('rect').datum().x = elementTranslateX + elementRectX -100;
-						return elementTranslateX -100;
+						d3.select(this).select('rect').datum().x = elementTranslateX + elementRectX -200;
+						return elementTranslateX -200;
 					}else{
 						// only for the selected matrix itself
 						return elementTranslateX;
 					}
 				})
-				/* move matrixes down
-				.attr('y', function(){
-					var currentTranslateY = parseFloat(departmentG.attr('y'));
-					var currentRectY = parseFloat(departmentRect.attr('y'));
-					
-					var elementTranslateY = parseFloat(d3.select(this).attr('y'));
-					var elementRectY = parseFloat(d3.select(this).select('rect').attr('y'));
-					
-					if (elementTranslateY+elementRectY > currentTranslateY+currentRectY){
-						// it means we move the matrix
-						d3.select(this).select('rect').datum().y = elementTranslateY + elementRectY + node.size;
-						return elementTranslateY + node.size;
-					}else{
-						// we do not move the matrix
-						return elementTranslateY;
-					}		
-				})
-				*/
+				
 				// move matrixes
 				.transition().attr("transform" , function(){
 					return "translate(" + this.attributes.x.value + "," + this.attributes.y.value +")";
@@ -365,8 +362,25 @@ function  createMatrixLink(parentDivID, jsonFile){
 					.attr("x2", function(d) { return d.target.x + d.target.size/2; })
 					.attr("y2", function(d) { return d.target.y + d.target.size/2; }).duration(transitionTime);
 		
-			// move screen to matrix
-			//container.transition().attr("transform", "translate(" + (0) +","+ (0) + ")scale(1)").duration(transitionTime);
+			// hide unrelated departments
+			container.selectAll('.departmentG').style("opacity",function(){
+				// reset related and selected classes
+				d3.select(this).select('rect').classed("related",0).classed("selected",0);
+				
+				if (d3.select(this).select('rect').datum()==node) {
+					d3.select(this).select('rect').classed("selected",1);
+					return 1
+				};
+				
+				
+				for (var i=0;i<node.relatedNodes.length;i++){
+					if(d3.select(this).select('rect').datum()==node.relatedNodes[i]){
+							d3.select(this).select('rect').classed("related",1);
+							return 1;
+					}
+				}
+				return 0.3;
+			});
 			
 		} // end of enlargeMatrix function
 		
@@ -418,8 +432,8 @@ function  createMatrixLink(parentDivID, jsonFile){
 					
 					}else if (tempIf < 0){
 						// we  move  matrixes a bit right
-						d3.select(this).select('rect').datum().x = elementTranslateX + elementRectX +100;
-						return elementTranslateX +100;
+						d3.select(this).select('rect').datum().x = elementTranslateX + elementRectX +200;
+						return elementTranslateX +200;
 					}else{
 						// only for the selected matrix itself
 						return elementTranslateX;
@@ -437,8 +451,13 @@ function  createMatrixLink(parentDivID, jsonFile){
 					.attr("x2", function(d) { return d.target.x + d.target.size/2; })
 					.attr("y2", function(d) { return d.target.y + d.target.size/2; }).duration(transitionTime);
 		
-			// move screen to matrix
-			//container.transition().attr("transform", "translate(" + (0) +","+ (0) + ")scale(1)").duration(transitionTime);
+			// reset classes and opacity
+			// hide unrelated departments
+			container.selectAll('.departmentG').style("opacity",function(){
+				// reset related and selected classes
+				d3.select(this).select('rect').classed("related",0).classed("selected",0);
+				return 1
+			});
 
 		} // end of shrinkMatrix
 	} // end of createMatrix function

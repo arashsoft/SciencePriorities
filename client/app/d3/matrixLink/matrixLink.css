@@ -6,21 +6,36 @@
 .matrixLink.link {
 	stroke: #999;
 	stroke-opacity: 1;
-	stroke-width: 0.3;
 }
 
 .matrixLink.line{
 	stroke: #fff;
 	stroke-width: 0.8;
+	pointer-events : none;
 }
 
 .matrixLink.background{
 	fill: #eee;
 	stroke-width: 2;
 	stroke:black;
-	opacity: 0.95;
+	opacity: 1;
 }
 .matrixLink.background.drag{
 	stroke:blue;
 	stroke-width: 3;
+}
+
+.matrixLink.background.related{
+	stroke:purple;
+	stroke-width: 5;
+}
+
+.matrixLink.background.selected{
+	stroke:blue;
+	stroke-width: 5;
+}
+
+.matrixLink.cell{
+	pointer-events : none;
+	fill : rgb(44, 160, 44);
 }
