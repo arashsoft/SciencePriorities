@@ -89,7 +89,7 @@ function  createMatrixLink(parentDivID, jsonFile){
     .on("zoom", function(){
 			container.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
 		});
-
+		
 	// empty parentObject and start adding items to it
 	parentObject.empty();
 	var svg = d3.select("#"+parentDivID).append("svg")
@@ -99,7 +99,7 @@ function  createMatrixLink(parentDivID, jsonFile){
 	var mainSvg = svg;
 	
 	svg = svg.append("g")
-		 .call(screenDragZoom)
+		.call(screenDragZoom).on("dblclick.zoom", null);
 	
 	var mainRect = svg.append("rect")
     .attr("width", width)
@@ -137,7 +137,6 @@ function  createMatrixLink(parentDivID, jsonFile){
 	for (var i=0, length =forceNodes.length; i < length ; i++ ){
 		createMatrix(forceNodes[i] , departmentMatrixes[i].links, departmentMatrixes[i].nodes);
 	}
-	
 	
 	// "nodes" and "links" refer to elements inside the current matrix
 	// but the parameter "node" refers to the matrix element itself
@@ -213,7 +212,7 @@ function  createMatrixLink(parentDivID, jsonFile){
 			.attr("class","departmentG")
 			.call(matrixDrag);
 		
-		
+		var departmentRectTimer;
 		var departmentRect = departmentG.append("rect")
 			.attr("class", "matrixLink background")
 			.attr("x", node.x)
@@ -224,6 +223,20 @@ function  createMatrixLink(parentDivID, jsonFile){
 			.on("click", function(){
 				if (d3.event.defaultPrevented) return;
 				enlargeMatrix();
+			}).on("touchstart", function(e){
+				departmentRectTimer = setTimeout(function(){
+				// here we handle long-press function	
+				// 500 is the length of time we want the user to touch before we do something	
+					var abc = fdgdsfdgf;
+				}, 500); 
+			}).on("touchend", function(e){
+				//stops short touches from firing the event	
+				if (departmentRectTimer)
+					clearTimeout(departmentRectTimer)
+			}).on("touchmove", function(e){
+				//stops short touches from firing the event	
+				if (departmentRectTimer)
+					clearTimeout(departmentRectTimer);
 			});
 		
 		departmentG.append("text")
