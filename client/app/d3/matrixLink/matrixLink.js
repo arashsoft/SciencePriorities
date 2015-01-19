@@ -109,8 +109,25 @@ function  createMatrixLink(parentDivID, jsonFile){
 	
 	var container = svg.append("g");
 	
-	// we do not want to show department nodetrix - we just use it as matrix places
+	// we add context-menu container and call it on departmentRects touchHold
+	// we convert d3 select to jquery select  --> $(container[0])
+	$(container[0]).contextmenu({
+		preventContextMenuForPopup: true,
+    preventSelect: true,
+		menu: [
+        {title: "Copy", cmd: "copy", uiIcon: "ui-icon-copy"},
+        {title: "Arrange", children: [
+            {title: "By name", cmd: "name"},
+            {title: "By collaboration count", cmd: "count"}
+						]}
+        ],
+			select: function(event, ui) {
+				// call refreshMatrix method
+				$(ui.target).trigger("refreshMatrix" ,ui.cmd);
+			}
+	});
 	
+	// we do not want to show department nodetrix - we just use it as matrix places
 	// move department nodes to center (margin and other stupid things../)
 	for (var i=0, length = forceNodes.length; i < length ; i++ ){
 		forceNodes[i].x += moveToCenter.x;
@@ -223,21 +240,45 @@ function  createMatrixLink(parentDivID, jsonFile){
 			.on("click", function(){
 				if (d3.event.defaultPrevented) return;
 				enlargeMatrix();
-			}).on("touchstart", function(e){
-				departmentRectTimer = setTimeout(function(){
+			});
+		
+		departmentRect.on("touchstart", function(){	
+			departmentRectTimer = setTimeout(function(){
 				// here we handle long-press function	
 				// 500 is the length of time we want the user to touch before we do something	
-					var abc = fdgdsfdgf;
-				}, 500); 
-			}).on("touchend", function(e){
-				//stops short touches from firing the event	
-				if (departmentRectTimer)
-					clearTimeout(departmentRectTimer)
-			}).on("touchmove", function(e){
-				//stops short touches from firing the event	
-				if (departmentRectTimer)
-					clearTimeout(departmentRectTimer);
-			});
+				// TODO : we have to prevent tap becasue its hold d3.event.preventDefault does not work
+				$(container[0]).contextmenu("open", $(departmentRect[0]));
+			}, 250); 
+		}).on("touchend", function(e){
+			//stops short touches from firing the event	
+			if (departmentRectTimer)
+				clearTimeout(departmentRectTimer);
+		}).on("touchmove", function(e){
+			//stops short touches from firing the event	
+			if (departmentRectTimer)
+				clearTimeout(departmentRectTimer);
+		});
+		
+		$(departmentRect[0]).bind("refreshMatrix" , function(event , order){
+			if (order=="name"){
+				xScale.domain(orders.name);
+			}else if (order=="count"){
+				xScale.domain(orders.count);
+			}
+			
+			var t = departmentG.transition().duration(2500);
+			t.selectAll(".matrixLink.row")
+					.delay(function(d, i) { return xScale(i) * 4; })
+					.attr("transform", function(d, i) { return "translate(0," + (xScale(i) + parseFloat(departmentRect.attr('y'))) + ")"; })
+				.selectAll(".matrixLink.cell")
+					.delay(function(d) { return xScale(d.x) * 4; })
+					.attr("x", function(d) { return xScale(d.x) + parseFloat((departmentRect.attr('x'))); });
+
+			t.selectAll(".matrixLink.column")
+					.delay(function(d, i) { return xScale(i) * 4; })
+					.attr("transform", function(d, i) { return "translate(" + (xScale(i) + parseFloat((departmentRect.attr('x')))) + ")rotate(-90)"; });
+			
+		});
 		
 		departmentG.append("text")
 			.attr("x", node.x)
@@ -299,8 +340,7 @@ function  createMatrixLink(parentDivID, jsonFile){
 			// we take 20% as margin (* 0.8)
 			node.size = Math.min(height,width)*0.8;
 
-			xScale = d3.scale.ordinal().rangeBands([0, node.size]);
-			xScale.domain(orders.name);
+			xScale.rangeBands([0, node.size]);
 			
 			departmentRect.transition().attr("width", node.size)
 			.attr("height", node.size).duration(transitionTime);
@@ -405,8 +445,7 @@ function  createMatrixLink(parentDivID, jsonFile){
 			var differentSize = node.size;
 			node.size = matrixSize;
 
-			xScale = d3.scale.ordinal().rangeBands([0, node.size]);
-			xScale.domain(orders.name);
+			xScale.rangeBands([0, node.size]);
 			
 			departmentRect.transition().attr("width", node.size)
 			.attr("height", node.size).duration(transitionTime);
