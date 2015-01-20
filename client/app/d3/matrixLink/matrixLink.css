@@ -14,6 +14,16 @@
 	pointer-events : none;
 }
 
+.matrixLink.text{
+	cursor:pointer;
+}
+.matrixLink.text.selected{
+	fill:red;
+}
+
+.matrixLink.title{
+}
+
 .matrixLink.background{
 	fill: #eee;
 	stroke-width: 2;
@@ -38,4 +48,13 @@
 .matrixLink.cell{
 	pointer-events : none;
 	fill : rgb(44, 160, 44);
+}
+
+.noselect {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }

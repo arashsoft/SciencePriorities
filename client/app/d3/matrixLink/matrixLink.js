@@ -3,6 +3,19 @@ nodes: [{name:"abc" , department : "dasdas"},{name:"def"},{name:"123"},{name:546
 links : [{source:"adc.id",target:"123.id", type:"award" , linkType:"departmentName or 0" },{source:"546",target:"def", ...}],
 departments : [{name : chemistry},{name : computer science},{name : biology}]
 */
+
+// remove object from Array
+Array.prototype.remove = function() {
+    var what, a = arguments, L = a.length, ax;
+    while (L && this.length) {
+        what = a[--L];
+        while ((ax = this.indexOf(what)) !== -1) {
+            this.splice(ax, 1);
+        }
+    }
+    return this;
+};
+
 function  createMatrixLink(parentDivID, jsonFile){
 	var parentObject = $("#"+parentDivID);
 	var width = parentObject[0].clientWidth;
@@ -13,6 +26,7 @@ function  createMatrixLink(parentDivID, jsonFile){
 	var color = d3.scale.category20();
 	var matrixSize = (minLenght/6);
 	var transitionTime = 700;
+	var selectedProfessors = [];
 	
 	// now we want to make department nodes and links to run a force layout on them
 	// it helps us to find best places for our matrixes
@@ -92,6 +106,12 @@ function  createMatrixLink(parentDivID, jsonFile){
 		
 	// empty parentObject and start adding items to it
 	parentObject.empty();
+	
+	parentObject.append('<div class ="noselect" style="position:absolute; top:10px;left:10px; opacity: 0.85"> <ul id="'+ parentDivID+ 'professorsMenu"> <li class="ui-widget-header">Selected Professors</li></ul></div>');
+	$("#"+parentDivID+"professorsMenu").menu({
+		items: "> :not(.ui-widget-header)"
+	});
+  
 	var svg = d3.select("#"+parentDivID).append("svg")
 		 .attr("width", width)
 		 .attr("height", height);
@@ -177,7 +197,7 @@ function  createMatrixLink(parentDivID, jsonFile){
 			nodes[link.target].count ++;
 		});
 
-		// Precompute the orders.
+		// Pre-compute the orders.
 		var orders = {
 			name: d3.range(n).sort(function(a, b) { return d3.ascending(nodes[a].name, nodes[b].name); }),
 			count: d3.range(n).sort(function(a, b) { return nodes[b].count - nodes[a].count; }),
@@ -237,7 +257,7 @@ function  createMatrixLink(parentDivID, jsonFile){
 			.attr("width", node.size)
 			.attr("height", node.size)
 			.datum(node)
-			.on("click", function(){
+			.on("dblclick", function(){
 				if (d3.event.defaultPrevented) return;
 				enlargeMatrix();
 			});
@@ -268,15 +288,15 @@ function  createMatrixLink(parentDivID, jsonFile){
 			
 			var t = departmentG.transition().duration(2500);
 			t.selectAll(".matrixLink.row")
-					.delay(function(d, i) { return xScale(i) * 4; })
-					.attr("transform", function(d, i) { return "translate(0," + (xScale(i) + parseFloat(departmentRect.attr('y'))) + ")"; })
+				.delay(function(d, i) { return xScale(i) * 4; })
+				.attr("transform", function(d, i) { return "translate(0," + (xScale(i) + parseFloat(departmentRect.attr('y'))) + ")"; })
 				.selectAll(".matrixLink.cell")
 					.delay(function(d) { return xScale(d.x) * 4; })
 					.attr("x", function(d) { return xScale(d.x) + parseFloat((departmentRect.attr('x'))); });
 
 			t.selectAll(".matrixLink.column")
-					.delay(function(d, i) { return xScale(i) * 4; })
-					.attr("transform", function(d, i) { return "translate(" + (xScale(i) + parseFloat((departmentRect.attr('x')))) + ")rotate(-90)"; });
+				.delay(function(d, i) { return xScale(i) * 4; })
+				.attr("transform", function(d, i) { return "translate(" + (xScale(i) + parseFloat((departmentRect.attr('x')))) + ")rotate(-90)"; });
 			
 		});
 		
@@ -284,7 +304,9 @@ function  createMatrixLink(parentDivID, jsonFile){
 			.attr("x", node.x)
 			.attr("y", node.y)
 			.attr("dy", "-2px")
-			.text(node.name);
+			.text(node.name)
+			.style("font-size","14px")
+			.attr("class","matrixLink title");
 		
 		var row = departmentG.selectAll(".matrixLink.row")
 			.data(matrix)
@@ -336,6 +358,7 @@ function  createMatrixLink(parentDivID, jsonFile){
 	  function createRow(row) {
 		//var tempData = $.grep(row, function(d) {return d.z ? d.z : null;});	
 	  }
+		
 		function enlargeMatrix(){
 			// we take 20% as margin (* 0.8)
 			node.size = Math.min(height,width)*0.8;
@@ -361,21 +384,81 @@ function  createMatrixLink(parentDivID, jsonFile){
 			columnLines.attr("x1", -node.size);
 			rowLines.attr("x2", node.size);
 			
+			// add professors text
 			var rowText = row.append("text")
 				.attr("x", -6 + parseFloat((departmentRect.attr('x'))))
 				.attr("y", (xScale.rangeBand() / 2) )
 				.attr("dy", ".32em")
 				.attr("text-anchor", "end")
+				.attr("class","matrixLink text")
+				.style("font-Size", "14px")
 				.text(function(d, i) { return nodes[i].name; });
+				
+			
+			// handle adding or removing professors to list
+			rowText.on("click",function(d , i){
+				if (d3.select(this).classed("selected")){
+					// remove from menu
+					$("#"+parentDivID +nodes[i].ID).remove();
+					// remove from selectedProfessors array
+					selectedProfessors.remove(nodes[i]);
+					// remove class to make them black again
+					d3.select(this).classed("selected",false);
+					d3.select(columnText[0][i]).classed("selected",false);
+					
+				}else{
+					
+					// add to menu
+					$("#"+parentDivID+"professorsMenu").append("<li id='" + parentDivID +nodes[i].ID+ "'>"+ nodes[i].name+"</li>");
+					// add to selectedProfessors array
+					selectedProfessors.push(nodes[i]);
+					// set class to make them red
+					d3.select(this).classed("selected",true);
+					d3.select(columnText[0][i]).classed("selected",true);
+				}
+			});
 			
 			var columnText = column.append("text")
 				.attr("x", 10 - parseFloat((departmentRect.attr('y'))))
 				.attr("y", (xScale.rangeBand() / 2))
 				.attr("dy", ".32em")
 				.attr("text-anchor", "start")
-				.text(function(d, i) { return nodes[i].name; });
+				.attr("class","matrixLink text")
+				.style("font-Size", "14px")
+				.text(function(d, i) { return nodes[i].name; })
+				.classed("selected",function(d,i){
+					for (var j =0;j<selectedProfessors.length;j++){
+						if(selectedProfessors[j].ID==nodes[i].ID){
+							d3.select(rowText[0][i]).classed("selected",true);
+							return true;
+						}
+					}
+					return false;
+				});
+				
+			columnText.on("click",function(d , i){
+				if (d3.select(this).classed("selected")){
+					// remove from menu
+					$("#"+parentDivID +nodes[i].ID).remove();
+					// remove from selectedProfessors array
+					selectedProfessors.remove(nodes[i]);
+					// remove class to make them black again
+					d3.select(this).classed("selected",false);
+					d3.select(rowText[0][i]).classed("selected",false);
+					
+				}else{
+					
+					// add to menu
+					$("#"+parentDivID+"professorsMenu").append("<li id='" + parentDivID +nodes[i].ID+ "'>"+ nodes[i].name+"</li>");
+					// add to selectedProfessors array
+					selectedProfessors.push(nodes[i]);
+					// set class to make them red
+					d3.select(this).classed("selected",true);
+					d3.select(rowText[0][i]).classed("selected",true);
+				}
+			});
 			
-			departmentRect.on("click", function(){
+			departmentRect.on("dblclick", function(){
 				if (d3.event.defaultPrevented) return;
 				rowText.remove();
 				columnText.remove();
@@ -406,7 +489,6 @@ function  createMatrixLink(parentDivID, jsonFile){
 						return elementTranslateX;
 					}
 				})
-				
 				// move matrixes
 				.transition().attr("transform" , function(){
 					return "translate(" + this.attributes.x.value + "," + this.attributes.y.value +")";
@@ -423,12 +505,13 @@ function  createMatrixLink(parentDivID, jsonFile){
 				// reset related and selected classes
 				d3.select(this).select('rect').classed("related",0).classed("selected",0);
 				
+				// selected department itself
 				if (d3.select(this).select('rect').datum()==node) {
 					d3.select(this).select('rect').classed("selected",1);
 					return 1
 				};
 				
-				
+				// related departments
 				for (var i=0;i<node.relatedNodes.length;i++){
 					if(d3.select(this).select('rect').datum()==node.relatedNodes[i]){
 							d3.select(this).select('rect').classed("related",1);
@@ -450,7 +533,7 @@ function  createMatrixLink(parentDivID, jsonFile){
 			departmentRect.transition().attr("width", node.size)
 			.attr("height", node.size).duration(transitionTime);
 			
-			departmentRect.on("click", function(){
+			departmentRect.on("dblclick", function(){
 				if (d3.event.defaultPrevented) return;
 				enlargeMatrix(this);
 			});
