@@ -4,7 +4,9 @@ links : [{source:"adc.id",target:"123.id", type:"award" , linkType:"departmentNa
 departments : [{name : chemistry},{name : computer science},{name : biology}]
 */
 
-// remove object from Array
+// This module is not working with angular and everything is jquery base. It means we add elements to dom directly, but, everything above parentDivID is safe and can be angular base.
+
+// remove object from Array prototype
 Array.prototype.remove = function() {
     var what, a = arguments, L = a.length, ax;
     while (L && this.length) {
@@ -23,10 +25,11 @@ function  createMatrixLink(parentDivID, jsonFile){
 	var margin = {width: width/5, height: height/5};
 	var minLenght = Math.min(width,height);
 	var moveToCenter = {x: margin.width/2 , y: margin.height/2 }
-	var color = d3.scale.category20();
+	var departmentColor = d3.scale.category20();
 	var matrixSize = (minLenght/6);
 	var transitionTime = 700;
 	var selectedProfessors = [];
+	var departmentColor = d3.scale.category20();
 	
 	// now we want to make department nodes and links to run a force layout on them
 	// it helps us to find best places for our matrixes
@@ -38,9 +41,7 @@ function  createMatrixLink(parentDivID, jsonFile){
 	var nodeHash = new Object();
 	for (var i =0 , length = forceNodes.length; i < length; i++){
 		forceNodes[i].relatedNodes = [];
-		
 		nodeHash[forceNodes[i].name] = i;
-		
 		// make empty links and nodes for each department metrix
 		departmentMatrixes[i] = new Object();
 		departmentMatrixes[i].name = forceNodes[i].name;
@@ -107,7 +108,10 @@ function  createMatrixLink(parentDivID, jsonFile){
 	// empty parentObject and start adding items to it
 	parentObject.empty();
 	
-	parentObject.append('<div class ="noselect" style="position:absolute; top:10px;left:10px; opacity: 0.85"> <ul id="'+ parentDivID+ 'professorsMenu"> <li class="ui-widget-header">Selected Professors</li></ul></div>');
+	// department selection bar
+	parentObject.append('<div id="'+ parentDivID + 'departmentBar" class ="noselect niceScroll" style="position:absolute; top:5px;left:5px; max-height:100px; overflow-y: scroll; opacity: 0.85"></div>');
+	// selectedProfessor menu
+	parentObject.append('<div class ="noselect" style="position:absolute; top:100px;left:5px; opacity: 0.85; width:200px; visibility:hidden;"> <ul id="'+ parentDivID+ 'professorsMenu"> <li class="ui-widget-header">Selected Professors</li></ul></div>');
 	$("#"+parentDivID+"professorsMenu").menu({
 		items: "> :not(.ui-widget-header)"
 	});
@@ -174,6 +178,59 @@ function  createMatrixLink(parentDivID, jsonFile){
 	for (var i=0, length =forceNodes.length; i < length ; i++ ){
 		createMatrix(forceNodes[i] , departmentMatrixes[i].links, departmentMatrixes[i].nodes);
 	}
+	
+	// time to add departmentbar items
+	d3.select("#"+parentDivID + "departmentBar").selectAll("label")
+		.data(forceNodes).enter()
+		.append("label")
+		.attr("class","departmentButton btn btn-primary active")
+		.attr("name",function(d){return d.name;})
+		.style("background-color",function(d){return departmentColor(d.name);})
+		.html(function(d){return d.name});
+	
+	// TODO : convert this jquery click to d3.on("click") -- just for making code more readable
+	//set onclick for departmentBar
+	$("#"+parentDivID + "departmentBar > .btn.btn-primary").click(function(event){
+		var element = $(event.currentTarget);
+		if(element.hasClass("active")){
+			// hide department
+			element.removeClass("active");
+			container.selectAll(".departmentG").style("visibility" , function(){ 
+				if (d3.select(this).select(".matrixLink.background").data()[0].name==element.attr("name")){
+					return "hidden";
+				}else{
+					return d3.select(this).style("visibility");
+				}
+			})
+			// hide related links
+			matrixDepartmentlinks.style("visibility", function(d){
+				if (d.source.name == element.attr("name") || d.target.name == element.attr("name")){
+					return "hidden";
+				}else {
+					return d3.select(this).style("visibility");
+				}
+			})
+		}else{
+			// show department
+			element.addClass("active");
+			container.selectAll(".departmentG").style("visibility" , function(){ 
+				if (d3.select(this).select(".matrixLink.background").data()[0].name==element.attr("name")){
+					return "visible";
+				}else{
+					return d3.select(this).style("visibility");
+				}
+			})
+			// show related links
+			matrixDepartmentlinks.style("visibility", function(d){
+				// this looong if simply check if both sides of link are visible or not
+				if ((d.source.name == element.attr("name") && $(d.target.element.node().parentNode).css("visibility")=="visible")|| (d.target.name == element.attr("name") && $(d.source.element.node().parentNode).css("visibility")=="visible")){
+					return "visible";
+				}else {
+					return d3.select(this).style("visibility");
+				}
+			})
+		}
+	}) // end of departmentBar click
 	
 	// "nodes" and "links" refer to elements inside the current matrix
 	// but the parameter "node" refers to the matrix element itself
@@ -262,11 +319,17 @@ function  createMatrixLink(parentDivID, jsonFile){
 				enlargeMatrix();
 			});
 		
+		// we make a link from data to element (because sometimes we have access to data but we do not want to loop between elements to find it)
+		departmentRect.datum(function(d){
+			d.element = departmentRect;
+			return d;
+		})
+		
 		departmentRect.on("touchstart", function(){	
 			departmentRectTimer = setTimeout(function(){
-				// here we handle long-press function	
+				// handle long-press function	
 				// 500 is the length of time we want the user to touch before we do something	
-				// TODO : we have to prevent tap becasue its hold d3.event.preventDefault does not work
+				// TODO : we have to prevent tap because it is hold d3.event.preventDefault does not work - (there is not any listener on tap so it is safe)
 				$(container[0]).contextmenu("open", $(departmentRect[0]));
 			}, 250); 
 		}).on("touchend", function(e){
@@ -300,13 +363,23 @@ function  createMatrixLink(parentDivID, jsonFile){
 			
 		});
 		
-		departmentG.append("text")
-			.attr("x", node.x)
-			.attr("y", node.y)
-			.attr("dy", "-2px")
+		// department titles
+		var departmentTitle = departmentG.append("text")
+			.attr("x",  parseFloat(departmentRect.attr("x")) + (parseFloat(departmentRect.attr("width")/2)))
+			.attr("y", parseFloat(departmentRect.attr("y")) + parseFloat(departmentRect.attr("height")))
+			.attr("dy", "14px")
 			.text(node.name)
-			.style("font-size","14px")
 			.attr("class","matrixLink title");
+		
+		/* departmentG.insert("rect", "text")
+			.attr("x",departmentTitle.node().getBBox().x)
+			.attr("y",departmentTitle.node().getBBox().y)
+			.attr("width",departmentTitle.node().getBBox().width)
+			.attr("height",departmentTitle.node().getBBox().height)
+			.style("fill" , departmentColor(node.name));
+		 */
+		
+			
 		
 		var row = departmentG.selectAll(".matrixLink.row")
 			.data(matrix)
@@ -368,6 +441,8 @@ function  createMatrixLink(parentDivID, jsonFile){
 			departmentRect.transition().attr("width", node.size)
 			.attr("height", node.size).duration(transitionTime);
 			
+			departmentTitle.transition().attr("x", parseFloat(departmentRect.attr("x")) + (node.size/2))
+			.attr("y", parseFloat(departmentRect.attr("y")) + node.size).duration(transitionTime);
 			
 			row.transition().attr("transform", function(d, i) {
 				return "translate(0," + (xScale(i) + parseFloat(departmentRect.attr('y'))) + ")";
@@ -405,11 +480,14 @@ function  createMatrixLink(parentDivID, jsonFile){
 					// remove class to make them black again
 					d3.select(this).classed("selected",false);
 					d3.select(columnText[0][i]).classed("selected",false);
+					if (selectedProfessors.length==0)
+						$("#"+parentDivID+"professorsMenu").css("visibility","hidden");
 					
 				}else{
 					
 					// add to menu
-					$("#"+parentDivID+"professorsMenu").append("<li id='" + parentDivID +nodes[i].ID+ "'>"+ nodes[i].name+"</li>");
+					$("#"+parentDivID+"professorsMenu").css("visibility","visible").append("<li id='" + parentDivID +nodes[i].ID+ "'>"+ nodes[i].name+"</li>");
+					
 					// add to selectedProfessors array
 					selectedProfessors.push(nodes[i]);
 					// set class to make them red
@@ -445,11 +523,12 @@ function  createMatrixLink(parentDivID, jsonFile){
 					// remove class to make them black again
 					d3.select(this).classed("selected",false);
 					d3.select(rowText[0][i]).classed("selected",false);
-					
+					if (selectedProfessors.length==0)
+						$("#"+parentDivID+"professorsMenu").css("visibility","hidden");
 				}else{
 					
 					// add to menu
-					$("#"+parentDivID+"professorsMenu").append("<li id='" + parentDivID +nodes[i].ID+ "'>"+ nodes[i].name+"</li>");
+					$("#"+parentDivID+"professorsMenu").css("visibility","visible").append("<li id='" + parentDivID +nodes[i].ID+ "'>"+ nodes[i].name+"</li>");
 					// add to selectedProfessors array
 					selectedProfessors.push(nodes[i]);
 					// set class to make them red
@@ -533,6 +612,9 @@ function  createMatrixLink(parentDivID, jsonFile){
 			departmentRect.transition().attr("width", node.size)
 			.attr("height", node.size).duration(transitionTime);
 			
+			departmentTitle.transition().attr("x", parseFloat(departmentRect.attr("x")) + (node.size/2))
+			.attr("y", parseFloat(departmentRect.attr("y")) + node.size).duration(transitionTime);
+			
 			departmentRect.on("dblclick", function(){
 				if (d3.event.defaultPrevented) return;
 				enlargeMatrix(this);
@@ -599,13 +681,14 @@ function  createMatrixLink(parentDivID, jsonFile){
 
 		} // end of shrinkMatrix
 	} // end of createMatrix function
+	
+	// this function handle screen resize
 	function matrixLinkResize(){
 		mainSvg.attr("width", width)
 		 .attr("height", height);
 	
 		mainRect.attr("width", width)
     .attr("height", height);
-		
 	}
 	
 	// set resizer function every 1 sec
