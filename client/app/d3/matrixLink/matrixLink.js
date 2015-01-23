@@ -108,6 +108,9 @@ function  createMatrixLink(parentDivID, jsonFile){
 	// empty parentObject and start adding items to it
 	parentObject.empty();
 	
+	// selectedDepartment menu
+	var selectedDepartmentMenu = parentObject.append('<div class ="noselect" style="position:absolute; top:100px; right:5px; opacity: 0.85; width:200px; visibility:visible;"> <ul id="'+ parentDivID+ 'departmentMenu"> <li class="ui-widget-header">Selected Professors</li></ul></div>');
+	
 	// department selection bar
 	parentObject.append('<div id="'+ parentDivID + 'departmentBar" class ="noselect niceScroll" style="position:absolute; top:5px;left:5px; max-height:100px; overflow-y: scroll; opacity: 0.85"></div>');
 	// selectedProfessor menu
@@ -139,11 +142,12 @@ function  createMatrixLink(parentDivID, jsonFile){
 		preventContextMenuForPopup: true,
     preventSelect: true,
 		menu: [
-        {title: "Copy", cmd: "copy", uiIcon: "ui-icon-copy"},
+        {title: "Select/UnSelect", cmd: "select"},
         {title: "Arrange", children: [
-            {title: "By name", cmd: "name"},
-            {title: "By collaboration count", cmd: "count"}
-						]}
+           {title: "By name", cmd: "name"},
+           {title: "By collaboration count", cmd: "count"}
+				]},
+				{title: "Hide", cmd: "hide"}
         ],
 			select: function(event, ui) {
 				// call refreshMatrix method
@@ -180,7 +184,7 @@ function  createMatrixLink(parentDivID, jsonFile){
 	}
 	
 	// time to add departmentbar items
-	d3.select("#"+parentDivID + "departmentBar").selectAll("label")
+	departmentBarLables = d3.select("#"+parentDivID + "departmentBar").selectAll("label")
 		.data(forceNodes).enter()
 		.append("label")
 		.attr("class","departmentButton btn btn-primary active")
@@ -188,7 +192,7 @@ function  createMatrixLink(parentDivID, jsonFile){
 		.style("background-color",function(d){return departmentColor(d.name);})
 		.html(function(d){return d.name});
 	
-	// TODO : convert this jquery click to d3.on("click") -- just for making code more readable
+	// TODO : convert this jquery.click to d3.on("click") -- just for making code more readable
 	//set onclick for departmentBar
 	$("#"+parentDivID + "departmentBar > .btn.btn-primary").click(function(event){
 		var element = $(event.currentTarget);
@@ -343,24 +347,46 @@ function  createMatrixLink(parentDivID, jsonFile){
 		});
 		
 		$(departmentRect[0]).bind("refreshMatrix" , function(event , order){
-			if (order=="name"){
-				xScale.domain(orders.name);
-			}else if (order=="count"){
-				xScale.domain(orders.count);
-			}
-			
-			var t = departmentG.transition().duration(2500);
-			t.selectAll(".matrixLink.row")
-				.delay(function(d, i) { return xScale(i) * 4; })
-				.attr("transform", function(d, i) { return "translate(0," + (xScale(i) + parseFloat(departmentRect.attr('y'))) + ")"; })
-				.selectAll(".matrixLink.cell")
-					.delay(function(d) { return xScale(d.x) * 4; })
-					.attr("x", function(d) { return xScale(d.x) + parseFloat((departmentRect.attr('x'))); });
+			switch(order) {
+				case "name":
+				case "count":
+					if (order=="name"){
+						xScale.domain(orders.name);
+					}else if (order=="count"){
+						xScale.domain(orders.count);
+					}
+					var t = departmentG.transition().duration(2500);
+					t.selectAll(".matrixLink.row")
+						.delay(function(d, i) { return xScale(i) * 4; })
+						.attr("transform", function(d, i) { return "translate(0," + (xScale(i) + parseFloat(departmentRect.attr('y'))) + ")"; })
+						.selectAll(".matrixLink.cell")
+							.delay(function(d) { return xScale(d.x) * 4; })
+							.attr("x", function(d) { return xScale(d.x) + parseFloat((departmentRect.attr('x'))); });
 
-			t.selectAll(".matrixLink.column")
-				.delay(function(d, i) { return xScale(i) * 4; })
-				.attr("transform", function(d, i) { return "translate(" + (xScale(i) + parseFloat((departmentRect.attr('x')))) + ")rotate(-90)"; });
-			
+					t.selectAll(".matrixLink.column")
+						.delay(function(d, i) { return xScale(i) * 4; })
+						.attr("transform", function(d, i) { return "translate(" + (xScale(i) + parseFloat((departmentRect.attr('x')))) + ")rotate(-90)"; });
+					break;
+				case "hide":
+					// hide department
+					// make lable de-active
+					departmentBarLables.each(function(d){
+						if (d.name==node.name){
+							d3.select(this).classed("active",false);
+						}
+					});
+					departmentG.style("visibility","hidden");
+					// hide related links
+					matrixDepartmentlinks.style("visibility", function(d){
+						if (d.source.name == node.name || d.target.name == node.name){
+							return "hidden";
+						}else {
+							return d3.select(this).style("visibility");
+						}
+					})
+				default:
+				// default happens when user click on Arrange. nothing to do.
+			}
 		});
 		
 		// department titles
