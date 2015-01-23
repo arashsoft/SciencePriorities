@@ -8,8 +8,7 @@
 }
 
 .departmentButton:not(.active) {
-	border-width : 2px;
-	border-color : red !important;
+	opacity: 0.3;
 }
 
 .matrixLink.node {
