@@ -5,6 +5,7 @@
 	margin : 1px;
 	color: #000 !important;
 	font-weight: bold;
+	padding: 3px 6px;
 }
 
 .departmentButton:not(.active) {
@@ -42,23 +43,21 @@
 
 .matrixLink.background{
 	fill: #eee;
-	stroke-width: 2;
-	stroke:black;
+	stroke-width: 6;
 	opacity: 1;
 }
 .matrixLink.background.drag{
-	stroke:blue;
-	stroke-width: 3;
+	/* stroke:blue; */
+	stroke-width: 4;
 }
 
 .matrixLink.background.related{
-	stroke:purple;
-	stroke-width: 5;
+	stroke:purple !important; 
 }
 
 .matrixLink.background.selected{
-	stroke:blue;
-	stroke-width: 5;
+	/* stroke:blue; */
+	stroke-width: 10;
 }
 
 .matrixLink.cell{

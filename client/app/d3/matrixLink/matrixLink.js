@@ -317,6 +317,7 @@ function  createMatrixLink(parentDivID, jsonFile){
 			.attr("y", node.y)
 			.attr("width", node.size)
 			.attr("height", node.size)
+			.style("stroke", departmentColor(node.name))
 			.datum(node)
 			.on("dblclick", function(){
 				if (d3.event.defaultPrevented) return;
