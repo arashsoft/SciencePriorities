@@ -7,7 +7,7 @@ var passport = require('passport');
 // TODO: read users from database
 var users = [
   { id: 1, username: 'arash', password: 'secret' },
-  { id: 2, username: 'joe', password: 'birthday'}
+  { id: 2, username: 'insightlab', password: 'rki#$2sd'}
 ];
 
 passport.use('local-login', new LocalStrategy({passReqToCallback : true }, function(req, username, password, done) {
