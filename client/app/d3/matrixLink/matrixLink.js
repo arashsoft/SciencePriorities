@@ -29,6 +29,7 @@ function  createMatrixLink(parentDivID, jsonFile){
 	var matrixSize = (minLenght/6);
 	var transitionTime = 700;
 	var selectedProfessors = [];
+	var selectedDepartments =[];
 	var departmentColor = d3.scale.category20();
 	
 	// now we want to make department nodes and links to run a force layout on them
@@ -109,7 +110,10 @@ function  createMatrixLink(parentDivID, jsonFile){
 	parentObject.empty();
 	
 	// selectedDepartment menu
-	var selectedDepartmentMenu = parentObject.append('<div class ="noselect" style="position:absolute; top:100px; right:5px; opacity: 0.85; width:200px; visibility:visible;"> <ul id="'+ parentDivID+ 'departmentMenu"> <li class="ui-widget-header">Selected Professors</li></ul></div>');
+	var selectedDepartmentMenu = parentObject.append('<div class ="noselect" style="position:absolute; top:100px; right:5px; opacity: 0.85; width:220px; visibility:hidden;"> <ul id="'+ parentDivID+ 'departmentMenu"> <li class="ui-widget-header">Selected Departments</li></ul></div>');
+	$("#"+parentDivID+"departmentMenu").menu({
+		items: "> :not(.ui-widget-header)"
+	});
 	
 	// department selection bar
 	parentObject.append('<div id="'+ parentDivID + 'departmentBar" class ="noselect niceScroll" style="position:absolute; top:5px;left:5px; max-height:100px; overflow-y: scroll; opacity: 0.85"></div>');
@@ -333,10 +337,10 @@ function  createMatrixLink(parentDivID, jsonFile){
 		departmentRect.on("touchstart", function(){	
 			departmentRectTimer = setTimeout(function(){
 				// handle long-press function	
-				// 500 is the length of time we want the user to touch before we do something	
+				// 350 is the length of time we want the user to touch before we do something	
 				// TODO : we have to prevent tap because it is hold d3.event.preventDefault does not work - (there is not any listener on tap so it is safe)
 				$(container[0]).contextmenu("open", $(departmentRect[0]));
-			}, 250); 
+			}, 350); 
 		}).on("touchend", function(e){
 			//stops short touches from firing the event	
 			if (departmentRectTimer)
@@ -385,6 +389,22 @@ function  createMatrixLink(parentDivID, jsonFile){
 							return d3.select(this).style("visibility");
 						}
 					})
+					break;
+				case "select":
+					if (selectedDepartments.indexOf(node)!=-1){
+						// unselect
+						selectedDepartments.remove(node);
+						node.selectMenuElement.remove();
+						if (selectedDepartments.length==0){
+							$("#"+parentDivID+ "departmentMenu").css("visibility","hidden");
+						}
+					}else{
+						// select
+						$("#"+parentDivID+ "departmentMenu").css("visibility","visible");
+						selectedDepartments.push(node);
+						node.selectMenuElement = $("<li>"+ node.name+"</li>").appendTo("#"+parentDivID+ "departmentMenu");
+					}
+					break;
 				default:
 				// default happens when user click on Arrange. nothing to do.
 			}
@@ -612,14 +632,14 @@ function  createMatrixLink(parentDivID, jsonFile){
 				d3.select(this).select('rect').classed("related",0).classed("selected",0);
 				
 				// selected department itself
-				if (d3.select(this).select('rect').datum()==node) {
+				if (d3.select(this).select('rect').datum().name==node.name) {
 					d3.select(this).select('rect').classed("selected",1);
 					return 1
 				};
 				
 				// related departments
 				for (var i=0;i<node.relatedNodes.length;i++){
-					if(d3.select(this).select('rect').datum()==node.relatedNodes[i]){
+					if(d3.select(this).select('rect').datum().name==node.relatedNodes[i].name){
 							d3.select(this).select('rect').classed("related",1);
 							return 1;
 					}
