@@ -42,6 +42,7 @@ function  createMatrixLink(parentDivID, jsonFile){
 	var nodeHash = new Object();
 	for (var i =0 , length = forceNodes.length; i < length; i++){
 		forceNodes[i].relatedNodes = [];
+		forceNodes[i].ID = "Department" + i;
 		nodeHash[forceNodes[i].name] = i;
 		// make empty links and nodes for each department metrix
 		departmentMatrixes[i] = new Object();
@@ -110,7 +111,7 @@ function  createMatrixLink(parentDivID, jsonFile){
 	parentObject.empty();
 	
 	// selectedDepartment menu
-	var selectedDepartmentMenu = parentObject.append('<div class ="noselect" style="position:absolute; top:100px; right:5px; opacity: 0.85; width:220px; visibility:hidden;"> <ul id="'+ parentDivID+ 'departmentMenu"> <li class="ui-widget-header">Selected Departments</li></ul></div>');
+	var selectedDepartmentMenu = parentObject.append('<div class ="noselect" style="position:absolute; top:100px; right:5px; opacity: 0.85; width:200px; visibility:hidden;"> <ul id="'+ parentDivID+ 'departmentMenu" style="padding:10px;"> <li class="ui-widget-header">Selected Departments</li></ul></div>');
 	$("#"+parentDivID+"departmentMenu").menu({
 		items: "> :not(.ui-widget-header)"
 	});
@@ -118,7 +119,7 @@ function  createMatrixLink(parentDivID, jsonFile){
 	// department selection bar
 	parentObject.append('<div id="'+ parentDivID + 'departmentBar" class ="noselect niceScroll" style="position:absolute; top:5px;left:5px; max-height:100px; overflow-y: scroll; opacity: 0.85"></div>');
 	// selectedProfessor menu
-	parentObject.append('<div class ="noselect" style="position:absolute; top:100px;left:5px; opacity: 0.85; width:200px; visibility:hidden;"> <ul id="'+ parentDivID+ 'professorsMenu"> <li class="ui-widget-header">Selected Professors</li></ul></div>');
+	parentObject.append('<div class ="noselect" style="position:absolute; top:100px;left:5px; opacity: 0.85; width:200px; visibility:hidden;"> <ul id="'+ parentDivID+ 'professorsMenu" style="padding:10px;"> <li class="ui-widget-header">Selected Professors</li></ul></div>');
 	$("#"+parentDivID+"professorsMenu").menu({
 		items: "> :not(.ui-widget-header)"
 	});
@@ -402,7 +403,8 @@ function  createMatrixLink(parentDivID, jsonFile){
 						// select
 						$("#"+parentDivID+ "departmentMenu").css("visibility","visible");
 						selectedDepartments.push(node);
-						node.selectMenuElement = $("<li>"+ node.name+"</li>").appendTo("#"+parentDivID+ "departmentMenu");
+						node.selectMenuElement = $("<li id='" + parentDivID + node.ID+ "' class='matrixLink selectLi'>"+ node.name+"</li>").append('<style>#'+ parentDivID + node.ID +':before {color:'+departmentColor(node.name)+';}</style>');
+						node.selectMenuElement.appendTo("#"+parentDivID+ "departmentMenu");
 					}
 					break;
 				default:
@@ -533,7 +535,7 @@ function  createMatrixLink(parentDivID, jsonFile){
 				}else{
 					
 					// add to menu
-					$("#"+parentDivID+"professorsMenu").css("visibility","visible").append("<li id='" + parentDivID +nodes[i].ID+ "'>"+ nodes[i].name+"</li>");
+					$("#"+parentDivID+"professorsMenu").css("visibility","visible").append("<li class='matrixLink selectLi' id='" + parentDivID +nodes[i].ID+ "'>"+ nodes[i].name+"</li>").append('<style>#'+ parentDivID +nodes[i].ID +':before {color:'+departmentColor(node.name)+';}</style>');
 					
 					// add to selectedProfessors array
 					selectedProfessors.push(nodes[i]);
@@ -575,7 +577,7 @@ function  createMatrixLink(parentDivID, jsonFile){
 				}else{
 					
 					// add to menu
-					$("#"+parentDivID+"professorsMenu").css("visibility","visible").append("<li id='" + parentDivID +nodes[i].ID+ "'>"+ nodes[i].name+"</li>");
+					$("#"+parentDivID+"professorsMenu").css("visibility","visible").append("<li class='matrixLink selectLi' id='" + parentDivID +nodes[i].ID+ "'>"+ nodes[i].name+"</li>").append('<style>#'+ parentDivID +nodes[i].ID +':before {color:'+departmentColor(node.name)+';}</style>');;
 					// add to selectedProfessors array
 					selectedProfessors.push(nodes[i]);
 					// set class to make them red
