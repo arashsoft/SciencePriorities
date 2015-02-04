@@ -5,6 +5,7 @@
 var errors = require('./components/errors');
 var jsonHandler = require('./makeJson.js');
 var passport = require('./authenticate.js');
+var path = require('path');
 
 module.exports = function(app) {
 
@@ -44,12 +45,34 @@ module.exports = function(app) {
 		 we should use callback function instead of return value; */
 		//res.send(jsonHandler.makeJson(req.params.entityName,req.params.propertyName));
    });
+	 
+	 //jsonrequest2/departmentSelect/' + JSON.stringify(selectedDepartments)
+	 // dynamic json request
+	app.get('/jsonrequest2/:param1/:values1',function(req, res) {
+		if (req.isAuthenticated()){
+			jsonHandler.makeDynamicJson(req.params.param1,JSON.parse(req.params.values1), function (jsonFile){
+				if (jsonFile=="mysql connection error"){
+					res.send({"error":'Error: cannot connect to the database please contact with your server administrator'});
+				}else if ( jsonFile=="unknown visualizaition request"){
+					res.send({"error":'Your requested visualization is not available.'});
+				}else{
+					res.send(jsonFile);
+				}
+			});
+		}else{
+			// not authenticated
+			// the client side should handle redirect
+			req.flash('loginMessage', 'Please sign in!');
+			res.send({"redirect": '/'});
+		}
+  });
+	 
   
   // main page
 	app.get('/main' , function(req, res) {
 		if (req.isAuthenticated()){  
 			//res.render('mainPage.html.ejs', { message: req.flash('loginMessage') });
-			res.sendfile(app.get('appPath') + '/mainPage.html');
+			res.sendfile(path.resolve('./client/mainPage.html'));
 		}else{
 			req.flash('loginMessage', 'Please sign in!');
 			res.render('loginPage.ejs', { message: req.flash('loginMessage') });

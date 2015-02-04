@@ -1,5 +1,16 @@
 // hard code awards based on their ID <= 20074 because of data problem
 
+// semi-prototype function to check if an object is empty or not.
+function isEmptyObject(obj) {
+  for (var key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+
 exports.makeJson = function(entityName, propertyName, layoutName, callback){
 		
 	var mysql = require('mysql');
@@ -155,4 +166,82 @@ exports.makeJson = function(entityName, propertyName, layoutName, callback){
 				callback("unknown visualizaition request");
 		}
 	});
-}
+} // end of makeJson
+
+exports.makeDynamicJson = function(type, values1, callback){
+	var mysql = require('mysql');
+	var mysqlConf = require('./config/mysql.config');
+	var connection = mysql.createConnection({
+	  host : mysqlConf.HOST,
+	  user : mysqlConf.USER,
+	  password : mysqlConf.PASSWORD,
+	  database : mysqlConf.DATABASE
+	});
+	//connection.connect();
+	if (type == "departmentSelect"){
+		connection.connect(function(err) {
+			if (err) {
+				console.error('error connecting to mysql');
+				connection.end();
+				callback("mysql connection error");
+				return;
+			}
+			
+			var queryText = 'SELECT p.* , d.Name as departmentName FROM professor  as p join department  as d  join faculty as f join university as u WHERE p.Department_Primary = d.ID and d.Faculty = f.ID and f.University = u.ID and u.Short_Name = "UWO" and d.Name IN (';
+			for (var i=0; i < values1.length; i++){
+				queryText += '"'+ values1[i] + '",'
+			}
+			// remove the extra comma
+			queryText = queryText.substring(0, queryText.length - 1);
+			// add the last ")"
+			queryText += ")";
+			connection.query(queryText, function(err,rows,fields){
+				// run second query based on professors name (rows)
+				queryText = "SELECT ap.Grant, GROUP_CONCAT(P.ID SEPARATOR '#')  as Professors, GROUP_CONCAT(D.name SEPARATOR '#') as Departments FROM (select CONCAT(award_professor.Grant, award_professor.Professor) as tempColumn, award_professor.Grant, award_professor.Professor, award_professor.ID from award_professor where award_professor.Professor in ("
+				for (var i=0;i<rows.length;i++){
+					queryText += rows[i].ID + ",";
+				}
+				queryText = queryText.substring(0, queryText.length - 1);
+				queryText += ") group by tempColumn) as ap join professor as P on P.ID= ap.Professor join department as D on P.Department_Primary=D.ID GROUP BY ap.Grant having count(ap.grant) > 1";
+				
+				connection.query(queryText, function(err2,rows2,fields2){
+					connection.end();
+					var tempResult = {};
+					tempResult.nodes = rows;
+					tempResult.links = new Array();
+					
+					var tempLinks = [];
+					// we have to it because of d3.force bug (it does not support node names as source and target)
+					var nodeHash = new Object();
+					for (var i =0; i < rows.length; i++){
+						nodeHash[rows[i].ID] = i;
+					}
+					for (var i=0 , length =rows2.length ; i < length; i++){
+						var professorIDs = rows2[i].Professors.split("#");
+						var departmentNames = rows2[i].Departments.split("#");
+						for (var j1=0 , j1Length = professorIDs.length; j1 < j1Length; j1++){
+							for (var j2= j1+1; j2 < j1Length; j2++){
+								tempLinks.push({source: nodeHash[professorIDs[j1]],target:nodeHash[professorIDs[j2]], width:1 ,type:"award", linkType:(departmentNames[j1]==departmentNames[j2] ? departmentNames[j1]:0)});
+							}
+						}
+					}
+					// remove duplicates
+					var LinkObjects = new Object();
+					for (var i =0, length = tempLinks.length; i < length ; i++){
+						// we remove dublicate links with this method
+						if (isEmptyObject(LinkObjects[tempLinks[i].source+"-"+tempLinks[i].target])){
+							LinkObjects[tempLinks[i].source+"-"+tempLinks[i].target]=tempLinks[i];
+						}else{
+							LinkObjects[tempLinks[i].source+"-"+tempLinks[i].target].width++;
+						}
+					}
+					// convert object to array
+					for (var tempLink in LinkObjects){
+						tempResult.links.push(LinkObjects[tempLink])
+					}
+					callback(tempResult);
+				});
+			});
+		}); // end of connection.connect()
+	} // end of if(type == departmentSelect)
+} // end of makeDynamicJson

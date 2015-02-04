@@ -110,11 +110,8 @@ function  createMatrixLink(parentDivID, jsonFile){
 	// empty parentObject and start adding items to it
 	parentObject.empty();
 	
-	// selectedDepartment menu
-	var selectedDepartmentMenu = parentObject.append('<div class ="noselect" style="position:absolute; top:100px; right:5px; opacity: 0.85; width:200px; visibility:hidden;"> <ul id="'+ parentDivID+ 'departmentMenu" style="padding:10px;"> <li class="ui-widget-header">Selected Departments</li></ul></div>');
-	$("#"+parentDivID+"departmentMenu").menu({
-		items: "> :not(.ui-widget-header)"
-	});
+	// selectedDepartments menu
+	$('<div class ="noselect" style="position:absolute; top:100px; right:5px; opacity: 0.85; width:200px; visibility:hidden;">	<ul class = "ui-menu ui-widget ui-widget-content ui-corner-all" id="'+ parentDivID+ 'departmentMenu" style="padding:10px;"> <li class="ui-widget-header">Selected Departments</li> <label class="btn btn-primary" id="'+parentDivID+'departmentMenuButton" style="padding: 0px 3px;margin-top:15px;" >Show Relations</label></ul> </div>').appendTo(parentObject);
 	
 	// department selection bar
 	parentObject.append('<div id="'+ parentDivID + 'departmentBar" class ="noselect niceScroll" style="position:absolute; top:5px;left:5px; max-height:100px; overflow-y: scroll; opacity: 0.85"></div>');
@@ -189,7 +186,7 @@ function  createMatrixLink(parentDivID, jsonFile){
 	}
 	
 	// time to add departmentbar items
-	departmentBarLables = d3.select("#"+parentDivID + "departmentBar").selectAll("label")
+	departmentBarLabels = d3.select("#"+parentDivID + "departmentBar").selectAll("label")
 		.data(forceNodes).enter()
 		.append("label")
 		.attr("class","departmentButton btn btn-primary active")
@@ -197,7 +194,6 @@ function  createMatrixLink(parentDivID, jsonFile){
 		.style("background-color",function(d){return departmentColor(d.name);})
 		.html(function(d){return d.name});
 	
-	// TODO : convert this jquery.click to d3.on("click") -- just for making code more readable
 	//set onclick for departmentBar
 	$("#"+parentDivID + "departmentBar > .btn.btn-primary").click(function(event){
 		var element = $(event.currentTarget);
@@ -240,6 +236,21 @@ function  createMatrixLink(parentDivID, jsonFile){
 			})
 		}
 	}) // end of departmentBar click
+	
+	//set onclick for departmentMenuButton
+	$("#"+parentDivID+"departmentMenuButton").click(function(){
+		
+		var mainDiv = $('<div align="center" class="matrixLinkBenchmarkSelectDiv"><div class="btn btn-danger close-btn" onclick="var tempObject = $(this).parent().parent(); tempObject.hide(1000,function(){tempObject.remove()});">X</div></div>');
+		$('<div class="matrixLinkBenchmarkSelect"></div>').append(mainDiv).appendTo(parentObject);
+		var loadingGif = $('<img src="/assets/images/loading.gif" alt="loading" style="width: 40%; height:60%;">');
+		loadingGif.appendTo(mainDiv);
+		
+		// request nodes and links for compare departments
+		$.get('/jsonrequest2/departmentSelect/' + JSON.stringify(selectedDepartments) , function(result){
+			loadingGif.remove();
+			compareDepartments(mainDiv,result);
+		});
+	});
 	
 	// "nodes" and "links" refer to elements inside the current matrix
 	// but the parameter "node" refers to the matrix element itself
@@ -375,8 +386,8 @@ function  createMatrixLink(parentDivID, jsonFile){
 					break;
 				case "hide":
 					// hide department
-					// make lable de-active
-					departmentBarLables.each(function(d){
+					// make label de-active
+					departmentBarLabels.each(function(d){
 						if (d.name==node.name){
 							d3.select(this).classed("active",false);
 						}
@@ -392,9 +403,9 @@ function  createMatrixLink(parentDivID, jsonFile){
 					})
 					break;
 				case "select":
-					if (selectedDepartments.indexOf(node)!=-1){
+					if (selectedDepartments.indexOf(node.name)!=-1){
 						// unselect
-						selectedDepartments.remove(node);
+						selectedDepartments.remove(node.name);
 						node.selectMenuElement.remove();
 						if (selectedDepartments.length==0){
 							$("#"+parentDivID+ "departmentMenu").css("visibility","hidden");
@@ -402,9 +413,9 @@ function  createMatrixLink(parentDivID, jsonFile){
 					}else{
 						// select
 						$("#"+parentDivID+ "departmentMenu").css("visibility","visible");
-						selectedDepartments.push(node);
+						selectedDepartments.push(node.name);
 						node.selectMenuElement = $("<li id='" + parentDivID + node.ID+ "' class='matrixLink selectLi'>"+ node.name+"</li>").append('<style>#'+ parentDivID + node.ID +':before {color:'+departmentColor(node.name)+';}</style>');
-						node.selectMenuElement.appendTo("#"+parentDivID+ "departmentMenu");
+						node.selectMenuElement.insertBefore("#"+parentDivID+"departmentMenuButton");
 					}
 					break;
 				default:
