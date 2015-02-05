@@ -235,10 +235,12 @@ exports.makeDynamicJson = function(type, values1, callback){
 							LinkObjects[tempLinks[i].source+"-"+tempLinks[i].target].width++;
 						}
 					}
+					
 					// convert object to array
 					for (var tempLink in LinkObjects){
 						tempResult.links.push(LinkObjects[tempLink])
 					}
+					
 					callback(tempResult);
 				});
 			});

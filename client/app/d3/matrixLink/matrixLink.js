@@ -30,7 +30,7 @@ function  createMatrixLink(parentDivID, jsonFile){
 	var transitionTime = 700;
 	var selectedProfessors = [];
 	var selectedDepartments =[];
-	var departmentColor = d3.scale.category20();
+
 	
 	// now we want to make department nodes and links to run a force layout on them
 	// it helps us to find best places for our matrixes
@@ -247,8 +247,8 @@ function  createMatrixLink(parentDivID, jsonFile){
 		
 		// request nodes and links for compare departments
 		$.get('/jsonrequest2/departmentSelect/' + JSON.stringify(selectedDepartments) , function(result){
-			loadingGif.remove();
-			compareDepartments(mainDiv,result);
+			result.department = selectedDepartments;
+			compareDepartments(mainDiv,result,departmentColor, loadingGif);
 		});
 	});
 	
