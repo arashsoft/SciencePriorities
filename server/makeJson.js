@@ -137,7 +137,7 @@ exports.makeJson = function(entityName, propertyName, layoutName, callback){
 				// we want to run 3 query synchronously and then return their results to dataIsReady(data)
 				var queryNumber = 3;
 				var tempData = new Array();
-				connection.query("SELECT ap.Grant, GROUP_CONCAT(P.ID SEPARATOR '#')  as Professors, GROUP_CONCAT(D.name SEPARATOR '#') as Departments FROM (select CONCAT(award_professor.Grant, award_professor.Professor) as tempColumn, award_professor.Grant, award_professor.Professor, award_professor.ID from award_professor group by tempColumn) as ap join professor as P on P.ID= ap.Professor join department as D on P.Department_Primary=D.ID GROUP BY ap.Grant having count(ap.grant) > 1" , function (err,rows,fields){
+				connection.query("SELECT ap.Grant, GROUP_CONCAT(P.ID SEPARATOR '#')  as Professors, GROUP_CONCAT(D.name SEPARATOR '#') as Departments FROM (select CONCAT(award_professor2.Grant, award_professor2.Professor) as tempColumn, award_professor2.Grant, award_professor2.Professor, award_professor2.ID from award_professor2 group by tempColumn) as ap join professor as P on P.ID= ap.Professor join department as D on P.Department_Primary=D.ID GROUP BY ap.Grant having count(ap.grant) > 1" , function (err,rows,fields){
 					tempData.links = rows;
 					// check if other queries already returned or not
 					if (1 == queryNumber--){
@@ -197,7 +197,7 @@ exports.makeDynamicJson = function(type, values1, callback){
 			queryText += ")";
 			connection.query(queryText, function(err,rows,fields){
 				// run second query based on professors name (rows)
-				queryText = "SELECT ap.Grant, GROUP_CONCAT(P.ID SEPARATOR '#')  as Professors, GROUP_CONCAT(D.name SEPARATOR '#') as Departments FROM (select CONCAT(award_professor.Grant, award_professor.Professor) as tempColumn, award_professor.Grant, award_professor.Professor, award_professor.ID from award_professor where award_professor.Professor in ("
+				queryText = "SELECT ap.Grant, GROUP_CONCAT(P.ID SEPARATOR '#')  as Professors, GROUP_CONCAT(D.name SEPARATOR '#') as Departments FROM (select CONCAT(award_professor2.Grant, award_professor2.Professor) as tempColumn, award_professor2.Grant, award_professor2.Professor, award_professor2.ID from award_professor2 where award_professor2.Professor in ("
 				for (var i=0;i<rows.length;i++){
 					queryText += rows[i].ID + ",";
 				}
@@ -208,6 +208,7 @@ exports.makeDynamicJson = function(type, values1, callback){
 					connection.end();
 					var tempResult = {};
 					tempResult.nodes = rows;
+					tempResult.department = values1;
 					tempResult.links = new Array();
 					
 					var tempLinks = [];
@@ -240,10 +241,96 @@ exports.makeDynamicJson = function(type, values1, callback){
 					for (var tempLink in LinkObjects){
 						tempResult.links.push(LinkObjects[tempLink])
 					}
-					
+
 					callback(tempResult);
 				});
 			});
 		}); // end of connection.connect()
 	} // end of if(type == departmentSelect)
+	else if (type == "professorSelect" ){
+		connection.connect(function(err) {
+			if (err) {
+				console.error('error connecting to mysql');
+				connection.end();
+				callback("mysql connection error");
+				return;
+			}
+			var queryText = "select distinct p.*, d.Name as departmentName from professor as p join department as d on p.Department_Primary=d.ID join award_professor2 as ap on ap.Professor=p.ID where ap.`Grant` in (select award.ID as awardID from award join award_professor2 as ap2 on ap2.`Grant`= award.ID where ap2.Professor in (";
+			for (var i=0; i < values1.length; i++){
+				queryText += '"'+ values1[i] + '",'
+			}
+			queryText = queryText.substring(0, queryText.length - 1);
+			queryText += "))";
+			connection.query(queryText, function(err,rows,fields){
+				// now we have IDs of related professors to selected professors
+				// run second query based on professors IDs (rows)
+				queryText = "SELECT ap.Grant, GROUP_CONCAT(P.ID SEPARATOR '#')  as Professors, GROUP_CONCAT(D.name SEPARATOR '#') as Departments FROM (select CONCAT(award_professor2.Grant, award_professor2.Professor) as tempColumn, award_professor2.Grant, award_professor2.Professor, award_professor2.ID from award_professor2 where award_professor2.Professor in ("
+				for (var i=0;i<rows.length;i++){
+					queryText += rows[i].ID + ",";
+				}
+				queryText = queryText.substring(0, queryText.length - 1);
+				queryText += ") group by tempColumn) as ap join professor as P on P.ID= ap.Professor join department as D on P.Department_Primary=D.ID GROUP BY ap.Grant having count(ap.grant) > 1";
+				
+				connection.query(queryText, function(err2,rows2,fields2){
+					// now we have links in 34#23#12#... format
+					var tempResult = {};
+					tempResult.nodes = rows;
+					tempResult.selectedNodes = values1;
+					tempResult.links = new Array();
+					
+					var tempLinks = [];
+					// we have to it because of d3.force bug (it does not support node names as source and target)
+					var nodeHash = new Object();
+					for (var i =0; i < rows.length; i++){
+						nodeHash[rows[i].ID] = i;
+					}
+					for (var i=0 , length =rows2.length ; i < length; i++){
+						var professorIDs = rows2[i].Professors.split("#");
+						var departmentNames = rows2[i].Departments.split("#");
+						for (var j1=0 , j1Length = professorIDs.length; j1 < j1Length; j1++){
+							for (var j2= j1+1; j2 < j1Length; j2++){
+								tempLinks.push({source: nodeHash[professorIDs[j1]],target:nodeHash[professorIDs[j2]], width:1 ,type:"award", linkType:(departmentNames[j1]==departmentNames[j2] ? departmentNames[j1]:0)});
+							}
+						}
+					}
+					// remove duplicates
+					var LinkObjects = new Object();
+					for (var i =0, length = tempLinks.length; i < length ; i++){
+						// we remove dublicate links with this method
+						if (isEmptyObject(LinkObjects[tempLinks[i].source+"-"+tempLinks[i].target])){
+							LinkObjects[tempLinks[i].source+"-"+tempLinks[i].target]=tempLinks[i];
+						}else{
+							LinkObjects[tempLinks[i].source+"-"+tempLinks[i].target].width++;
+						}
+					}
+					// convert object to array
+					for (var tempLink in LinkObjects){
+						tempResult.links.push(LinkObjects[tempLink])
+					}
+					
+					connection.query("select distinct D.name as department from award_professor2 as AP2 join professor as P on P.Id=AP2.professor join department as D on D.ID = P.Department_Primary where AP2.Grant in (select multiGrants.* from (select AP.Grant from award_professor2 as AP group by AP.Grant having count(AP.Grant)>1) as multiGrants) group by AP2.Professor", function(err3,rows3,fields3){
+						// we want to send department names too (rows3)
+						tempResult.departments = rows3;
+						connection.end();
+						callback(tempResult);
+					
+					}); // end of query 3
+				}); // end of query 2
+			}); // end of query 1
+		}); // end of connection.connect()
+	}else{
+		// unknown visualization
+		callback("unknown visualizaition request");
+	}
 } // end of makeDynamicJson
+
+
+
+
+
+
+
+
+
+
+

@@ -2,6 +2,11 @@
 // unlike other modules, parrentDiv should be jquery object not the object ID
 // departmentColor is optional
 // loadingObject is optional
+/* data has 
+data.nodes
+data.links
+data.department (it is array of selected departments)
+*/		
 
 function  compareDepartments(parentDiv, data ,departmentColor, loadingObject){
 	if (typeof(departmentColor) === 'undefined') { departmentColor = d3.scale.category20();; }
@@ -13,13 +18,27 @@ function  compareDepartments(parentDiv, data ,departmentColor, loadingObject){
 	var selectedProfs = [];
 
 	// select prof menu
-	var selectedProfDiv = $('<div class ="noselect" style="position:absolute; top:10px;left:5px; opacity: 0.85; width:200px; visibility :hidden;"></div>');
+	var selectedProfDiv = $('<div class ="noselect" style="position:absolute; top:10px;left:5px; opacity: 0.85; width:200px;"></div>');
 	var selectedProf_ul = $('<ul style="padding:10px;"> <li class="ui-widget-header">Selected Professors</li></ul>');
 	var selectedProf_Button = $('<label class="btn btn-primary" style="padding: 0px 3px;margin-top:15px;" >Show Relations</label>');
 	selectedProf_ul.append(selectedProf_Button);
 	selectedProfDiv.append(selectedProf_ul);
 	parentDiv.append(selectedProfDiv);
 	selectedProf_ul.menu({items: "> :not(.ui-widget-header)"});
+	
+	selectedProf_Button.click(function(){
+		if (selectedProfs.length==0){return;}
+		var mainDiv = $('<div align="center" class="matrixLinkBenchmarkSelectDiv2"><div class="btn btn-danger close-btn" onclick="var tempObject = $(this).parent().parent(); tempObject.hide(1000,function(){tempObject.remove()});">X</div></div>');
+		$('<div class="matrixLinkBenchmarkSelect"></div>').append(mainDiv).appendTo(parentDiv);
+		var loadingGif = $('<img src="/assets/images/loading.gif" alt="loading" style="width: 40%; height:60%;">');
+		loadingGif.appendTo(mainDiv);
+		
+		// get data for selected Professors
+		$.get('/jsonrequest2/professorSelect/' + JSON.stringify(selectedProfs) , function(result){
+			professorsRelation(mainDiv ,result, departmentColor, loadingGif);
+		});
+		
+	});
 	
 	// department selection bar
 	var departmentBar = $('<div class ="noselect niceScroll" style="position:absolute; top:5px;left:220px; max-height:100px; overflow-y: scroll; opacity: 0.85"></div>');
@@ -34,17 +53,13 @@ function  compareDepartments(parentDiv, data ,departmentColor, loadingObject){
 					// unselect
 					d3.select(this).classed("active",0);
 					forceNodeCircles.each(function(d2){
-						if (d2.departmentName==d){
-							d3.select(this).style("opacity",0.4);
-						}
+						if (d2.departmentName==d){d3.select(this).style("opacity",0.4);}
 					})
 				}else{
 					// select
 					d3.select(this).classed("active",1);
 					forceNodeCircles.each(function(d2){
-						if (d2.departmentName==d){
-							d3.select(this).style("opacity",1);
-						}
+						if (d2.departmentName==d){d3.select(this).style("opacity",1);}
 					})
 				}
 			});
@@ -65,31 +80,32 @@ function  compareDepartments(parentDiv, data ,departmentColor, loadingObject){
 		.append("rect")
 			.attr("width", width)
 			.attr("height", height)
+			.style("stroke-width",3)
+			.style("stroke","black")
 			.style("fill", "none")
 			.style("pointer-events", "all");
 	
-		
 	var container = svg.append("g");
 	
-	
 	var forceNode_drag = d3.behavior.drag()
-        .on("dragstart", dragstart)
-        .on("drag", dragmove)
-        .on("dragend", dragend);
+		.on("dragstart", dragstart)
+		.on("drag", dragmove)
+		.on("dragend", dragend);
+	
 	function dragstart(d, i) {
-			force.stop() // stops the force auto positioning before you start dragging
+		force.stop() // stops the force auto positioning before you start dragging
 	}
 	function dragmove(d, i) {
-			d.px += d3.event.dx;
-			d.py += d3.event.dy;
-			d.x += d3.event.dx;
-			d.y += d3.event.dy; 
-			tickHandler(); // this is the key to make it work together with updating both px,py,x,y on d !
+		d.px += d3.event.dx;
+		d.py += d3.event.dy;
+		d.x += d3.event.dx;
+		d.y += d3.event.dy; 
+		tickHandler(); // this is the key to make it work together with updating both px,py,x,y on d !
 	}
 	function dragend(d, i) {
-			d.fixed = true; // of course set the node to fixed so the force doesn't include the node in its auto positioning stuff
-			tickHandler();
-			force.resume();
+		d.fixed = true; // of course set the node to fixed so the force doesn't include the node in its auto positioning stuff
+		tickHandler();
+		force.resume();
 	}
 		
 	var forceLinks = container.selectAll(".compareD.link")
@@ -119,7 +135,7 @@ function  compareDepartments(parentDiv, data ,departmentColor, loadingObject){
 				selectedProfs.remove(d.ID);
 				d.selectMenuElement.remove();
 				d3.select(this).classed("selected",0);
-				if (selectedProfs.length==0){ selectedProfDiv.css("visibility","hidden"); }
+				//if (selectedProfs.length==0){ selectedProfDiv.css("visibility","hidden"); }
 				
 			}else{
 				//select
@@ -127,7 +143,7 @@ function  compareDepartments(parentDiv, data ,departmentColor, loadingObject){
 				d.selectMenuElement = $("<li class='compareD selectLi'>"+ d.Firstname+ ", "+ d.Middlename + " "+ d.Lastname+"</li>");
 				d.selectMenuElement.insertBefore(selectedProf_Button);
 				d3.select(this).classed("selected",1);
-				selectedProfDiv.css("visibility","visible");
+				//selectedProfDiv.css("visibility","visible");
 			}
 		});
 	
@@ -150,10 +166,9 @@ function  compareDepartments(parentDiv, data ,departmentColor, loadingObject){
 		.on("tick", tickHandler)
 		.start();
 	
-	forceNodes.each(function(d){if(d.weight==0){
-		$(this).hide();}});
+	// hide nodes without relation to make screen clean
+	forceNodes.each(function(d){if(d.weight==0){$(this).hide();}});
 	
-		
 	if (typeof(loadingObject) !== 'undefined') { loadingObject.remove(); }
 	
 	function tickHandler(e){

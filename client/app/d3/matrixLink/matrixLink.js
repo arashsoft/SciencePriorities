@@ -247,7 +247,7 @@ function  createMatrixLink(parentDivID, jsonFile){
 		
 		// request nodes and links for compare departments
 		$.get('/jsonrequest2/departmentSelect/' + JSON.stringify(selectedDepartments) , function(result){
-			result.department = selectedDepartments;
+			//result.department = selectedDepartments; -> we should not change data from here! makeJson (server size) will handle that
 			compareDepartments(mainDiv,result,departmentColor, loadingGif);
 		});
 	});

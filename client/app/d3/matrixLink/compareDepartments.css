@@ -31,6 +31,6 @@
 	cursor:pointer;
 }
 .compareD.circle.selected{
-	stroke-width : 2px;
-	stroke: black;
+	stroke-width : 3px;
+	stroke: red;
 }
