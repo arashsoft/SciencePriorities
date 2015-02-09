@@ -11,7 +11,7 @@ function createBarchart(parentDivID, entityName, propertyName, data , parentData
 	var divWidth = parentObject[0].clientWidth;
 	var divHeight = parentObject[0].clientHeight;
 	
-	var margin = {top: 20, right: 20, bottom: 40, left: 80},
+	var margin = {top: 20, right: 20, bottom: 40, left: 50},
 		 width = divWidth - margin.left - margin.right,
 		 height = divHeight - margin.top - margin.bottom;
 
@@ -101,15 +101,28 @@ function createBarchart(parentDivID, entityName, propertyName, data , parentData
 		.attr('lengthAdjust',"spacingAndGlyphs")
 		.attr ('textLength',Math.min(x.rangeBand(),40));
 		
-	svg.append('g')
+	var yAxisGElements = svg.append('g')
 		.attr('class', 'barchart y axis')
-		.call(yAxis)
-	 .append('text')
+		.call(yAxis);
+		
+	yAxisGElements.append('text')
 		.attr('transform', 'rotate(-90)')
 		.attr('y', 6)
 		.attr('dy', '.71em')
 		.style('text-anchor', 'end')
 		.text(entityName);
+	
+	// add bil, mil and k
+	yAxisGElements.selectAll("g").selectAll("text").text(function(d){	
+    if (d > 1000000000)
+        return (d / 1000000000) + 'Bil';
+    else if (d > 1000000)
+        return (d / 1000000) + 'Mil';
+    else if (d > 1000)
+        return (d / 1000) + 'K'
+		else
+				return d;
+	});
 	
 	// add return buttton for multi layer barcharts
 	var backButtonG;
@@ -178,6 +191,18 @@ function createBarchart(parentDivID, entityName, propertyName, data , parentData
 		//resize x axis texts
 		xAxisGElements.selectAll("g").selectAll("text")
 		.attr ('textLength',Math.min(x.rangeBand(),40));
+		
+		// add bil, mil and k
+		yAxisGElements.selectAll("g").selectAll("text").text(function(d){	
+			if (d > 1000000000)
+					return (d / 1000000000) + 'Bil';
+			else if (d > 1000000)
+					return (d / 1000000) + 'Mil';
+			else if (d > 1000)
+					return (d / 1000) + 'K'
+			else
+					return d;
+		});
 		
 		//move back ButtonG
 		if (typeof(parentData) != 'undefined'){
