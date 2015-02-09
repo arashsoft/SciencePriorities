@@ -89,12 +89,12 @@
 
 .matrixLink.background{
 	fill: #eee;
-	stroke-width: 6;
+	stroke-width: 4;
 	opacity: 1;
 }
 .matrixLink.background.drag{
 	/* stroke:blue; */
-	stroke-width: 4;
+	stroke-width: 3;
 }
 
 .matrixLink.background.related{
@@ -103,7 +103,7 @@
 
 .matrixLink.background.selected{
 	/* stroke:blue; */
-	stroke-width: 10;
+	stroke-width: 6;
 }
 
 .matrixLink.cell{

@@ -14,7 +14,7 @@ function  compareDepartments(parentDiv, data ,departmentColor, loadingObject){
 	var width = parentDiv.width();
 	var height = parentDiv.height();
 	var minLenght = Math.min(width,height);
-		
+	var circleSize = 30;
 	var selectedProfs = [];
 
 	// select prof menu
@@ -124,7 +124,7 @@ function  compareDepartments(parentDiv, data ,departmentColor, loadingObject){
 			.attr("class" , "compareD nodes");
 		
 	var forceNodeCircles = forceNodes.append("circle")
-		.attr("r", 30)
+		.attr("r", circleSize)
 		.attr("class","compareD circle")
 		.style("fill", function(d){return departmentColor(d.departmentName)})
 		.call(forceNode_drag)
@@ -149,6 +149,8 @@ function  compareDepartments(parentDiv, data ,departmentColor, loadingObject){
 	
 	var forceNodesTexts = forceNodes.append("text")
 		.attr("class","compareD texts noselect")
+		.attr('lengthAdjust',"spacingAndGlyphs")
+		.attr('textLength', circleSize*2)
 		.text( function (d) { return d.Firstname+ ", "+ d.Middlename + " "+ d.Lastname});
 	
 	

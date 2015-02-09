@@ -29,6 +29,8 @@
 }
 .compareD.circle{
 	cursor:pointer;
+	stroke-width: 1px;
+	stroke: white;
 }
 .compareD.circle.selected{
 	stroke-width : 3px;
