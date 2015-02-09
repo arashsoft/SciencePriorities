@@ -86,17 +86,21 @@ function createBarchart(parentDivID, entityName, propertyName, data , parentData
 			}
 		});
 		
-	svg.append('g')
+	var xAxisGElements = svg.append('g')
 		.attr('class', 'barchart x axis')
 		.attr('transform', 'translate(0,' + height + ')')
-		.call(xAxis)
-		.append('text')
+		.call(xAxis);
+		
+	xAxisGElements.append('text')
 		.attr('x', width/2)
 		.attr('dy', '2.2em')
 		.attr ('font-size','14px')
-		.style('text-anchor', 'middle')
 		.text(propertyName);
 
+	xAxisGElements.selectAll("g").selectAll("text")
+		.attr('lengthAdjust',"spacingAndGlyphs")
+		.attr ('textLength',Math.min(x.rangeBand(),40));
+		
 	svg.append('g')
 		.attr('class', 'barchart y axis')
 		.call(yAxis)
@@ -170,6 +174,10 @@ function createBarchart(parentDivID, entityName, propertyName, data , parentData
 		 .attr('width', x.rangeBand())
 		 .attr('y', function(d) { return y(d.value); })
 		 .attr('height', function(d) { return height - y(d.value); });
+		
+		//resize x axis texts
+		xAxisGElements.selectAll("g").selectAll("text")
+		.attr ('textLength',Math.min(x.rangeBand(),40));
 		
 		//move back ButtonG
 		if (typeof(parentData) != 'undefined'){
