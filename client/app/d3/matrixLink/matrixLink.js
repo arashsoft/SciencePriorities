@@ -114,7 +114,7 @@ function  createMatrixLink(parentDivID, jsonFile){
 	$('<div class ="noselect" style="position:absolute; top:100px; right:5px; opacity: 0.85; width:200px; visibility:hidden;">	<ul class = "ui-menu ui-widget ui-widget-content ui-corner-all" id="'+ parentDivID+ 'departmentMenu" style="padding:10px;"> <li class="ui-widget-header">Selected Departments</li> <label class="btn btn-primary" id="'+parentDivID+'departmentMenuButton" style="padding: 0px 3px;margin-top:15px;" >Show Relations</label></ul> </div>').appendTo(parentObject);
 	
 	// department selection bar
-	parentObject.append('<div id="'+ parentDivID + 'departmentBar" class ="noselect niceScroll" style="position:absolute; top:5px;left:5px; max-height:100px; overflow-y: scroll; opacity: 0.85"></div>');
+	parentObject.append('<div id="'+ parentDivID + 'departmentBar" class ="noselect niceScroll" style="position:absolute; top:5px;left:5px; max-height:10%; overflow-y: scroll; opacity: 0.85"></div>');
 	// selectedProfessor menu
 	parentObject.append('<div class ="noselect" style="position:absolute; top:100px;left:5px; opacity: 0.85; width:200px; visibility:hidden;"> <ul id="'+ parentDivID+ 'professorsMenu" style="padding:10px;"> <li class="ui-widget-header">Selected Professors</li></ul></div>');
 	$("#"+parentDivID+"professorsMenu").menu({
@@ -334,25 +334,28 @@ function  createMatrixLink(parentDivID, jsonFile){
 			.attr("width", node.size)
 			.attr("height", node.size)
 			.style("stroke", departmentColor(node.name))
-			.datum(node)
-			.on("dblclick", function(){
+			.datum(node);
+			
+		departmentRect.on("click", function(){
 				if (d3.event.defaultPrevented) return;
 				enlargeMatrix();
 			});
-		
+			
 		// we make a link from data to element (because sometimes we have access to data but we do not want to loop between elements to find it)
 		departmentRect.datum(function(d){
 			d.element = departmentRect;
 			return d;
 		})
 		
-		departmentRect.on("touchstart", function(){	
+		departmentRect.on("touchstart", function(){
+			var myevent = d3.event;
 			departmentRectTimer = setTimeout(function(){
 				// handle long-press function	
-				// 350 is the length of time we want the user to touch before we do something	
-				// TODO : we have to prevent tap because it is hold d3.event.preventDefault does not work - (there is not any listener on tap so it is safe)
-				$(container[0]).contextmenu("open", $(departmentRect[0]));
-			}, 350); 
+				// 1000 is the length of time we want the user to touch before we do something	
+				// TODO : we have to prevent tap because it is hold d3.event.preventDefault does not work
+				myevent.preventDefault();
+				//$(container[0]).contextmenu("open", $(departmentRect[0]));
+			}, 1000); 
 		}).on("touchend", function(e){
 			//stops short touches from firing the event	
 			if (departmentRectTimer)
@@ -526,7 +529,6 @@ function  createMatrixLink(parentDivID, jsonFile){
 				.attr("dy", ".32em")
 				.attr("text-anchor", "end")
 				.attr("class","matrixLink text")
-				.style("font-Size", "14px")
 				.text(function(d, i) { return nodes[i].name; });
 				
 			
@@ -562,7 +564,6 @@ function  createMatrixLink(parentDivID, jsonFile){
 				.attr("dy", ".32em")
 				.attr("text-anchor", "start")
 				.attr("class","matrixLink text")
-				.style("font-Size", "14px")
 				.text(function(d, i) { return nodes[i].name; })
 				.classed("selected",function(d,i){
 					for (var j =0;j<selectedProfessors.length;j++){
@@ -597,7 +598,7 @@ function  createMatrixLink(parentDivID, jsonFile){
 				}
 			});
 			
-			departmentRect.on("dblclick", function(){
+			departmentRect.on("click", function(){
 				if (d3.event.defaultPrevented) return;
 				rowText.remove();
 				columnText.remove();
@@ -675,7 +676,7 @@ function  createMatrixLink(parentDivID, jsonFile){
 			departmentTitle.transition().attr("x", parseFloat(departmentRect.attr("x")) + (node.size/2))
 			.attr("y", parseFloat(departmentRect.attr("y")) + node.size).duration(transitionTime);
 			
-			departmentRect.on("dblclick", function(){
+			departmentRect.on("click", function(){
 				if (d3.event.defaultPrevented) return;
 				enlargeMatrix(this);
 			});

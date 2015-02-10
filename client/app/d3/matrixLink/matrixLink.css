@@ -12,6 +12,12 @@
 	opacity: 0.3;
 }
 
+.panel-body{
+	padding: 10px 8px;
+	}
+.panel-title > a{
+	font-size:80%
+}
 
 .matrixLinkBenchmarkSelect{
 	position: absolute;
@@ -77,6 +83,7 @@
 
 .matrixLink.text{
 	cursor:pointer;
+	font-size: 120%;
 }
 .matrixLink.text.selected{
 	fill:red;
