@@ -64,7 +64,8 @@ function  createMatrixLink(parentDivID, jsonFile){
 			tempLink.source = nodeHash[jsonFile.nodes[jsonFile.links[i].source].department];
 			tempLink.target = nodeHash[jsonFile.nodes[jsonFile.links[i].target].department];
 			tempLink.width = 1;
-			// we remove dublicate links with this method
+			tempLink.type = jsonFile.links[i].type;
+			// we remove duplicate links with this method
 			if ($.isEmptyObject(forceLinkObjects[tempLink.source+"-"+tempLink.target])){
 				forceLinkObjects[tempLink.source+"-"+tempLink.target]=tempLink;
 			}else{
@@ -72,7 +73,7 @@ function  createMatrixLink(parentDivID, jsonFile){
 			}
 		} else{
 			// link inside a department
-			departmentMatrixes[nodeHash[jsonFile.links[i].linkType]].links.push({source: jsonFile.nodes[jsonFile.links[i].source].departmentMatrixesPlace, target: jsonFile.nodes[jsonFile.links[i].target].departmentMatrixesPlace });
+			departmentMatrixes[nodeHash[jsonFile.links[i].linkType]].links.push({source: jsonFile.nodes[jsonFile.links[i].source].departmentMatrixesPlace, target: jsonFile.nodes[jsonFile.links[i].target].departmentMatrixesPlace,type:jsonFile.links[i].type });
 		}
 	}
 	// convert forceLinkObjects to forceLinks (object to array)
@@ -87,8 +88,8 @@ function  createMatrixLink(parentDivID, jsonFile){
 		.size([width- margin.width, height  -margin.height])
 		.nodes(forceNodes)
 		.links(forceLinks)
-		.charge(-(minLenght*10))
-		.linkDistance( minLenght/3)
+		.charge(-(minLenght*14))
+		.linkDistance( minLenght/2.2)
 		.friction(0.7)
 		.gravity(0.2)
 		.linkStrength(0.5);
@@ -269,7 +270,9 @@ function  createMatrixLink(parentDivID, jsonFile){
 		// Convert links to matrix; count character occurrences.
 		links.forEach(function(link) {
 			matrix[link.source][link.target].z += 1;
+			matrix[link.source][link.target].type=link.type;
 			matrix[link.target][link.source].z += 1;
+			matrix[link.target][link.source].type=link.type;
 			nodes[link.source].count ++;
 			nodes[link.target].count ++;
 		});
@@ -458,7 +461,8 @@ function  createMatrixLink(parentDivID, jsonFile){
 							.attr("x", function(d) { return (xScale(d.x) + node.x); })
 							.attr("width", xScale.rangeBand())
 							.attr("height", xScale.rangeBand())
-							.style("fill", "rgb(44, 160, 44)");
+							.style("fill", function(d){
+								return d.type=="pub"?"red":"green";});
 				});
 		
 		var rowLines = row.append("line")

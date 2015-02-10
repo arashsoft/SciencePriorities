@@ -1,3 +1,4 @@
+// IMPORTANT: we use fake database for generating matrix-link visualization (award relations are real but publication relations are based on fake tables)
 // hard code awards based on their ID <= 20074 because of data problem
 
 // semi-prototype function to check if an object is empty or not.
@@ -122,6 +123,7 @@ exports.makeJson = function(entityName, propertyName, layoutName, callback){
 					}
 					
 					jsonFile.links = new Array();
+					// award links
 					for (var i=0 , length =data.links.length ; i < length; i++){
 						var professorIDs = data.links[i].Professors.split("#");
 						var departmentNames = data.links[i].Departments.split("#");
@@ -131,12 +133,24 @@ exports.makeJson = function(entityName, propertyName, layoutName, callback){
 							}
 						}
 					}
+					// publication links
+					for (var i=0 , length =data.publicationLinks.length ; i < length; i++){
+						var professorIDs = data.publicationLinks[i].Professors.split("#");
+						var departmentNames = data.publicationLinks[i].Departments.split("#");
+						for (var j1=0 , j1Length = professorIDs.length; j1 < j1Length; j1++){
+							for (var j2= j1+1; j2 < j1Length; j2++){
+								jsonFile.links.push({source: nodeHash[professorIDs[j1]],target:nodeHash[professorIDs[j2]],type:"pub", linkType:(departmentNames[j1]==departmentNames[j2] ? departmentNames[j1]:0)});
+							}
+						}
+					}
+					
 					connection.end();
 					callback(jsonFile);
 				}
-				// we want to run 3 query synchronously and then return their results to dataIsReady(data)
-				var queryNumber = 3;
+				// we want to run multi queries synchronously and then return their results to dataIsReady(data)
+				var queryNumber = 4;
 				var tempData = new Array();
+				// return award links
 				connection.query("SELECT ap.Grant, GROUP_CONCAT(P.ID SEPARATOR '#')  as Professors, GROUP_CONCAT(D.name SEPARATOR '#') as Departments FROM (select CONCAT(award_professor2.Grant, award_professor2.Professor) as tempColumn, award_professor2.Grant, award_professor2.Professor, award_professor2.ID from award_professor2 group by tempColumn) as ap join professor as P on P.ID= ap.Professor join department as D on P.Department_Primary=D.ID GROUP BY ap.Grant having count(ap.grant) > 1" , function (err,rows,fields){
 					tempData.links = rows;
 					// check if other queries already returned or not
@@ -145,13 +159,26 @@ exports.makeJson = function(entityName, propertyName, layoutName, callback){
 					}
 				});
 				
-				connection.query("select P.ID as ID, concat(cast(P.Firstname as char(15)),',',cast(P.Middlename as CHAR(15)),' ',P.Lastname)  as name , D.name as department from award_professor2 as AP2 join professor as P on P.Id=AP2.professor join department as D on D.ID = P.Department_Primary where AP2.Grant in (select multiGrants.* from (select AP.Grant from award_professor2 as AP group by AP.Grant having count(AP.Grant)>1) as multiGrants) group by AP2.Professor", function(err,rows,fields){
+				// return publication links
+				connection.query("SELECT pa.Publication, GROUP_CONCAT(P.ID SEPARATOR '#')  as Professors, GROUP_CONCAT(D.name SEPARATOR '#') as Departments FROM (select CONCAT(publication_author_profOnly.Author,'#', publication_author_profOnly.Publication) as tempColumn, publication_author_profOnly.* from publication_author_profOnly group by tempColumn) as pa join author_2_fake as a2 on a2.ID=pa.Author join professor as P on P.ID= a2.Professor_ID join department as D on P.Department_Primary=D.ID GROUP BY pa.Publication having count(pa.Publication) > 1" , function (err,rows,fields){
+					tempData.publicationLinks = rows;
+					// check if other queries already returned or not
+					if (1 == queryNumber--){
+						dataIsReady(tempData);
+					}
+				});
+				
+				// TODO: add co-supervision
+				// mega query!! this query makes list of active professors and takes around 10 sec on the current server machine to run
+				connection.query("select P.ID as ID, concat(cast(P.Firstname as char(15)),',',cast(P.Middlename as CHAR(15)),' ',P.Lastname)  as name , D.name as department from publication_author_profOnly as pa join author_2_fake as a2f on pa.Author=a2f.ID join professor as P on P.Id=a2f.Professor_ID join department as D on D.ID = P.Department_Primary where pa.Publication in (select pa.Publication from publication_author_profOnly as pa join author_2_fake as a2f on a2f.ID=pa.Author where a2f.Professor_ID is not null group by pa.Publication having count(pa.Publication)>1) group by P.ID union select P.ID as ID, concat(cast(P.Firstname as char(15)),',',cast(P.Middlename as CHAR(15)),' ',P.Lastname)  as name , D.name as department from award_professor2 as AP2 join professor as P on P.Id=AP2.professor join department as D on D.ID = P.Department_Primary where AP2.Grant in (select multiGrants.* from (select AP.Grant from award_professor2 as AP group by AP.Grant having count(AP.Grant)>1) as multiGrants) group by AP2.Professor", function(err,rows,fields){
 					tempData.nodes = rows;
 					// check if other queries already returned or not
 					if (1 == queryNumber--){
 						dataIsReady(tempData);
 					}
 				});
+				
+				// TODO: add publication and co-supervision (I skiped publication becasue of saving time and the result is same in our fake data)
 				connection.query("select distinct D.name as name from award_professor2 as AP2 join professor as P on P.Id=AP2.professor join department as D on D.ID = P.Department_Primary where AP2.Grant in (select multiGrants.* from (select AP.Grant from award_professor2 as AP group by AP.Grant having count(AP.Grant)>1) as multiGrants) group by AP2.Professor", function(err,rows,fields){
 					tempData.departments = rows;
 					// check if other queries already returned or not

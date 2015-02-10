@@ -73,6 +73,7 @@ module.exports = function(app) {
 		if (req.isAuthenticated()){  
 			//res.render('mainPage.html.ejs', { message: req.flash('loginMessage') });
 			res.sendfile(path.resolve('./client/mainPage.html'));
+			// res.sendfile(path.resolve('../client/mainPage.html'));
 		}else{
 			req.flash('loginMessage', 'Please sign in!');
 			res.render('loginPage.ejs', { message: req.flash('loginMessage') });
