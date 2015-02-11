@@ -15,11 +15,11 @@ connection.connect(function(err) {
 		return;
 	}
 	
-	var randomSize = 11;
+	var randomSize = 10;
 	var departmentName = "Computer Science";
-	connection.query('select a2f.ID as ID from award_professor2 as AP2 join professor as P on P.Id=AP2.professor join department as D on D.ID = P.Department_Primary join author_2_fake as a2f on a2f.Professor_ID= P.ID where  AP2.Grant in (select multiGrants.* from (select AP.Grant from award_professor2 as AP group by AP.Grant having count(AP.Grant)>1) as multiGrants)  group by AP2.Professor  order by rand() limit '+randomSize, function(err,rows,fields){
+	connection.query('select a2f.ID as ID from award_professor2 as AP2 join professor as P on P.Id=AP2.professor join department as D on D.ID = P.Department_Primary join author_2_fake as a2f on a2f.Professor_ID= P.ID where  AP2.Grant in (select multiGrants.* from (select AP.Grant from award_professor2 as AP group by AP.Grant having count(AP.Grant)>1) as multiGrants) and D.name="'+departmentName+'" group by AP2.Professor  order by rand() limit '+randomSize, function(err,rows,fields){
 		
-		connection.query('select a2f.ID as ID from award_professor2 as AP2 join professor as P on P.Id=AP2.professor join department as D on D.ID = P.Department_Primary join author_2_fake as a2f on a2f.Professor_ID= P.ID where  AP2.Grant in (select multiGrants.* from (select AP.Grant from award_professor2 as AP group by AP.Grant having count(AP.Grant)>1) as multiGrants) group by AP2.Professor  order by rand() limit '+randomSize, function(err2,rows2,fields2){
+		connection.query('select a2f.ID as ID from award_professor2 as AP2 join professor as P on P.Id=AP2.professor join department as D on D.ID = P.Department_Primary join author_2_fake as a2f on a2f.Professor_ID= P.ID where  AP2.Grant in (select multiGrants.* from (select AP.Grant from award_professor2 as AP group by AP.Grant having count(AP.Grant)>1) as multiGrants) and D.name="'+departmentName+'" group by AP2.Professor  order by rand() limit '+randomSize, function(err2,rows2,fields2){
 			var insertQuery = 'INSERT INTO publication_author_profOnly (Publication,Author) VALUES ';
 			for (var i=0;i<rows.length;i++){
 				var publicationID = Math.floor((Math.random() * 2000) + 1);
