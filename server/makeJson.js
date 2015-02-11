@@ -144,11 +144,17 @@ exports.makeJson = function(entityName, propertyName, layoutName, callback){
 						}
 					}
 					
+					for (var i=0 , length =data.coSupervisionLinks.length ; i < length; i++){
+						var currentLink = data.coSupervisionLinks[i];
+						jsonFile.links.push({source: nodeHash[currentLink.pID1], target: nodeHash[currentLink.pID2], type:"coSuper", linkType:(currentLink.pD1==currentLink.pD2? currentLink.departmentName:0) })
+						
+					}
+					
 					connection.end();
 					callback(jsonFile);
 				}
 				// we want to run multi queries synchronously and then return their results to dataIsReady(data)
-				var queryNumber = 4;
+				var queryNumber = 5;
 				var tempData = new Array();
 				// return award links
 				connection.query("SELECT ap.Grant, GROUP_CONCAT(P.ID SEPARATOR '#')  as Professors, GROUP_CONCAT(D.name SEPARATOR '#') as Departments FROM (select CONCAT(award_professor2.Grant, award_professor2.Professor) as tempColumn, award_professor2.Grant, award_professor2.Professor, award_professor2.ID from award_professor2 group by tempColumn) as ap join professor as P on P.ID= ap.Professor join department as D on P.Department_Primary=D.ID GROUP BY ap.Grant having count(ap.grant) > 1" , function (err,rows,fields){
@@ -168,8 +174,17 @@ exports.makeJson = function(entityName, propertyName, layoutName, callback){
 					}
 				});
 				
+				// return co-supervision links
+				connection.query("select p.ID as pID1,  p.Department_Primary as pD1, p2.ID as pID2, p2.Department_Primary as pD2 , d.Name as departmentName from student_fake as sf join professor as p on p.ID=sf.Supervisor1 join professor as p2 on p2.ID=sf.Supervisor2 join department as d on p.Department_Primary=d.ID where sf.Supervisor2 is not null" , function (err,rows,fields){
+					tempData.coSupervisionLinks = rows;
+					// check if other queries already returned or not
+					if (1 == queryNumber--){
+						dataIsReady(tempData);
+					}
+				});
+				
 				// TODO: add co-supervision
-				// mega query!! this query makes list of active professors and takes around 10 sec on the current server machine to run
+				// mega query!! this query makes list of active professors and takes around 5 sec on the current server machine to run
 				connection.query("select P.ID as ID, concat(cast(P.Firstname as char(15)),',',cast(P.Middlename as CHAR(15)),' ',P.Lastname)  as name , D.name as department from publication_author_profOnly as pa join author_2_fake as a2f on pa.Author=a2f.ID join professor as P on P.Id=a2f.Professor_ID join department as D on D.ID = P.Department_Primary where pa.Publication in (select pa.Publication from publication_author_profOnly as pa join author_2_fake as a2f on a2f.ID=pa.Author where a2f.Professor_ID is not null group by pa.Publication having count(pa.Publication)>1) group by P.ID union select P.ID as ID, concat(cast(P.Firstname as char(15)),',',cast(P.Middlename as CHAR(15)),' ',P.Lastname)  as name , D.name as department from award_professor2 as AP2 join professor as P on P.Id=AP2.professor join department as D on D.ID = P.Department_Primary where AP2.Grant in (select multiGrants.* from (select AP.Grant from award_professor2 as AP group by AP.Grant having count(AP.Grant)>1) as multiGrants) group by AP2.Professor", function(err,rows,fields){
 					tempData.nodes = rows;
 					// check if other queries already returned or not
@@ -179,6 +194,7 @@ exports.makeJson = function(entityName, propertyName, layoutName, callback){
 				});
 				
 				// TODO: add publication and co-supervision (I skiped publication becasue of saving time and the result is same in our fake data)
+				// select department names
 				connection.query("select distinct D.name as name from award_professor2 as AP2 join professor as P on P.Id=AP2.professor join department as D on D.ID = P.Department_Primary where AP2.Grant in (select multiGrants.* from (select AP.Grant from award_professor2 as AP group by AP.Grant having count(AP.Grant)>1) as multiGrants) group by AP2.Professor", function(err,rows,fields){
 					tempData.departments = rows;
 					// check if other queries already returned or not

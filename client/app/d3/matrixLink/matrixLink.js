@@ -50,6 +50,8 @@ function  createMatrixLink(parentDivID, jsonFile){
 		departmentMatrixes[i].links = new Array();
 		departmentMatrixes[i].nodes = new Array();
 	}
+	
+	// add departmentMatrixes Nodes
 	for (var i =0, length = jsonFile.nodes.length; i < length ; i++){
 		var arrayLenght = departmentMatrixes[nodeHash[jsonFile.nodes[i].department]].nodes.push(jsonFile.nodes[i]);
 		// we store the index of the node in departmentMatrixesPlace, so we can use it to address the node in new format
@@ -228,7 +230,7 @@ function  createMatrixLink(parentDivID, jsonFile){
 			})
 			// show related links
 			matrixDepartmentlinks.style("visibility", function(d){
-				// this looong if simply check if both sides of link are visible or not
+				// check if both sides of link are visible or not
 				if ((d.source.name == element.attr("name") && $(d.target.element.node().parentNode).css("visibility")=="visible")|| (d.target.name == element.attr("name") && $(d.source.element.node().parentNode).css("visibility")=="visible")){
 					return "visible";
 				}else {
@@ -264,15 +266,21 @@ function  createMatrixLink(parentDivID, jsonFile){
 		nodes.forEach(function(node, i) {
 			node.index = i;
 			node.count = 0;
-			matrix[i] = d3.range(n).map(function(j) { return {x: j, y: i, z: 0}; });
+			matrix[i] = d3.range(n).map(function(j) { return {x: j, y: i, award:0,pub:0,coSuper:0}; });
 		});
 
-		// Convert links to matrix; count character occurrences.
+		// Convert links to matrix; count link occurrence
 		links.forEach(function(link) {
-			matrix[link.source][link.target].z += 1;
-			matrix[link.source][link.target].type=link.type;
-			matrix[link.target][link.source].z += 1;
-			matrix[link.target][link.source].type=link.type;
+			if(link.type=="award"){
+				matrix[link.source][link.target].award++;
+				matrix[link.target][link.source].award++;
+			}else if(link.type=="pub"){
+				matrix[link.source][link.target].pub++;
+				matrix[link.target][link.source].pub++;
+			}else {
+				matrix[link.source][link.target].coSuper++;
+				matrix[link.target][link.source].coSuper++;
+			}
 			nodes[link.source].count ++;
 			nodes[link.target].count ++;
 		});
@@ -339,7 +347,7 @@ function  createMatrixLink(parentDivID, jsonFile){
 			.style("stroke", departmentColor(node.name))
 			.datum(node);
 			
-		departmentRect.on("click", function(){
+		departmentRect.on("dblclick", function(){
 				if (d3.event.defaultPrevented) return;
 				enlargeMatrix();
 			});
@@ -449,22 +457,12 @@ function  createMatrixLink(parentDivID, jsonFile){
 		
 		var row = departmentG.selectAll(".matrixLink.row")
 			.data(matrix)
-				.enter().append("g")
-				.attr("class", "matrixLink row")
-				.attr("transform", function(d, i) {return "translate(0," + (xScale(i) + node.y) + ")"; })
-				.each(function (d){
-					//createRow(d);
-					d3.select(this).selectAll(".matrixLink.cell")
-						.data(d.filter(function(d){return d.z;} ))
-						.enter().append("rect")
-							.attr("class", "matrixLink cell")
-							.attr("x", function(d) { return (xScale(d.x) + node.x); })
-							.attr("width", xScale.rangeBand())
-							.attr("height", xScale.rangeBand())
-							.style("fill", function(d){
-								return d.type=="pub"?"red":"green";});
-				});
-		
+			.enter().append("g")
+			.attr("class", "matrixLink row")
+			.attr("transform", function(d, i) {return "translate(0," + (xScale(i) + node.y) + ")"; })
+			.each(function (d){
+				createRow(this , d);
+			});
 		var rowLines = row.append("line")
 			.attr("x2", node.size)
 			.attr("class", "matrixLink line")
@@ -495,8 +493,38 @@ function  createMatrixLink(parentDivID, jsonFile){
 			.attr("text-anchor", "start")
 			.text(function(d, i) { return nodes[i].name; });
 */
-	  function createRow(row) {
-		//var tempData = $.grep(row, function(d) {return d.z ? d.z : null;});	
+	  function createRow(object , objectData) {
+			// awards
+			d3.select(object).selectAll(".matrixLink.cell.award")
+				.data(objectData.filter(function(d){return d.award;} ))
+				.enter().append("rect")
+				.attr("class", "matrixLink cell award")
+				.attr("x", function(d) { return (xScale(d.x) + node.x); })
+				.attr("width", xScale.rangeBand()/3)
+				.attr("height", xScale.rangeBand())
+				.style("fill","green")
+				.style("opacity",function(d){return 0.4+d.award*0.2;});
+			// pubs
+			d3.select(object).selectAll(".matrixLink.cell.pub")
+				.data(objectData.filter(function(d){return d.pub;} ))
+				.enter().append("rect")
+				.attr("class", "matrixLink cell pub")
+				.attr("x", function(d) { return (xScale(d.x) + node.x + xScale.rangeBand()/3); })
+				.attr("width", xScale.rangeBand()/3)
+				.attr("height", xScale.rangeBand())
+				.style("fill","blue")
+				.style("opacity",function(d){return 0.4+d.pub*0.2;});
+			// co-Supervisor
+			d3.select(object).selectAll(".matrixLink.cell.coSuper")
+				.data(objectData.filter(function(d){return d.coSuper;} ))
+				.enter().append("rect")
+				.attr("class", "matrixLink cell coSuper")
+				.attr("x", function(d) { return (xScale(d.x) + node.x + xScale.rangeBand()*2/3); })
+				.attr("width", xScale.rangeBand()/3)
+				.attr("height", xScale.rangeBand())
+				.style("fill","red")
+				.style("opacity",function(d){return 0.4+d.coSuper*0.2;});
+			
 	  }
 		
 		function enlargeMatrix(){
@@ -516,10 +544,19 @@ function  createMatrixLink(parentDivID, jsonFile){
 			}).duration(transitionTime)
 			.each(function (d){
 				//createRow(d);
-				d3.select(this).selectAll(".matrixLink.cell")
+				d3.select(this).selectAll(".matrixLink.cell.award")
 						.transition().attr("x", function(d) { return xScale(d.x) + parseFloat((departmentRect.attr('x'))); })
-						.attr("width", xScale.rangeBand())
+						.attr("width", xScale.rangeBand()/3)
 						.attr("height", xScale.rangeBand()).duration(transitionTime);
+				d3.select(this).selectAll(".matrixLink.cell.pub")
+						.transition().attr("x", function(d) { return xScale(d.x) + parseFloat((departmentRect.attr('x'))) + xScale.rangeBand()/3; })
+						.attr("width", xScale.rangeBand()/3)
+						.attr("height", xScale.rangeBand()).duration(transitionTime);
+				d3.select(this).selectAll(".matrixLink.cell.coSuper")
+						.transition().attr("x", function(d) { return xScale(d.x) + parseFloat((departmentRect.attr('x'))) + xScale.rangeBand()*2/3; })
+						.attr("width", xScale.rangeBand()/3)
+						.attr("height", xScale.rangeBand()).duration(transitionTime);
+				
 			});
 			
 			column.transition().attr("transform", function(d, i) { return "translate(" + (xScale(i) + parseFloat((departmentRect.attr('x')))) + ")rotate(-90)"; }).duration(transitionTime);
@@ -602,7 +639,7 @@ function  createMatrixLink(parentDivID, jsonFile){
 				}
 			});
 			
-			departmentRect.on("click", function(){
+			departmentRect.on("dblclick", function(){
 				if (d3.event.defaultPrevented) return;
 				rowText.remove();
 				columnText.remove();
@@ -680,7 +717,7 @@ function  createMatrixLink(parentDivID, jsonFile){
 			departmentTitle.transition().attr("x", parseFloat(departmentRect.attr("x")) + (node.size/2))
 			.attr("y", parseFloat(departmentRect.attr("y")) + node.size).duration(transitionTime);
 			
-			departmentRect.on("click", function(){
+			departmentRect.on("dblclick", function(){
 				if (d3.event.defaultPrevented) return;
 				enlargeMatrix(this);
 			});
@@ -690,9 +727,17 @@ function  createMatrixLink(parentDivID, jsonFile){
 			}).duration(transitionTime)
 			.each(function (d){
 				//createRow(d);
-				d3.select(this).selectAll(".matrixLink.cell")
+				d3.select(this).selectAll(".matrixLink.cell.award")
 						.transition().attr("x", function(d) { return xScale(d.x) + parseFloat((departmentRect.attr('x'))); })
-						.attr("width", xScale.rangeBand())
+						.attr("width", xScale.rangeBand()/3)
+						.attr("height", xScale.rangeBand()).duration(transitionTime);
+				d3.select(this).selectAll(".matrixLink.cell.pub")
+						.transition().attr("x", function(d) { return xScale(d.x) + parseFloat((departmentRect.attr('x'))) + xScale.rangeBand()/3; })
+						.attr("width", xScale.rangeBand()/3)
+						.attr("height", xScale.rangeBand()).duration(transitionTime);
+				d3.select(this).selectAll(".matrixLink.cell.coSuper")
+						.transition().attr("x", function(d) { return xScale(d.x) + parseFloat((departmentRect.attr('x'))) + xScale.rangeBand()*2/3; })
+						.attr("width", xScale.rangeBand()/3)
 						.attr("height", xScale.rangeBand()).duration(transitionTime);
 			});
 			
