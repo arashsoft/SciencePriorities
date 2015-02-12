@@ -76,13 +76,18 @@ function createBarchart(parentDivID, entityName, propertyName, data , parentData
 			tip.hide(d);
 			tip.show(d);
 		})
-      .on('mouseout', tip.hide)
+		.on('mouseout', tip.hide)
 		.on('click', function(d){
 			if (typeof d.child != 'undefined'){
 				clearInterval(intervalID);
 				angular.element(parentObject[0]).scope().intervalID = createBarchart(parentDivID, entityName, d.name, d.child , data , propertyName);
 			}else{
 				return 0;
+			}
+		})
+		.each(function(d){
+			if (typeof d.child != 'undefined'){
+				d3.select(this).classed("clickable" , true);
 			}
 		});
 		

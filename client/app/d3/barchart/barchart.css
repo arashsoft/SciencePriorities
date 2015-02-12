@@ -2,6 +2,11 @@
   fill: steelblue;
 }
 
+.barchart.bar.clickable {
+  stroke-width:2px;
+	stroke:blue;
+}
+
 .barchart.bar:hover {
   stroke:black;
   stroke-width:1;
