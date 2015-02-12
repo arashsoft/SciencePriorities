@@ -565,6 +565,26 @@ function  createMatrixLink(parentDivID, jsonFile, loadingObject){
 			columnLines.attr("x1", -node.size);
 			rowLines.attr("x2", node.size);
 			
+			
+			// add background for professors texts
+			// jquery? because d3 is stupid at adding single elements
+			/*
+			var rowTextBackground = $("<rect/>").attr("x",  node.x-100)
+				.attr("y",  node.y)
+				.attr("width", 100)
+				.attr("height", node.size)
+				.attr("class", "matrixLink textBackground")
+				.insertBefore($(row[0][0]));
+			*/
+			// surprise! jquery is not working! -> the problem is SVG is XML format not html! I use pure JS
+			var rowTextBackground = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+			rowTextBackground.setAttributeNS(null,"x",  parseFloat((departmentRect.attr('x')))-120);
+			rowTextBackground.setAttributeNS(null,"y",  parseFloat((departmentRect.attr('y'))));
+			rowTextBackground.setAttributeNS(null,"width", 120);
+			rowTextBackground.setAttributeNS(null,"height", node.size);
+			rowTextBackground.setAttributeNS(null,"class", "matrixLink textBackground");
+			departmentG[0][0].insertBefore(rowTextBackground, row[0][0]);
+			
 			// add professors text
 			var rowText = row.append("text")
 				.attr("x", -6 + parseFloat((departmentRect.attr('x'))))
@@ -573,7 +593,8 @@ function  createMatrixLink(parentDivID, jsonFile, loadingObject){
 				.attr("text-anchor", "end")
 				.attr("class","matrixLink text")
 				.text(function(d, i) { return nodes[i].name; });
-				
+			
+			
 			
 			// handle adding or removing professors to list
 			rowText.on("click",function(d , i){
@@ -600,6 +621,14 @@ function  createMatrixLink(parentDivID, jsonFile, loadingObject){
 					d3.select(columnText[0][i]).classed("selected",true);
 				}
 			});
+			
+			var columnTextBackground = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+			columnTextBackground.setAttributeNS(null,"x",  parseFloat((departmentRect.attr('x'))));
+			columnTextBackground.setAttributeNS(null,"y",  parseFloat((departmentRect.attr('y')))-120);
+			columnTextBackground.setAttributeNS(null,"width", node.size);
+			columnTextBackground.setAttributeNS(null,"height", 120);
+			columnTextBackground.setAttributeNS(null,"class", "matrixLink textBackground");
+			departmentG[0][0].insertBefore(columnTextBackground, row[0][0]);
 			
 			var columnText = column.append("text")
 				.attr("x", 10 - parseFloat((departmentRect.attr('y'))))
@@ -643,8 +672,13 @@ function  createMatrixLink(parentDivID, jsonFile, loadingObject){
 			
 			departmentRect.on("dblclick", function(){
 				if (d3.event.defaultPrevented) return;
+				// remove texts
 				rowText.remove();
 				columnText.remove();
+				// remove text backgrounds
+				departmentG[0][0].removeChild(rowTextBackground);
+				departmentG[0][0].removeChild(columnTextBackground);
+				
 				shrinkMatrix();
 			});
 			
