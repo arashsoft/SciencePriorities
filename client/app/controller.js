@@ -152,6 +152,10 @@ angular.module('sciencePriorities2App').controller("layoutController" , ["$scope
 	// handle advanced layouts
 	$scope.advanceClicked = function(){
 	
+	
+		//show loading animation (TODO: add this loading gif to template and rewrite it with angular)
+		var loadingGif = $('<img src="/assets/images/loading.gif" alt="loading" style="width: 40%; height:60%; position:absolute;left:30%;top:20%;">');
+		loadingGif.appendTo($("#"+$scope.dropID));
 		// selectedEntity and selectedProperty are not correct names in this function but we use them because of consistency
 		$.get("/jsonrequest/"+$scope.selectedEntity+"/"+$scope.selectedProperty+"/null", function (jsonFile){
 			// if the session was expire or user loged out of the tool
@@ -165,22 +169,28 @@ angular.module('sciencePriorities2App').controller("layoutController" , ["$scope
 			if (typeof jsonFile.error == 'string'){
 				// I know its against angular manners but I prefer to manipulate DOM element directly
 				// TODO: rewrite this code with angular
+				loadingGif.remove();
 				$($element).find(".benchmarkSelect").append('<div class="alert alert-danger alert-dismissible" style="margin:10px; font-size:12px;">'+jsonFile.error +'<span style="float:right; border: 1px solid #a94442; padding:1px; cursor:pointer; border-radius: 4px;" onclick="$(this).parent().hide(1000);">X</span> </div>');
 				return;
 			}
 			
-			// if the compiler arrives here it means we got the data without any error
+			// if the compiler arrives here it means we got the data without any error and we want to show new visualization
 			
 			// stop previous layout interval (resizing)
 			clearInterval($scope.intervalID);
-			
+			// clear previous layout
 			$("#"+$scope.dropID).empty();
+			// add a new loading animation
+			loadingGif.appendTo($("#"+$scope.dropID));
+			
 			if ($scope.selectedProperty=="Node-Link"){
+				loadingGif.remove();
 				$scope.intervalID = createNodeLink($scope.dropID, jsonFile);
 			}else if ($scope.selectedProperty=="Matrix"){
+				loadingGif.remove();
 				$scope.intervalID = createMatrix($scope.dropID, jsonFile);
 			}else if ($scope.selectedProperty=="Matrix-Link"){
-				$scope.intervalID = createMatrixLink($scope.dropID, jsonFile);
+				$scope.intervalID = createMatrixLink($scope.dropID, jsonFile , loadingGif);
 			}
 		});
 	}

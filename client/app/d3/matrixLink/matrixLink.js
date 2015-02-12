@@ -5,6 +5,7 @@ departments : [{name : chemistry},{name : computer science},{name : biology}]
 */
 
 // This module is not working with angular and everything is jquery base. It means we add elements to dom directly, but, everything above parentDivID is safe and can be angular base.
+// loadingObject is optional
 
 // remove object from Array prototype
 Array.prototype.remove = function() {
@@ -18,7 +19,7 @@ Array.prototype.remove = function() {
     return this;
 };
 
-function  createMatrixLink(parentDivID, jsonFile){
+function  createMatrixLink(parentDivID, jsonFile, loadingObject){
 	var parentObject = $("#"+parentDivID);
 	var width = parentObject[0].clientWidth;
 	var height = parentObject[0].clientHeight;;
@@ -111,6 +112,7 @@ function  createMatrixLink(parentDivID, jsonFile){
 		});
 		
 	// empty parentObject and start adding items to it
+	// 	if (typeof(loadingObject) !== 'undefined') { loadingObject.remove(); }
 	parentObject.empty();
 	
 	// selectedDepartments menu
@@ -245,7 +247,7 @@ function  createMatrixLink(parentDivID, jsonFile){
 		
 		var mainDiv = $('<div align="center" class="matrixLinkBenchmarkSelectDiv"><div class="btn btn-danger close-btn" onclick="var tempObject = $(this).parent().parent(); tempObject.hide(1000,function(){tempObject.remove()});">X</div></div>');
 		$('<div class="matrixLinkBenchmarkSelect"></div>').append(mainDiv).appendTo(parentObject);
-		var loadingGif = $('<img src="/assets/images/loading.gif" alt="loading" style="width: 40%; height:60%;">');
+		var loadingGif = $('<img src="/assets/images/loading.gif" alt="loading" style="width: 40%; height:60%; position:absolute;left:30%;top:20%;">');
 		loadingGif.appendTo(mainDiv);
 		
 		// request nodes and links for compare departments
