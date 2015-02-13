@@ -66,13 +66,16 @@ function  createMatrixLink(parentDivID, jsonFile, loadingObject){
 			var tempLink = new Object();
 			tempLink.source = nodeHash[jsonFile.nodes[jsonFile.links[i].source].department];
 			tempLink.target = nodeHash[jsonFile.nodes[jsonFile.links[i].target].department];
-			tempLink.width = 1;
+			tempLink.award = 0;
+			tempLink.pub=0;
+			tempLink.coSuper=0;
 			tempLink.type = jsonFile.links[i].type;
 			// we remove duplicate links with this method
 			if ($.isEmptyObject(forceLinkObjects[tempLink.source+"-"+tempLink.target])){
+				tempLink[tempLink.type] =1;
 				forceLinkObjects[tempLink.source+"-"+tempLink.target]=tempLink;
 			}else{
-				forceLinkObjects[tempLink.source+"-"+tempLink.target].width++;
+				forceLinkObjects[tempLink.source+"-"+tempLink.target][tempLink.type]++;
 			}
 		} else{
 			// link inside a department
@@ -116,12 +119,25 @@ function  createMatrixLink(parentDivID, jsonFile, loadingObject){
 	parentObject.empty();
 	
 	// selectedDepartments menu
-	$('<div class ="noselect" style="position:absolute; top:100px; right:5px; opacity: 0.85; width:200px; visibility:hidden;">	<ul class = "ui-menu ui-widget ui-widget-content ui-corner-all" id="'+ parentDivID+ 'departmentMenu" style="padding:10px;"> <li class="ui-widget-header">Selected Departments</li> <label class="btn btn-primary" id="'+parentDivID+'departmentMenuButton" style="padding: 0px 3px;margin-top:15px;" >Show Relations</label></ul> </div>').appendTo(parentObject);
+	var selectDepartmentDiv= $('<div class ="noselect" style="position:absolute; top:11%; right:5px; opacity: 0.85; width:14%; min-width:125px;"><div align="center"><label class="btn btn-primary checkboxButton">Award <input type="checkbox" value="award" checked></label><label class="btn btn-primary checkboxButton">Publication <input type="checkbox" value="pub" checked></label><label class="btn btn-primary checkboxButton">Supervision <input type="checkbox" value="coSuper" checked><label></div><ul class = "ui-menu ui-widget ui-widget-content ui-corner-all" id="'+ parentDivID+ 'departmentMenu" style="padding:10px; margin-top:10px; visibility:hidden"> <li class="ui-widget-header">Selected Departments</li> <label class="btn btn-primary" id="'+parentDivID+'departmentMenuButton" style="padding: 0px 3px;margin-top:15px;" >Show Relations</label></ul> </div>')
+	selectDepartmentDiv.appendTo(parentObject);
+	
+	selectDepartmentDiv.find(".checkboxButton input").change(function() {
+		var awardM = selectDepartmentDiv.find(".checkboxButton input[value='award']").is(":checked");
+		var pubM = selectDepartmentDiv.find(".checkboxButton input[value='pub']").is(":checked");
+		var coSuperM = selectDepartmentDiv.find(".checkboxButton input[value='coSuper']").is(":checked");
+		matrixDepartmentlinks.style("stroke-width", function(d){
+				return lineScale(d.award * awardM + d.pub * pubM + d.coSuper * coSuperM);
+		});
+		
+	});
+		
 	
 	// department selection bar
 	parentObject.append('<div id="'+ parentDivID + 'departmentBar" class ="noselect niceScroll" style="position:absolute; top:5px;left:5px; max-height:10%; overflow-y: scroll; opacity: 0.85"></div>');
+	
 	// selectedProfessor menu
-	parentObject.append('<div class ="noselect" style="position:absolute; top:100px;left:5px; opacity: 0.85; width:200px; visibility:hidden;"> <ul id="'+ parentDivID+ 'professorsMenu" style="padding:10px;"> <li class="ui-widget-header">Selected Professors</li></ul></div>');
+	parentObject.append('<div class ="noselect" style="position:absolute; top:11%;left:5px; opacity: 0.85; width:14%; min-width:125px; visibility:hidden;"> <ul id="'+ parentDivID+ 'professorsMenu" style="padding:10px;"> <li class="ui-widget-header">Selected Professors</li></ul></div>');
 	$("#"+parentDivID+"professorsMenu").menu({
 		items: "> :not(.ui-widget-header)"
 	});
@@ -171,9 +187,13 @@ function  createMatrixLink(parentDivID, jsonFile, loadingObject){
 	}
 	
 	// scale for links width
-	var lineScale = d3.scale.linear()
-    .domain([1, 100])
-    .range([0.3,10]);
+	//var lineScale = d3.scale.linear()
+	function lineScale(value){
+		//.domain([1, 100])
+    //.range([0.3,10]);
+		if (value==0){return 0;}
+		return (97/990)*value+(20/99);
+	}
 	// draw links between departments for first time
 	var matrixDepartmentlinks = container.selectAll(".matrixLink.link")
 		.data(forceLinks)
@@ -183,7 +203,7 @@ function  createMatrixLink(parentDivID, jsonFile, loadingObject){
 			.attr("y1", function(d) { return d.source.y + d.source.size/2})
 			.attr("x2", function(d) { return d.target.x + d.target.size/2})
 			.attr("y2", function(d) { return d.target.y + d.target.size/2})
-			.style("stroke-width", function(d){return lineScale(d.width)});
+			.style("stroke-width", function(d){return lineScale(d.award + d.pub + d.coSuper)});
 	
 	// its time to show matrixes
 	for (var i=0, length =forceNodes.length; i < length ; i++ ){

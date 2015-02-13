@@ -18,7 +18,7 @@ connection.connect(function(err) {
 	var insertSize = 7;
 	var departmentName = "Biology";
 	// list all professors for selected department
-	connection.query("select P.ID as ID, concat(cast(P.Firstname as char(15)),',',cast(P.Middlename as CHAR(15)),' ',P.Lastname)  as name , D.ID as dID , D.name as department from award_professor2 as AP2 join professor as P on P.Id=AP2.professor join department as D on D.ID = P.Department_Primary where AP2.Grant in (select multiGrants.* from (select AP.Grant from award_professor2 as AP group by AP.Grant having count(AP.Grant)>1) as multiGrants) and D.Name='"+departmentName+"' group by AP2.Professor ", function(err,rows,fields){
+	connection.query("select P.ID as ID, concat(cast(P.Firstname as char(15)),',',cast(P.Middlename as CHAR(15)),' ',P.Lastname)  as name , D.ID as dID , D.name as department from award_professor2 as AP2 join professor as P on P.Id=AP2.professor join department as D on D.ID = P.Department_Primary where AP2.Grant in (select multiGrants.* from (select AP.Grant from award_professor2 as AP group by AP.Grant having count(AP.Grant)>1) as multiGrants)  group by AP2.Professor ", function(err,rows,fields){
 		
 		var insertQuery = 'INSERT INTO student_fake (Department,Supervisor1,Supervisor2) VALUES ';
 		for (var i=0;i<insertSize;i++){

@@ -7,6 +7,11 @@
 	font-weight: bold;
 	padding: 1px 3px;
 }
+.checkboxButton{
+	margin : 3px;
+	padding: 5px 3px;
+	width: 110px;
+}
 
 .departmentButton:not(.active) {
 	opacity: 0.3;
