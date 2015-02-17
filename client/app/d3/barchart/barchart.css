@@ -4,7 +4,7 @@
 
 .barchart.bar.clickable {
   stroke-width:2px;
-	stroke:blue;
+	stroke:rgb(13, 56, 183);
 }
 
 .barchart.bar:hover {
