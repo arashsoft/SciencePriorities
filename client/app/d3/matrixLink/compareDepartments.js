@@ -222,7 +222,8 @@ function  compareDepartments(parentDiv, data ,departmentColor, loadingObject){
 				d3.select(this).classed("selected",1);
 				//selectedProfDiv.css("visibility","visible");
 			}
-		});
+		})
+		.on("dblclick",function(d){d.fixed = false});
 	
 	var forceNodesTexts = forceNodes.append("text")
 		.attr("class","compareD texts noselect")
