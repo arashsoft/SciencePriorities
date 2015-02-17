@@ -119,14 +119,14 @@ function  createMatrixLink(parentDivID, jsonFile, loadingObject){
 	parentObject.empty();
 	
 	// selectedDepartments menu
-	var selectDepartmentDiv= $('<div class ="noselect" style="position:absolute; top:11%; right:5px; opacity: 0.85; width:14%; min-width:125px;"><div align="center"><label class="btn btn-primary checkboxButton">Award <input type="checkbox" value="award" checked></label><label class="btn btn-primary checkboxButton">Publication <input type="checkbox" value="pub" checked></label><label class="btn btn-primary checkboxButton">Supervision <input type="checkbox" value="coSuper" checked><label></div><ul class = "ui-menu ui-widget ui-widget-content ui-corner-all" id="'+ parentDivID+ 'departmentMenu" style="padding:10px; margin-top:10px; visibility:hidden"> <li class="ui-widget-header">Selected Departments</li> <label class="btn btn-primary" id="'+parentDivID+'departmentMenuButton" style="padding: 0px 3px;margin-top:15px;" >Show Relations</label></ul> </div>')
+	var selectDepartmentDiv= $('<div class ="noselect" style="position:absolute; top:11%; right:5px; opacity: 0.85; width:14%; min-width:125px;"><div align="center"><label class="btn btn-primary checkboxButton" style="background-color: rgb(0, 100, 0);">Award <input type="checkbox" value="award" checked></label><label class="btn btn-primary checkboxButton" style="background-color: rgb(17, 63, 170);">Publication <input type="checkbox" value="pub" checked></label><label class="btn btn-primary checkboxButton" style="background-color: rgb(214, 29, 29);">Supervision <input type="checkbox" value="coSuper" checked><label></div><ul class = "ui-menu ui-widget ui-widget-content ui-corner-all" id="'+ parentDivID+ 'departmentMenu" style="padding:10px; margin-top:10px; visibility:hidden"> <li class="ui-widget-header">Selected Departments</li> <label class="btn btn-primary" id="'+parentDivID+'departmentMenuButton" style="padding: 0px 3px;margin-top:15px;" >Show Relations</label></ul> </div>')
 	selectDepartmentDiv.appendTo(parentObject);
 	
 	selectDepartmentDiv.find(".checkboxButton input").change(function() {
 		var awardM = selectDepartmentDiv.find(".checkboxButton input[value='award']").is(":checked");
 		var pubM = selectDepartmentDiv.find(".checkboxButton input[value='pub']").is(":checked");
 		var coSuperM = selectDepartmentDiv.find(".checkboxButton input[value='coSuper']").is(":checked");
-		matrixDepartmentlinks.style("stroke-width", function(d){
+		matrixDepartmentlinks.transition().duration(400).style("stroke-width", function(d){
 				return lineScale(d.award * awardM + d.pub * pubM + d.coSuper * coSuperM);
 		});
 		
@@ -157,26 +157,8 @@ function  createMatrixLink(parentDivID, jsonFile, loadingObject){
     .style("fill", "none")
     .style("pointer-events", "all");
 	
+	// main g - all elements will add to container
 	var container = svg.append("g");
-	
-	// we add context-menu container and call it on departmentRects touchHold
-	// we convert d3 select to jquery select  --> $(container[0])
-	$(container[0]).contextmenu({
-		preventContextMenuForPopup: true,
-    preventSelect: true,
-		menu: [
-        {title: "Select/UnSelect", cmd: "select"},
-        {title: "Arrange", children: [
-           {title: "By name", cmd: "name"},
-           {title: "By collaboration count", cmd: "count"}
-				]},
-				{title: "Hide", cmd: "hide"}
-        ],
-			select: function(event, ui) {
-				// call refreshMatrix method
-				$(ui.target).trigger("refreshMatrix" ,ui.cmd);
-			}
-	});
 	
 	// we do not want to show department nodetrix - we just use it as matrix places
 	// move department nodes to center (margin and other stupid things../)
@@ -209,6 +191,24 @@ function  createMatrixLink(parentDivID, jsonFile, loadingObject){
 	for (var i=0, length =forceNodes.length; i < length ; i++ ){
 		createMatrix(forceNodes[i] , departmentMatrixes[i].links, departmentMatrixes[i].nodes);
 	}
+	
+	// we add context-menu to department rectangles (context-menu handle events itself)
+	$(".departmentG").contextmenu({
+		preventContextMenuForPopup: true,
+    preventSelect: true,
+		menu: [
+        {title: "Select/UnSelect", cmd: "select"},
+        {title: "Arrange", children: [
+           {title: "By name", cmd: "name"},
+           {title: "By collaboration count", cmd: "count"}
+				]},
+				{title: "Hide", cmd: "hide"}
+        ],
+			select: function(event, ui) {
+				// call refreshMatrix method
+				$(ui.target).trigger("refreshMatrix" ,ui.cmd);
+			}
+	});
 	
 	// time to add departmentbar items
 	departmentBarLabels = d3.select("#"+parentDivID + "departmentBar").selectAll("label")
@@ -272,7 +272,6 @@ function  createMatrixLink(parentDivID, jsonFile, loadingObject){
 		
 		// request nodes and links for compare departments
 		$.get('/jsonrequest2/departmentSelect/' + JSON.stringify(selectedDepartments) , function(result){
-			//result.department = selectedDepartments; -> we should not change data from here! makeJson (server size) will handle that
 			compareDepartments(mainDiv,result,departmentColor, loadingGif);
 		});
 	});
