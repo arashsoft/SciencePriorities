@@ -4,12 +4,22 @@
 // loadingObject is optional
 /* data has 
 data.nodes
-data.links
+data.awardlinks
+data.publinks
+data.coSuplinks
 data.department (it is array of selected departments)
 */		
 
 function  compareDepartments(parentDiv, data ,departmentColor, loadingObject){
-	if (typeof(departmentColor) === 'undefined') { departmentColor = d3.scale.category20();; }
+	if (typeof(departmentColor) === 'undefined') { departmentColor = d3.scale.category20(); }
+	var linkColor = {};
+	linkColor["award"] = "rgb(0, 100, 0)";
+	linkColor["pub"] = "rgb(17, 63, 170)";
+	linkColor["coSuper"] = "rgb(214, 29, 29)";
+	
+	
+	data.links = new Array();
+	data.links = data.awardLinks.concat(data.pubLinks,data.coSupLinks);
 	
 	var width = parentDiv.width();
 	var height = parentDiv.height();
@@ -40,6 +50,72 @@ function  compareDepartments(parentDiv, data ,departmentColor, loadingObject){
 		
 	});
 	
+	var selectLinkTypeDiv = $('<div class ="noselect" style="position:absolute; top:11%; right:5px; opacity: 0.85; width:14%; min-width:125px;"><div align="center"><label class="btn btn-primary checkboxButton" style="background-color: rgb(0, 100, 0);">Award <input type="checkbox" value="award" checked></label><label class="btn btn-primary checkboxButton" style="background-color: rgb(17, 63, 170);">Publication <input type="checkbox" value="pub" checked></label><label class="btn btn-primary checkboxButton" style="background-color: rgb(214, 29, 29);">Supervision <input type="checkbox" value="coSuper" checked><label></div>');
+	parentDiv.append(selectLinkTypeDiv);
+	// handle link type filters
+	selectLinkTypeDiv.find(".checkboxButton input").change(function(event) {		
+		if (event.currentTarget.value=="award"){
+			if (event.currentTarget.checked){
+				// add links
+				data.links = data.links.concat(data.awardLinks);
+				force.links(data.links);
+			}else{
+				// remove links
+				for(var i = data.links.length - 1; i >= 0; i--) {
+					if(data.links[i].type=="award") {
+						 data.links.splice(i, 1);
+					}
+				}
+			}
+		}else if (event.currentTarget.value=="pub"){
+			if (event.currentTarget.checked){
+				// add links
+				data.links = data.links.concat(data.pubLinks);
+				force.links(data.links);
+			}else{
+				// remove links
+				for(var i = data.links.length - 1; i >= 0; i--) {
+					if(data.links[i].type=="pub") {
+						 data.links.splice(i, 1);
+					}
+				}
+			}
+		}else if(event.currentTarget.value=="coSuper"){
+			if (event.currentTarget.checked){
+				// add links
+				data.links = data.links.concat(data.coSupLinks);
+				force.links(data.links);
+			}else{
+				// remove links
+				for(var i = data.links.length - 1; i >= 0; i--) {
+					if(data.links[i].type=="coSuper") {
+						 data.links.splice(i, 1);
+					}
+				}
+			}
+		}
+		var newLinks = container.selectAll(".compareD.link")
+		.data(data.links);
+		
+		newLinks.exit().remove();
+		
+		newLinks.enter().append("line")
+			.attr("class" , "compareD link")
+			.attr("x1", function(d) { return d.source.x})
+			.attr("y1", function(d) { return d.source.y})
+			.attr("x2", function(d) { return d.target.x})
+			.attr("y2", function(d) { return d.target.y});
+		
+		newLinks
+			.style("stroke-width", function(d) { return d.width;})
+			.style("stroke", function(d){return linkColor[d.type];}); 
+		
+		forceLinks = newLinks;
+		force.resume();
+		forceNodes.moveToFront();
+		
+	});
+	
 	// department selection bar
 	var departmentBar = $('<div class ="noselect niceScroll" style="position:absolute; top:5px;left:220px; max-height:100px; overflow-y: scroll; opacity: 0.85"></div>');
 	parentDiv.append(departmentBar);
@@ -53,13 +129,13 @@ function  compareDepartments(parentDiv, data ,departmentColor, loadingObject){
 					// unselect
 					d3.select(this).classed("active",0);
 					forceNodeCircles.each(function(d2){
-						if (d2.departmentName==d){d3.select(this).style("opacity",0.4);}
+						if (d2.departmentName==d){d3.select(this.parentNode).style("opacity",0.1);}
 					})
 				}else{
 					// select
 					d3.select(this).classed("active",1);
 					forceNodeCircles.each(function(d2){
-						if (d2.departmentName==d){d3.select(this).style("opacity",1);}
+						if (d2.departmentName==d){d3.select(this.parentNode).style("opacity",1);}
 					})
 				}
 			});
@@ -116,7 +192,8 @@ function  compareDepartments(parentDiv, data ,departmentColor, loadingObject){
 			.attr("y1", function(d) { return d.source.y})
 			.attr("x2", function(d) { return d.target.x})
 			.attr("y2", function(d) { return d.target.y})
-			.style("stroke-width", function(d) { return d.width});
+			.style("stroke-width", function(d) { return d.width;})
+			.style("stroke", function(d){return linkColor[d.type];});
 			
 	var forceNodes = container.selectAll(".compareD.nodes")
 		.data(data.nodes)
@@ -186,14 +263,14 @@ function  compareDepartments(parentDiv, data ,departmentColor, loadingObject){
 			.attr("y2", function(d) { return d.target.y});
 	}
 	
-}
+} // end of compareDepartments
 
 
-
-
-
-
-
+d3.selection.prototype.moveToFront = function() {
+  return this.each(function(){
+    this.parentNode.appendChild(this);
+  });
+};
 
 
 

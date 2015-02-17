@@ -2,7 +2,7 @@
 
 }
 .compareD.link{
-	stroke: #999;
+	opacity: 0.5;
 }
 .compareD.texts{
 	text-anchor: middle;

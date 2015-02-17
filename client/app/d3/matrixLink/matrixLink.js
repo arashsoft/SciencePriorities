@@ -118,7 +118,7 @@ function  createMatrixLink(parentDivID, jsonFile, loadingObject){
 	// 	if (typeof(loadingObject) !== 'undefined') { loadingObject.remove(); }
 	parentObject.empty();
 	
-	// selectedDepartments menu
+	// selectedDepartments menu - also select link types
 	var selectDepartmentDiv= $('<div class ="noselect" style="position:absolute; top:11%; right:5px; opacity: 0.85; width:14%; min-width:125px;"><div align="center"><label class="btn btn-primary checkboxButton" style="background-color: rgb(0, 100, 0);">Award <input type="checkbox" value="award" checked></label><label class="btn btn-primary checkboxButton" style="background-color: rgb(17, 63, 170);">Publication <input type="checkbox" value="pub" checked></label><label class="btn btn-primary checkboxButton" style="background-color: rgb(214, 29, 29);">Supervision <input type="checkbox" value="coSuper" checked><label></div><ul class = "ui-menu ui-widget ui-widget-content ui-corner-all" id="'+ parentDivID+ 'departmentMenu" style="padding:10px; margin-top:10px; visibility:hidden"> <li class="ui-widget-header">Selected Departments</li> <label class="btn btn-primary" id="'+parentDivID+'departmentMenuButton" style="padding: 0px 3px;margin-top:15px;" >Show Relations</label></ul> </div>')
 	selectDepartmentDiv.appendTo(parentObject);
 	
