@@ -47,6 +47,7 @@ function  compareDepartments(parentDiv, data ,departmentColor, loadingObject , p
 		
 		// get data for selected Professors
 		$.get('/jsonrequest2/professorSelect/' + JSON.stringify(selectedProfs) , function(result){
+			force.stop();
 			compareDepartments(mainDiv ,result, departmentColor, loadingGif , selectedProfs);
 		});
 		
@@ -127,7 +128,7 @@ function  compareDepartments(parentDiv, data ,departmentColor, loadingObject , p
 	});
 	
 	// department selection bar
-	var departmentBar = $('<div class ="noselect niceScroll" style="position:absolute; top:5px;left:220px; max-height:100px; overflow-y: scroll; opacity: 0.85"></div>');
+	var departmentBar = $('<div class ="noselect niceScroll" style="position:absolute; top:5px;left:220px; right:35px; max-height:100px; overflow-y: scroll; opacity: 0.85"></div>');
 	parentDiv.append(departmentBar);
 	d3.selectAll(departmentBar.toArray()).selectAll("compareD departmentBarItem")
 		.data(data.department).enter().append("div")
