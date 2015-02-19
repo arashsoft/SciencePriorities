@@ -137,11 +137,38 @@ function  createMatrixLink(parentDivID, jsonFile, loadingObject){
 	parentObject.append('<div id="'+ parentDivID + 'departmentBar" class ="noselect niceScroll" style="position:absolute; top:5px;left:5px; max-height:10%; overflow-y: scroll; opacity: 0.85"></div>');
 	
 	// selectedProfessor menu
-	parentObject.append('<div class ="noselect" style="position:absolute; top:11%;left:5px; opacity: 0.85; width:14%; min-width:125px; visibility:hidden;"> <ul id="'+ parentDivID+ 'professorsMenu" style="padding:10px;"> <li class="ui-widget-header">Selected Professors</li></ul></div>');
-	$("#"+parentDivID+"professorsMenu").menu({
+	var selectedProfMenu = $('<div class ="noselect" style="position:absolute; top:11%;left:5px; opacity: 0.85; width:14%; min-width:125px; visibility:hidden;"></div>');
+	var selectedProfUl = $(' <ul style="padding:10px;"> <li class="ui-widget-header">Selected Professors</li></ul>');
+	var selectedProf_Button = $('<label class="btn btn-primary" style="padding: 0px 3px;margin-top:15px;" >Show Relations</label>');
+	
+	selectedProfUl.append(selectedProf_Button);
+	selectedProfMenu.append(selectedProfUl);
+	parentObject.append(selectedProfMenu);
+	
+	selectedProfUl.menu({
 		items: "> :not(.ui-widget-header)"
 	});
   
+	selectedProf_Button.click(function(){
+		if (selectedProfessors.length==0){return;}
+		var selectedProfessorsID = [];
+		for (var i=0; i< selectedProfessors.length ; i++){
+			selectedProfessorsID.push(selectedProfessors[i].ID);
+		}
+		
+		var mainDiv = $('<div align="center" class="matrixLinkBenchmarkSelectDiv"><div class="btn btn-danger close-btn" onclick="var tempObject = $(this).parent().parent(); tempObject.hide(1000,function(){tempObject.remove()});">X</div></div>');
+		$('<div class="matrixLinkBenchmarkSelect"></div>').append(mainDiv).appendTo(parentObject);
+		var loadingGif = $('<img src="/assets/images/loading.gif" alt="loading" style="width: 40%; height:60%;">');
+		loadingGif.appendTo(mainDiv);
+		
+		// get data for selected Professors
+		$.get('/jsonrequest2/professorSelect/' + JSON.stringify(selectedProfessorsID) , function(result){
+			compareDepartments(mainDiv ,result, departmentColor, loadingGif , selectedProfessorsID);
+		});
+		
+	});
+	
+	
 	var svg = d3.select("#"+parentDivID).append("svg")
 		 .attr("width", width)
 		 .attr("height", height);
@@ -626,12 +653,17 @@ function  createMatrixLink(parentDivID, jsonFile, loadingObject){
 					d3.select(this).classed("selected",false);
 					d3.select(columnText[0][i]).classed("selected",false);
 					if (selectedProfessors.length==0)
-						$("#"+parentDivID+"professorsMenu").css("visibility","hidden");
+						selectedProfUl.css("visibility","hidden");
 					
 				}else{
 					
 					// add to menu
-					$("#"+parentDivID+"professorsMenu").css("visibility","visible").append("<li class='matrixLink selectLi' id='" + parentDivID +nodes[i].ID+ "'>"+ nodes[i].name+"</li>").append('<style>#'+ parentDivID +nodes[i].ID +':before {color:'+departmentColor(node.name)+';}</style>');
+					selectedProfUl.css("visibility","visible");
+					
+					var tempLi = $("<li class='matrixLink selectLi' id='" + parentDivID +nodes[i].ID+ "'>"+ nodes[i].name+"</li>");
+					var tempLiStyle = $('<style>#'+ parentDivID +nodes[i].ID +':before {color:'+departmentColor(node.name)+';}</style>');
+					tempLi.insertBefore(selectedProf_Button);
+					tempLiStyle.insertBefore(selectedProf_Button);
 					
 					// add to selectedProfessors array
 					selectedProfessors.push(nodes[i]);
@@ -676,11 +708,17 @@ function  createMatrixLink(parentDivID, jsonFile, loadingObject){
 					d3.select(this).classed("selected",false);
 					d3.select(rowText[0][i]).classed("selected",false);
 					if (selectedProfessors.length==0)
-						$("#"+parentDivID+"professorsMenu").css("visibility","hidden");
+						selectedProfUl.css("visibility","hidden");
 				}else{
 					
 					// add to menu
-					$("#"+parentDivID+"professorsMenu").css("visibility","visible").append("<li class='matrixLink selectLi' id='" + parentDivID +nodes[i].ID+ "'>"+ nodes[i].name+"</li>").append('<style>#'+ parentDivID +nodes[i].ID +':before {color:'+departmentColor(node.name)+';}</style>');;
+					selectedProfUl.css("visibility","visible");
+					
+					var tempLi = $("<li class='matrixLink selectLi' id='" + parentDivID +nodes[i].ID+ "'>"+ nodes[i].name+"</li>");
+					var tempLiStyle = $('<style>#'+ parentDivID +nodes[i].ID +':before {color:'+departmentColor(node.name)+';}</style>');
+					tempLi.insertBefore(selectedProf_Button);
+					tempLiStyle.insertBefore(selectedProf_Button);
+					
 					// add to selectedProfessors array
 					selectedProfessors.push(nodes[i]);
 					// set class to make them red
