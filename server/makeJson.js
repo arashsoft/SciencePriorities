@@ -242,8 +242,6 @@ exports.makeDynamicJson = function(type, values1, callback){
 				
 				function dataIsReady(data){	
 					
-					
-					
 					connection.end();
 					callback(data);
 				}
@@ -370,35 +368,60 @@ exports.makeDynamicJson = function(type, values1, callback){
 				callback("mysql connection error");
 				return;
 			}
-			var queryText = "select distinct p.*, d.Name as departmentName from professor as p join department as d on p.Department_Primary=d.ID join award_professor2 as ap on ap.Professor=p.ID where ap.`Grant` in (select award.ID as awardID from award join award_professor2 as ap2 on ap2.`Grant`= award.ID where ap2.Professor in (";
+			
+			var professorsList = " ("; 
 			for (var i=0; i < values1.length; i++){
-				queryText += '"'+ values1[i] + '",'
+				professorsList += '"'+ values1[i] + '",';
 			}
-			queryText = queryText.substring(0, queryText.length - 1);
-			queryText += "))";
+			professorsList = professorsList.substring(0, professorsList.length - 1);
+			professorsList += ") ";
+			
+			// this query generates list of all professors whom are related to selected professors
+			var queryText = "select distinct p.*, d.Name as departmentName from professor as p join department as d on p.Department_Primary=d.ID join award_professor2 as ap on ap.Professor=p.ID where ap.`Grant` in (select award.ID as awardID from award join award_professor2 as ap2 on ap2.`Grant`= award.ID where ap2.Professor in "+professorsList+") union select distinct p.*, d.Name as departmentName from professor as p join department as d on p.Department_Primary=d.ID join author_2_fake as a2f on a2f.Professor_ID=p.ID join publication_author_profOnly as pap on pap.Author = a2f.ID where pap.Publication in (select pap.Publication as pubID from publication_author_profOnly as pap join author_2_fake as a2f on a2f.ID= pap.Author where a2f.Professor_ID in "+professorsList+") union select distinct p.*, d.Name as departmentName from professor as p join department as d on p.Department_Primary=d.ID join student_fake as sf on sf.Supervisor1=p.ID or sf.Supervisor2=p.ID where sf.Supervisor1 in "+professorsList+" or sf.Supervisor2 in "+professorsList;
+			
 			connection.query(queryText, function(err,rows,fields){
-				// now we have IDs of related professors to selected professors
-				// run second query based on professors IDs (rows)
-				queryText = "SELECT ap.Grant, GROUP_CONCAT(P.ID SEPARATOR '#')  as Professors, GROUP_CONCAT(D.name SEPARATOR '#') as Departments FROM (select CONCAT(award_professor2.Grant, award_professor2.Professor) as tempColumn, award_professor2.Grant, award_professor2.Professor, award_professor2.ID from award_professor2 where award_professor2.Professor in ("
-				for (var i=0;i<rows.length;i++){
-					queryText += rows[i].ID + ",";
-				}
-				queryText = queryText.substring(0, queryText.length - 1);
-				queryText += ") group by tempColumn) as ap join professor as P on P.ID= ap.Professor join department as D on P.Department_Primary=D.ID GROUP BY ap.Grant having count(ap.grant) > 1";
+				// now we have information of related professors to selected professors
 				
-				connection.query(queryText, function(err2,rows2,fields2){
-					// now we have links in 34#23#12#... format
-					var tempResult = {};
-					tempResult.nodes = rows;
-					tempResult.selectedNodes = values1;
-					tempResult.links = new Array();
+				function dataIsReady(data){	
+					
+					connection.end();
+					callback(data);
+				}
+
+				// we run next queries based on professors name (rows)
+				var departmentList = {};
+				var profIDs = "(";
+				for (var i=0;i<rows.length;i++){
+					profIDs += rows[i].ID + ",";
+					departmentList[rows[i].departmentName] = rows[i].departmentName;
+				}
+				profIDs = profIDs.substring(0, profIDs.length - 1);
+				profIDs +=")";
+				
+				var awardQueryText = "SELECT ap.Grant, GROUP_CONCAT(P.ID SEPARATOR '#')  as Professors, GROUP_CONCAT(D.name SEPARATOR '#') as Departments FROM (select CONCAT(award_professor2.Grant, award_professor2.Professor) as tempColumn, award_professor2.Grant, award_professor2.Professor, award_professor2.ID from award_professor2 where award_professor2.Professor in " + profIDs + " group by tempColumn) as ap join professor as P on P.ID= ap.Professor join department as D on P.Department_Primary=D.ID GROUP BY ap.Grant having count(ap.grant) > 1";
+				
+				var pubQueryText = "SELECT pa.Publication, GROUP_CONCAT(P.ID SEPARATOR '#')  as Professors, GROUP_CONCAT(D.name SEPARATOR '#') as Departments FROM (select CONCAT(publication_author_profOnly.Author,'#', publication_author_profOnly.Publication) as tempColumn, publication_author_profOnly.* from publication_author_profOnly join author_2_fake as ia2f on ia2f.ID = publication_author_profOnly.Author join professor on professor.ID= ia2f.Professor_ID where professor.ID in " + profIDs + " group by tempColumn) as pa join author_2_fake as a2 on a2.ID=pa.Author join professor as P on P.ID= a2.Professor_ID join department as D on P.Department_Primary=D.ID  GROUP BY pa.Publication having count(pa.Publication) > 1";
+				
+				var coSuperQueryText = "select p.ID as pID1,  p.Department_Primary as pD1, p2.ID as pID2, p2.Department_Primary as pD2 , d.Name as departmentName from student_fake as sf join professor as p on p.ID=sf.Supervisor1 join professor as p2 on p2.ID=sf.Supervisor2 join department as d on p.Department_Primary=d.ID where sf.Supervisor2 is not null and p.ID in " + profIDs + " and p2.ID in " + profIDs;
+				
+				var queryNumber = 3;
+				var tempData = {};
+				tempData.nodes = rows;
+				tempData.department = [];
+				for (var id in departmentList){
+					tempData.department.push(departmentList[id])
+				}
+				
+				var nodeHash = new Object();
+				for (var i =0; i < rows.length; i++){
+					nodeHash[rows[i].ID] = i;
+				}
+					
+				// award links
+				connection.query(awardQueryText, function(err2,rows2,fields2){
+					tempData.awardLinks = new Array();
 					
 					var tempLinks = [];
-					// we have to it because of d3.force bug (it does not support node names as source and target)
-					var nodeHash = new Object();
-					for (var i =0; i < rows.length; i++){
-						nodeHash[rows[i].ID] = i;
-					}
 					for (var i=0 , length =rows2.length ; i < length; i++){
 						var professorIDs = rows2[i].Professors.split("#");
 						var departmentNames = rows2[i].Departments.split("#");
@@ -418,20 +441,69 @@ exports.makeDynamicJson = function(type, values1, callback){
 							LinkObjects[tempLinks[i].source+"-"+tempLinks[i].target].width++;
 						}
 					}
+					
 					// convert object to array
 					for (var tempLink in LinkObjects){
-						tempResult.links.push(LinkObjects[tempLink])
+						tempData.awardLinks.push(LinkObjects[tempLink])
 					}
 					
-					connection.query("select distinct D.name as department from award_professor2 as AP2 join professor as P on P.Id=AP2.professor join department as D on D.ID = P.Department_Primary where AP2.Grant in (select multiGrants.* from (select AP.Grant from award_professor2 as AP group by AP.Grant having count(AP.Grant)>1) as multiGrants) group by AP2.Professor", function(err3,rows3,fields3){
-						// we want to send department names too (rows3)
-						tempResult.departments = rows3;
-						connection.end();
-						callback(tempResult);
+					// check if other queries already returned or not
+					if (1 == queryNumber--){
+						dataIsReady(tempData);
+					}
+				}); // end of award query
+				
+				// pub links
+				connection.query(pubQueryText, function(err2,rows2,fields2){
+					tempData.pubLinks = new Array();
 					
-					}); // end of query 3
-				}); // end of query 2
-			}); // end of query 1
+					var tempLinks = [];
+					
+					for (var i=0 , length =rows2.length ; i < length; i++){
+						var professorIDs = rows2[i].Professors.split("#");
+						var departmentNames = rows2[i].Departments.split("#");
+						for (var j1=0 , j1Length = professorIDs.length; j1 < j1Length; j1++){
+							for (var j2= j1+1; j2 < j1Length; j2++){
+								tempLinks.push({source: nodeHash[professorIDs[j1]],target:nodeHash[professorIDs[j2]], width:1 ,type:"pub", linkType:(departmentNames[j1]==departmentNames[j2] ? departmentNames[j1]:0)});
+							}
+						}
+					}
+					// remove duplicates
+					var LinkObjects = new Object();
+					for (var i =0, length = tempLinks.length; i < length ; i++){
+						// we remove dublicate links with this method
+						if (isEmptyObject(LinkObjects[tempLinks[i].source+"-"+tempLinks[i].target])){
+							LinkObjects[tempLinks[i].source+"-"+tempLinks[i].target]=tempLinks[i];
+						}else{
+							LinkObjects[tempLinks[i].source+"-"+tempLinks[i].target].width++;
+						}
+					}
+					
+					// convert object to array
+					for (var tempLink in LinkObjects){
+						tempData.pubLinks.push(LinkObjects[tempLink])
+					}
+					
+					// check if other queries already returned or not
+					if (1 == queryNumber--){
+						dataIsReady(tempData);
+					}
+				}); // end of pub query
+				
+				// co-supervision links
+				connection.query(coSuperQueryText, function(err2,rows2,fields2){
+					tempData.coSupLinks = new Array();
+					
+					for (var i=0 , length =rows2.length ; i < length; i++){
+						tempData.coSupLinks.push({source: nodeHash[rows2[i].pID1], target: nodeHash[rows2[i].pID2], type:"coSuper", linkType:(rows2[i].pD1==rows2[i].pD2? rows2[i].departmentName:0) , width :1 })
+					}
+					// check if other queries already returned or not
+					if (1 == queryNumber--){
+						dataIsReady(tempData);
+					}
+				}); // end of co-supervision query
+				
+			}); // end of professors' list query
 		}); // end of connection.connect()
 	}else{
 		// unknown visualization

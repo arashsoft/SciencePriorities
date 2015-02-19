@@ -2,6 +2,8 @@
 // unlike other modules, parrentDiv should be jquery object not the object ID
 // departmentColor is optional
 // loadingObject is optional
+// previousSelectedProfs is optional
+
 /* data has 
 data.nodes
 data.awardlinks
@@ -10,7 +12,7 @@ data.coSuplinks
 data.department (it is array of selected departments)
 */		
 
-function  compareDepartments(parentDiv, data ,departmentColor, loadingObject){
+function  compareDepartments(parentDiv, data ,departmentColor, loadingObject , previousSelectedProfs){
 	if (typeof(departmentColor) === 'undefined') { departmentColor = d3.scale.category20(); }
 	var linkColor = {};
 	linkColor["award"] = "rgb(0, 100, 0)";
@@ -45,7 +47,7 @@ function  compareDepartments(parentDiv, data ,departmentColor, loadingObject){
 		
 		// get data for selected Professors
 		$.get('/jsonrequest2/professorSelect/' + JSON.stringify(selectedProfs) , function(result){
-			professorsRelation(mainDiv ,result, departmentColor, loadingGif);
+			compareDepartments(mainDiv ,result, departmentColor, loadingGif , selectedProfs);
 		});
 		
 	});
@@ -249,6 +251,12 @@ function  compareDepartments(parentDiv, data ,departmentColor, loadingObject){
 		})
 		.on("dblclick",function(d){d.fixed = false});
 	
+	if (typeof(previousSelectedProfs) !== 'undefined'){
+		forceNodeCircles.filter(function(d) { 
+		return previousSelectedProfs.indexOf(d.ID) !== -1;
+		}).classed("previousSelect",true);
+	}
+	
 	var forceNodesTexts = forceNodes.append("text")
 		.attr("class","compareD texts noselect")
 		.attr('lengthAdjust',"spacingAndGlyphs")
@@ -263,10 +271,10 @@ function  compareDepartments(parentDiv, data ,departmentColor, loadingObject){
 		.size([width, height])
 		.nodes(data.nodes)
 		.links(data.links)
-		.gravity(.05)
+		.gravity(.02)
 		.distance(300)
-		.charge(-400)
-		.linkStrength(0.4)
+		.charge(-500)
+		.linkStrength(0.3)
 		.on("tick", tickHandler)
 		.start();
 	

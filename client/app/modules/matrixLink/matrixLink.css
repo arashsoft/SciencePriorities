@@ -33,20 +33,20 @@
 }
 .matrixLinkBenchmarkSelectDiv{
 	position:absolute;
-	top:5%;
-	bottom:5%;
-	left:5%;
-	right:5%;
+	top:4%;
+	bottom:4%;
+	left:4%;
+	right:4%;
 	background-color:white;
 	padding:0 px;
 }
 
 .matrixLinkBenchmarkSelectDiv2{
 	position:absolute;
-	top:2%;
-	bottom:2%;
-	left:2%;
-	right:2%;
+	top:1%;
+	bottom:1%;
+	left:1%;
+	right:1%;
 	background-color:white;
 	padding:0 px;
 }

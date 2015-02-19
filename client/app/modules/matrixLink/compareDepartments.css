@@ -37,5 +37,10 @@
 }
 .compareD.circle.selected{
 	stroke-width : 3px;
-	stroke: red;
+	stroke: red !important;
+}
+
+.compareD.circle.previousSelect{
+	stroke-width : 4px;
+	stroke: yellow;
 }
