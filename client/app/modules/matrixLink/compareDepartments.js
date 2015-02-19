@@ -111,6 +111,14 @@ function  compareDepartments(parentDiv, data ,departmentColor, loadingObject){
 			.style("stroke", function(d){return linkColor[d.type];}); 
 		
 		forceLinks = newLinks;
+		
+		// hide visible:hidden links again
+		forceLinks.each(function(d){
+			if ($(forceNodeCircles[0][d.source.index].parentNode).css("visibility")=="hidden" || $(forceNodeCircles[0][d.target.index].parentNode).css("visibility")=="hidden"){
+				d3.select(this).style("visibility","hidden");
+			}
+		});
+				
 		force.resume();
 		forceNodes.moveToFront();
 		
@@ -126,17 +134,33 @@ function  compareDepartments(parentDiv, data ,departmentColor, loadingObject){
 			.text(function(d){return d})
 			.on("click",function(d){
 				if ($(this).hasClass("active")){
-					// unselect
+					// hide
 					d3.select(this).classed("active",0);
+					// hide circles
 					forceNodeCircles.each(function(d2){
-						if (d2.departmentName==d){d3.select(this.parentNode).style("opacity",0.1);}
-					})
+						if (d2.departmentName==d){d3.select(this.parentNode).style("visibility","hidden");}
+					});
+					// hide links
+					forceLinks.each(function(d2){
+						if (d2.source.departmentName == d || d2.target.departmentName == d){
+							d3.select(this).style("visibility","hidden");
+						}
+					});
+					
 				}else{
-					// select
+					// show
 					d3.select(this).classed("active",1);
+					//show circles
 					forceNodeCircles.each(function(d2){
-						if (d2.departmentName==d){d3.select(this.parentNode).style("opacity",1);}
+						if (d2.departmentName==d){d3.select(this.parentNode).style("visibility","visible");}
 					})
+					// show links
+					forceLinks.each(function(d2){
+						// check if both sides of link are visible or not
+						if ((d2.source.departmentName == d && $(forceNodeCircles[0][d2.target.index].parentNode).css("visibility")=="visible")|| (d2.target.departmentName == d && $(forceNodeCircles[0][d2.source.index].parentNode).css("visibility")=="visible")){
+							d3.select(this).style("visibility","visible");
+						}
+					});
 				}
 			});
 	
