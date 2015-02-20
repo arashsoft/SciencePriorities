@@ -438,10 +438,18 @@ function  createMatrixLink(parentDivID, jsonFile, loadingObject){
 					t.selectAll(".matrixLink.row")
 						.delay(function(d, i) { return xScale(i) * 4; })
 						.attr("transform", function(d, i) { return "translate(0," + (xScale(i) + parseFloat(departmentRect.attr('y'))) + ")"; })
-						.selectAll(".matrixLink.cell")
+						.selectAll(".matrixLink.cell.award")
 							.delay(function(d) { return xScale(d.x) * 4; })
 							.attr("x", function(d) { return xScale(d.x) + parseFloat((departmentRect.attr('x'))); });
-
+					
+					t.selectAll(".matrixLink.row").selectAll(".matrixLink.cell.pub")
+						.delay(function(d) { return xScale(d.x) * 4; })
+						.attr("x", function(d) { return (xScale(d.x) + parseFloat((departmentRect.attr('x'))) + xScale.rangeBand()/3); });
+						
+					t.selectAll(".matrixLink.row").selectAll(".matrixLink.cell.coSuper")
+						.delay(function(d) { return xScale(d.x) * 4; })
+						.attr("x", function(d) { return (xScale(d.x) + parseFloat((departmentRect.attr('x'))) + xScale.rangeBand()*2/3); });
+							
 					t.selectAll(".matrixLink.column")
 						.delay(function(d, i) { return xScale(i) * 4; })
 						.attr("transform", function(d, i) { return "translate(" + (xScale(i) + parseFloat((departmentRect.attr('x')))) + ")rotate(-90)"; });
