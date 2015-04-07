@@ -1,0 +1,49 @@
+<br><br>
+<div>
+    <form>
+        <accordion close-others="">
+            <accordion-group heading="Filters" is-open="true">
+                <accordion close-others="oneAtATime">
+                    <accordion-group heading="Award Date Range" is-open="true">
+                        <div range-slider min="1975" max="2020" model-min="analytics.filterSetting.awardMinRange" model-max="analytics.filterSetting.awardMaxRange"></div>
+                        {{analytics.filterSetting.awardMinRange}} : {{analytics.filterSetting.awardMaxRange}}
+                    </accordion-group>
+                </accordion>
+
+                <accordion close-others="oneAtATime">
+                    <accordion-group heading="Award Amount"is-open="true">
+                        <div range-slider min="1" max="30000000" model-min="analytics.filterSetting.awardMinAmount" model-max="analytics.filterSetting.awardMaxAmount"></div>
+                        {{analytics.filterSetting.awardMinAmount}} : {{analytics.filterSetting.awardMaxAmount}}
+                    </accordion-group>
+                </accordion>
+
+                <accordion close-others="oneAtATime">
+                    <accordion-group heading="Award Status"is-open="true">
+                        <div>
+                            <div class="btn-group">
+                                <label class="btn btn-info btn-xs" ng-model="analytics.filterSetting.awardStatusAccepted" btn-checkbox ng-class="{ 'btn-danger': analytics.filterSetting.awardStatusAccepted===false }">Accepted</label>
+                                <label class="btn btn-info btn-xs" ng-model="analytics.filterSetting.awardStatusRejectedClosed" btn-checkbox ng-class="{ 'btn-danger': analytics.filterSetting.awardStatusRejectedClosed===false }">Rejected/Closed</label>
+                            </div>
+                        </div>
+                    </accordion-group>
+                </accordion>
+                <form>
+                    <label class="btn btn-md btn-warning" ng-click="analytics.resetFilters()">Reset</label>
+                    <!--<label class="btn btn-md btn-success" ng-click="analytics.update()">Update</label>-->
+                </form>
+            </accordion-group>
+
+            <!--<accordion-group heading="Analytics" is-open="true">
+                <accordion close-others="">
+                    <div>
+                        <h5>Analyzable Awards</h5>
+                        <div class="btn-group">
+                            <label class="btn btn-danger btn-md" ng-model="analytics.filterSetting.analyzableSwitch" btn-radio="'false'">Hide</label>
+                            <label class="btn btn-md btn-success" ng-model="analytics.filterSetting.analyzableSwitch" btn-radio="'true'">Show</label>
+                        </div>
+                    </div>
+                </accordion>
+            </accordion-group>-->
+        </accordion>
+    </form>
+</div>
