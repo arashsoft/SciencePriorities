@@ -27,99 +27,106 @@ angular.module('sciencePriorities2App')
 		$scope.advancedLayouts=[
 			{
 				"name":"Collaboration",
-				"properties" : ["Node-Link","Matrix ","Matrix-Link"],
+				"properties" : ["Node-Link","Matrix ","Matrix-Link", "Treemap"],
 				"isOpen":"true"
+			},
+			{
+				"name":"Correlation",
+				"properties" : ["Dual-Treemap"],
+				"isOpen":"false"
 			}
 		];
 	
 }]);
 
-angular.module('sciencePriorities2App').controller("CenterController" , ["$scope","$compile","$templateCache",function($scope, $compile, $templateCache){
-	$scope.multiViewModel="single"
-	// this function handle mouse drag and drop
-	$scope.dropped= function (dragEl, dropEl ){
-		var drag= $("#"+dragEl);
-		// in fact, dropDiv is $($element),
-		var dropDiv = $("#"+dropEl+ " > div");
-		
-		// remove previous benchmark select
-		dropDiv.find(".benchmarkSelect").remove();
-		
-		// pass drag parameters and drop-div id to associated controller scope
-		angular.element(dropDiv[0]).scope().selectedEntity= drag[0].attributes.selectedEntity.value;
-		angular.element(dropDiv[0]).scope().selectedProperty= drag[0].attributes.selectedProperty.value;
-		angular.element(dropDiv[0]).scope().dropID = dropDiv[0].id;
-		
-		if (drag.attr("selectedType")=="Advanced"){
-			
-			$.get("app/benchmarkMenu/advancedMenu.html", function(htmlFile) {	
-				var $el= $("#"+dropEl+ " > div").append(htmlFile);
-				// compile the html template to angular scope so call methods works properly
-				$compile($el)(angular.element(dropDiv[0]).scope());
-				
-				// the apply function make sure binding values are set
-				angular.element(dropDiv[0]).scope().$apply();
-			});
-			
-		}else{
-			// load select benchmark template
-			$.get("app/benchmarkMenu/benchmarkMenu.html", function(htmlFile) {	
-			
-				var $el= $("#"+dropEl+ " > div").append(htmlFile);
-				// compile the html template to angular scope so call methods works properly
-				$compile($el)(angular.element(dropDiv[0]).scope());
-				
-				// the apply function make sure binding values are set
-				angular.element(dropDiv[0]).scope().$apply();
-			});
-		}
-		
-	};
-	// this function handle touch drag and drop
-	$scope.onDropComplete = function(data,event){
-		//console.log("drop success, data:", event.element[0].getAttribute("selectedEntity"));
-		var dragEl= event.element[0].getAttribute('id');
-		
-		var drag= $("#"+dragEl);
-		// in fact, dropDiv is $($element),
-		var dropDiv = $("#"+data);
-		
-		// remove previous benchmark select
-		dropDiv.find(".benchmarkSelect").remove();
-		
-		// pass drag parameters and drop-div id to associated controller scope
-		angular.element(dropDiv[0]).scope().selectedEntity= drag[0].attributes.selectedEntity.value;
-		angular.element(dropDiv[0]).scope().selectedProperty= drag[0].attributes.selectedProperty.value;
-		angular.element(dropDiv[0]).scope().dropID = dropDiv[0].id;
-		
-		if (drag.attr("selectedType")=="Advanced"){
-			
-			$.get("app/benchmarkMenu/advancedMenu.html", function(htmlFile) {	
-				var $el= dropDiv.append(htmlFile);
-				// compile the html template to angular scope so call methods works properly
-				$compile($el)(angular.element(dropDiv[0]).scope());
-				
-				// the apply function make sure binding values are set
-				angular.element(dropDiv[0]).scope().$apply();
-			});
-			
-		}else{
-			// load select benchmark template
-			$.get("app/benchmarkMenu/benchmarkMenu.html", function(htmlFile) {	
-			
-				var $el= dropDiv.append(htmlFile);
-				// compile the html template to angular scope so call methods works properly
-				$compile($el)(angular.element(dropDiv[0]).scope());
-				
-				// the apply function make sure binding values are set
-				angular.element(dropDiv[0]).scope().$apply();
-			});
-		}
-		
-	};
-}]);
+angular.module('sciencePriorities2App')
+	.controller("CenterController" , ["$scope","$compile","$templateCache",function($scope, $compile, $templateCache){
+		$scope.multiViewModel="single"
+		// this function handle mouse drag and drop
+		$scope.dropped= function (dragEl, dropEl ){
+			var drag= $("#"+dragEl);
+			// in fact, dropDiv is $($element),
+			var dropDiv = $("#"+dropEl+ " > div");
 
-angular.module('sciencePriorities2App').controller("layoutController" , ["$scope","$element",function($scope , $element){
+			// remove previous benchmark select
+			dropDiv.find(".benchmarkSelect").remove();
+
+			// pass drag parameters and drop-div id to associated controller scope
+			angular.element(dropDiv[0]).scope().selectedEntity= drag[0].attributes.selectedEntity.value;
+			angular.element(dropDiv[0]).scope().selectedProperty= drag[0].attributes.selectedProperty.value;
+			angular.element(dropDiv[0]).scope().dropID = dropDiv[0].id;
+
+			if (drag.attr("selectedType")=="Advanced"){
+
+				$.get("app/benchmarkMenu/advancedMenu.html", function(htmlFile) {
+					var $el= $("#"+dropEl+ " > div").append(htmlFile);
+					// compile the html template to angular scope so call methods works properly
+					$compile($el)(angular.element(dropDiv[0]).scope());
+
+					// the apply function make sure binding values are set
+					angular.element(dropDiv[0]).scope().$apply();
+				});
+
+			}else{
+				// load select benchmark template
+				$.get("app/benchmarkMenu/benchmarkMenu.html", function(htmlFile) {
+
+					var $el= $("#"+dropEl+ " > div").append(htmlFile);
+					// compile the html template to angular scope so call methods works properly
+					$compile($el)(angular.element(dropDiv[0]).scope());
+
+					// the apply function make sure binding values are set
+					angular.element(dropDiv[0]).scope().$apply();
+				});
+			}
+
+		};
+		// this function handle touch drag and drop
+		$scope.onDropComplete = function(data,event){
+			//console.log("drop success, data:", event.element[0].getAttribute("selectedEntity"));
+			var dragEl= event.element[0].getAttribute('id');
+
+			var drag= $("#"+dragEl);
+			// in fact, dropDiv is $($element),
+			var dropDiv = $("#"+data);
+
+			// remove previous benchmark select
+			dropDiv.find(".benchmarkSelect").remove();
+
+			// pass drag parameters and drop-div id to associated controller scope
+			angular.element(dropDiv[0]).scope().selectedEntity= drag[0].attributes.selectedEntity.value;
+			angular.element(dropDiv[0]).scope().selectedProperty= drag[0].attributes.selectedProperty.value;
+			angular.element(dropDiv[0]).scope().dropID = dropDiv[0].id;
+
+			if (drag.attr("selectedType")=="Advanced"){
+
+				$.get("app/benchmarkMenu/advancedMenu.html", function(htmlFile) {
+					var $el= dropDiv.append(htmlFile);
+					// compile the html template to angular scope so call methods works properly
+					$compile($el)(angular.element(dropDiv[0]).scope());
+
+					// the apply function make sure binding values are set
+					angular.element(dropDiv[0]).scope().$apply();
+				});
+
+			}else{
+				// load select benchmark template
+				$.get("app/benchmarkMenu/benchmarkMenu.html", function(htmlFile) {
+
+					var $el= dropDiv.append(htmlFile);
+					// compile the html template to angular scope so call methods works properly
+					$compile($el)(angular.element(dropDiv[0]).scope());
+
+					// the apply function make sure binding values are set
+					angular.element(dropDiv[0]).scope().$apply();
+				});
+			}
+
+		};
+	}]);
+
+angular.module('sciencePriorities2App')
+	.controller("layoutController" , ["$scope", '$compile', "$element",function($scope ,$compile, $element ){
 	// $scope.dropID $scope.selectedProperty and $scope.selectedEntity set by drag&drop controller
 	
 	// handle benchmark selection
@@ -151,12 +158,11 @@ angular.module('sciencePriorities2App').controller("layoutController" , ["$scope
 	};
 	// handle advanced layouts
 	$scope.advanceClicked = function(){
-	
-	
 		//show loading animation (TODO: add this loading gif to template and rewrite it with angular)
 		var loadingGif = $('<img src="/assets/images/loading.gif" alt="loading" style="width: 40%; height:60%; position:absolute;left:30%;top:20%;">');
 		loadingGif.appendTo($("#"+$scope.dropID));
 		// selectedEntity and selectedProperty are not correct names in this function but we use them because of consistency
+		console.log("/jsonrequest/"+$scope.selectedEntity+"/"+$scope.selectedProperty+"/null");
 		$.get("/jsonrequest/"+$scope.selectedEntity+"/"+$scope.selectedProperty+"/null", function (jsonFile){
 			// if the session was expire or user loged out of the tool
 			if (typeof jsonFile.redirect == 'string'){
@@ -191,8 +197,14 @@ angular.module('sciencePriorities2App').controller("layoutController" , ["$scope
 				$scope.intervalID = createMatrix($scope.dropID, jsonFile);
 			}else if ($scope.selectedProperty=="Matrix-Link"){
 				$scope.intervalID = createMatrixLink($scope.dropID, jsonFile , loadingGif);
+			}else if ($scope.selectedProperty=="Treemap"){
+				loadingGif.remove();
+				$scope.intervalID = createTreemap($scope.dropID, jsonFile, $compile);
+			}
+			else if ($scope.selectedProperty=="Dual-Treemap"){
+				loadingGif.remove();
+				$scope.intervalID = createDualTreemap($scope.dropID, jsonFile, $compile);
 			}
 		});
 	}
 }]);
-
