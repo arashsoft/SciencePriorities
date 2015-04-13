@@ -7,6 +7,9 @@ function createPiechart(parentDivID, entityName, propertyName, data , parentData
 	
 	var parentObject = $("#"+parentDivID);
 	
+	// disable scrollbar
+	parentObject.css("overflow-y","hidden");
+	
 	var width = parentObject[0].clientWidth;
 	var height = parentObject[0].clientHeight;
 	var radius = Math.min(width, height) / 2;

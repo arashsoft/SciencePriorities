@@ -32,6 +32,8 @@ function  createMatrixLink(parentDivID, jsonFile, loadingObject){
 	var selectedProfessors = [];
 	var selectedDepartments =[];
 
+	// disable scrollbar
+	parentObject.css("overflow-y","hidden");
 	
 	// now we want to make department nodes and links to run a force layout on them
 	// it helps us to find best places for our matrixes

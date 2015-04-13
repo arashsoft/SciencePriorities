@@ -7,6 +7,8 @@ it is easy to fix with creating arrays of parentData
 function createBarchart(parentDivID, entityName, propertyName, data , parentData, parentPropertyName){
 	
 	var parentObject = $('#'+parentDivID);
+	// disable scrollbar
+	parentObject.css("overflow-y","hidden");
 	
 	var divWidth = parentObject[0].clientWidth;
 	var divHeight = parentObject[0].clientHeight;

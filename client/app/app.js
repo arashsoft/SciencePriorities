@@ -7,7 +7,8 @@ angular.module('sciencePriorities2App', [
   'ui.router',
   'ui.bootstrap',
   'lvl.directives.dragdrop',
-	'ngDraggable'
+	'ngDraggable',
+	'ui-rangeSlider'
 ])
   .config(function ($stateProvider, $urlRouterProvider, $locationProvider) {
     $urlRouterProvider
