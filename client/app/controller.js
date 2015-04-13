@@ -27,7 +27,7 @@ angular.module('sciencePriorities2App')
 		$scope.advancedLayouts=[
 			{
 				"name":"Collaboration",
-				"properties" : ["Node-Link","Matrix ","Matrix-Link", "Treemap"],
+				"properties" : ["Node-Link","Matrix","Matrix-Link", "Treemap"],
 				"isOpen":"true"
 			},
 			{
