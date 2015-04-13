@@ -365,8 +365,8 @@ angular.module('sciencePriorities2App')
                         else if(scope.weight === 'Amount') {
                             return d.size;
                         }*/
-                        return 1;
-                        //return d.size;
+                        //return 1;
+                        return d.size;
                     });
 
                 var nodes = treemap.nodes(root)
