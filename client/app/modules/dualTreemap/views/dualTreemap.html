@@ -1,0 +1,40 @@
+<div class="container-fluid" ng-controller="AnalyticsCtrl as analytics">
+
+    <div class="row container-fluid" id="treemapsDiv">
+        <div class="row">
+            <br>
+            <div id="filtersBox" class="col-sm-2 container-fluid"  ng-include="'/app/modules/dualTreemap/views/filters-box.html'" align="middle"></div>
+
+            <div id="dualTreemapDiv" class="row container-fluid ">
+                <div id="leftTreemap" class="col-sm-5 container-fluid" style="border:1px solid black;">
+                    <h5 align="left"><b>{{analytics.treemapLabels[0]}}</b></h5>
+                    <tree-map facet="analytics.treemapLabels[0]" param1="analytics.filterSetting" param2="analytics.awardSelection" type="analytics.treemapType[1]"></tree-map>
+                </div>
+
+                <div id="rightTreemap" class="col-sm-5 container-fluid" style="border:1px solid black;">
+                    <h5 align="left"><b>{{analytics.treemapLabels[1]}}</b></h5>
+                    <tree-map facet="analytics.treemapLabels[1]" param1="analytics.filterSetting" param2="analytics.awardSelection" type="analytics.treemapType[1]"></tree-map>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" style="background-color: #ffffff"><br></div>
+
+    <div class="row container-fluid " id="externalizationDiv>
+        <div class="row">
+            <div id="analyticsBox" class="col-xs-2 "  ng-include="'/app/modules/dualTreemap/views/analytics-box2.html'" align="middle"></div>
+
+            <div id="extVisBox" class="col-xs-10 container-fluid" align="middle">
+                <h4><b>Award-Publications Correlation Panel</b></h4>
+                <keyword-ext data="analytics.analyticsAward" param1="analytics.analyticsSetting" param2="analytics.awardSelection" param3="analytics.selectedPublicationsAnalytics"></keyword-ext>
+            </div>
+
+            <!--<div id="metadataBox" class="col-sm-2 container-fluid" ng-include="'/app/modules/dualTreemap/views/metadata-box.html'" align="middle"></div>-->
+        </div>
+    </div>
+
+</div>
+<script src="bower_components/d3/d3.superformula.js"></script>
+<script src="bower_components/d3-context-menu/js/d3-context-menu.js"></script>
+<link rel="stylesheet" href="bower_components/d3-context-menu/css/d3-context-menu.css" />

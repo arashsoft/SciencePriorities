@@ -17,7 +17,16 @@
     "jquery.ui": "~1.11.2",
     "angular-ui-bootstrap": "~0.11.2",
     "d3": "~3.4.13",
-    "d3-tip": "~0.6.6"
+    "d3-tip": "~0.6.6",
+    "angular-rangeslider": "~0.0.12",
+    "pparsons-angular-slider": "~0.4.2",
+    "md-chips": "~0.0.2",
+    "modernizr": "~2.8.3",
+    "async": "~0.9.2",
+    "underscore": "~1.8.2",
+    "jquery.scrollTo": "~2.1.0",
+    "angular-rangeslider-directive": "~0.0.2",
+    "d3-context-menu": "*"
   },
   "devDependencies": {
     "angular-mocks": ">=1.2.*",

@@ -1,0 +1,153 @@
+<div>
+    <h4><b>Analytics Control Panel</b></h4>
+
+    <div>
+        <accordion close-others="oneAtATime">
+            <accordion-group heading="Dates of Publications" is-open="true" is-disabled="true">
+                <div range-slider min="1990" max="2020" model-min="analytics.analyticsSetting.publicationMinRange" model-max="analytics.analyticsSetting.publicationMaxRange"></div>
+                {{analytics.analyticsSetting.publicationMinRange}} : {{analytics.analyticsSetting.publicationMaxRange}}
+            </accordion-group>
+        </accordion>
+    </div>
+
+    <div>
+        <accordion close-others="oneAtATime">
+            <accordion-group heading="Analytics Model" is-open="true" is-disabled="true">
+                <div>
+                    <accordion close-others="oneAtATime">
+                        <accordion-group heading="Very Relaxed" is-open="true">
+                            <table class="table table-bordered table-hover">
+                                <thead>Explore through all publications</thead>
+                                <tr class="info">
+                                    <td align="middle">
+                                        <h6>Author Correlation: {{analytics.analyticsSetting.author}}</h6>
+                                        <div class="btn-group">
+                                            <label class="btn btn-info btn-xs" ng-model="analytics.analyticsSetting.author" btn-radio="'Primary'">Primary</label>
+                                            <label class="btn btn-xs btn-primary" ng-model="analytics.analyticsSetting.author" btn-radio="'All'">All</label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="info" style="align-content: stretch">
+                                    <td align="middle">
+                                        <h6>Keyword Correlation: {{analytics.analyticsSetting.keyword}}</h6>
+                                        <div class="btn-group">
+                                            <label class="btn btn-info btn-xs" ng-model="analytics.analyticsSetting.keyword" btn-radio="'Linear'">Linear</label>
+                                            <label class="btn btn-xs btn-primary" ng-model="analytics.analyticsSetting.keyword" btn-radio="'Sigmoid'">Sigmoid</label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="info">
+                                    <td align="middle">
+                                        <h6>Confidence: {{analytics.analyticsSetting.confidence}}</h6>
+                                        <input type="range" min="0", max="1" step="0.05" ng-model="analytics.analyticsSetting.confidence" value="analytics.exploration.confidence">
+                                    </td>
+                                </tr>
+                                <tr class="info">
+                                    <td align="middle">
+                                        <h6>Aggregation: {{analytics.analyticsSetting.aggregation}}</h6>
+                                        <div class="btn-group">
+                                            <label class="btn btn-xs btn-info " ng-model="analytics.analyticsSetting.aggregation" btn-radio="'Uniform'">Uniform</label>
+                                            <label class="btn btn-xs btn-primary" ng-model="analytics.analyticsSetting.aggregation" btn-radio="'Weighted'">Weighted</label>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </accordion-group>
+
+                        <accordion-group heading="Relaxed">
+                            <table class="table table-bordered table-hover">
+                                <thead>Apply Keywords-Matching</thead>
+                                <tr class="info">
+                                    <td align="middle">
+                                        <h6>Author Correlation: {{analytics.analyticsSetting.author}}</h6>
+                                        <div class="btn-group">
+                                            <label class="btn btn-info btn-xs" ng-model="analytics.analyticsSetting.author" btn-radio="'Primary'">Primary</label>
+                                            <label class="btn btn-xs btn-primary" ng-model="analytics.analyticsSetting.author" btn-radio="'All'">All</label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="info" style="align-content: stretch">
+                                    <td align="middle">
+                                        <h6>Keyword Correlation: {{analytics.analyticsSetting.keyword}}</h6>
+                                        <div class="btn-group">
+                                            <label class="btn btn-info btn-xs" ng-model="analytics.analyticsSetting.keyword" btn-radio="'Linear'">Linear</label>
+                                            <label class="btn btn-xs btn-primary" ng-model="analytics.analyticsSetting.keyword" btn-radio="'Sigmoid'">Sigmoid</label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="info">
+                                    <td align="middle">
+                                        <h6>Confidence: {{analytics.analyticsSetting.confidence}}</h6>
+                                        <input type="range" min="0", max="1" step="0.05" ng-model="analytics.analyticsSetting.confidence" value="analytics.exploration.confidence">
+                                    </td>
+                                </tr>
+                                <tr class="info">
+                                    <td align="middle">
+                                        <h6>Aggregation: {{analytics.analyticsSetting.aggregation}}</h6>
+                                        <div class="btn-group">
+                                            <label class="btn btn-xs btn-info " ng-model="analytics.analyticsSetting.aggregation" btn-radio="'Uniform'">Uniform</label>
+                                            <label class="btn btn-xs btn-primary" ng-model="analytics.analyticsSetting.aggregation" btn-radio="'Weighted'">Weighted</label>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </accordion-group>
+
+                        <accordion-group heading="Specific">
+                            <table class="table table-bordered table-hover">
+                                <thead>Apply Topics-Modelling and Matching</thead>
+                                <tr class="info">
+                                    <td align="middle">
+                                        <h6>Author Correlation: {{analytics.analyticsSetting.author}}</h6>
+                                        <div class="btn-group">
+                                            <label class="btn btn-info btn-xs" ng-model="analytics.analyticsSetting.author" btn-radio="'Primary'">Primary</label>
+                                            <label class="btn btn-xs btn-primary" ng-model="analytics.analyticsSetting.author" btn-radio="'All'">All</label>
+                                        </div>
+
+                                    </td>
+                                </tr>
+                                <tr class="info" style="align-content: stretch">
+                                    <td align="middle">
+                                        <h6>Number of Topics: {{analytics.analyticsSetting.topicNumber}}</h6>
+                                        <div class="btn-group">
+                                            <label class="btn btn-info btn-xs" ng-model="analytics.analyticsSetting.topicNumber" btn-radio="1">One</label>
+                                            <label class="btn btn-xs btn-primary" ng-model="analytics.analyticsSetting.topicNumber" btn-radio="2">Two</label>
+                                            <label class="btn btn-xs btn-warning" ng-model="analytics.analyticsSetting.topicNumber" btn-radio="3">Three</label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="info">
+                                    <td align="middle">
+                                        <h6>Number of Terms: {{analytics.analyticsSetting.termNumber}}</h6>
+                                        <input type="range" min="1", max="5", step="1" ng-model="analytics.analyticsSetting.termNumber" value = "analytics.analytics.termNumber">
+                                    </td>
+                                </tr>
+                                <tr class="info">
+                                    <td align="middle">
+                                        <h6>Aggregation: {{analytics.analyticsSetting.aggregation}}</h6></h6>
+                                        <div class="btn-group">
+                                            <label class="btn btn-xs btn-info " ng-model="analytics.analyticsSetting.aggregation" btn-radio="'Uniform'">Uniform</label>
+                                            <label class="btn btn-xs btn-primary" ng-model="analytics.analyticsSetting.aggregation" btn-radio="'Weighted'">Weighted</label>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </accordion-group>
+                    </accordion>
+                </div>
+                <label class="btn btn-sm btn-warning" ng-click="analytics.resetAnalyticsAttributes()">Reset</label>
+                <!--<label class="btn btn-sm btn-success" ng-click="analytics.analyzeAward()">Analyze!</label>-->
+            </accordion-group>
+        </accordion>
+    </div>
+
+    <!--<div>
+        <accordion close-others="oneAtATime">
+            <accordion-group heading="Selected Publications" is-open="true">
+                <label class="btn btn-md btn-success" ng-click="analytics.analyzeSelectedPublications()">Analyze Publications</label>
+            </accordion-group>
+        </accordion>
+    </div>-->
+
+
+</div>

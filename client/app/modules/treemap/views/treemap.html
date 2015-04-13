@@ -1,0 +1,54 @@
+<div class="container-fluid"  ng-controller="AnalyticsCtrl as analytics">
+    <form ng-submit="update()">
+        <p>
+            <a href="http://www.billdwhite.com/wordpress/2012/12/16/d3-treemap-with-title-headers/">Replacement Dual Treemap</a>
+        </p>
+    </form>
+    <div class="row container-fluid">
+            <div class="row">
+                <div id="filtersBox" class="col-sm-3 container-fluid"  ng-include="'/app/modules/treemap/views/filters-box.html'" align="middle"></div>
+
+                <div id="treemapDiv" class="col-sm-9 container-fluid">
+                    <div id="treemap" ng-if="analytics.filterSetting.facet===analytics.treemapLabels[0]">
+                        <div>
+                            <div class="btn-group" align="middle">
+                                <label class="btn btn-xs" ng-model="analytics.filterSetting.facet" btn-radio="analytics.treemapLabels[0]" ng-class="{ 'btn-info': analytics.filterSetting.facet===analytics.treemapLabels[0]}">{{analytics.treemapLabels[0]}}</label>
+                                <label class="btn btn-xs" ng-model="analytics.filterSetting.facet" btn-radio="analytics.treemapLabels[1]" ng-class="{ 'btn-info': analytics.filterSetting.facet===analytics.treemapLabels[1]}">{{analytics.treemapLabels[1]}}</label>
+                                <label class="btn btn-xs" ng-model="analytics.filterSetting.facet" btn-radio="analytics.treemapLabels[2]" ng-class="{ 'btn-info': analytics.filterSetting.facet===analytics.treemapLabels[2]}">{{analytics.treemapLabels[2]}}</label>
+                            </div>
+                        </div>
+                        <br>
+                        <!--<tree-map facet="analytics.treemapLabels[0]" param1="analytics.filterSetting" param2="analytics.awardSelection"></tree-map>-->
+                        <tree-map facet="analytics.treemapLabels[0]" param1="analytics.filterSetting" param2="analytics.awardSelection" type="analytics.treemapType[0]" weight="analytics.treemapWeight[1]"></tree-map>
+                    </div>
+                    <div id="treemap" ng-if="analytics.filterSetting.facet===analytics.treemapLabels[1]">
+                        <div>
+                            <div class="btn-group">
+                                <label class="btn btn-xs" ng-model="analytics.filterSetting.facet" btn-radio="analytics.treemapLabels[0]" ng-class="{ 'btn-info': analytics.filterSetting.facet===analytics.treemapLabels[0]}">{{analytics.treemapLabels[0]}}</label>
+                                <label class="btn btn-xs" ng-model="analytics.filterSetting.facet" btn-radio="analytics.treemapLabels[1]" ng-class="{ 'btn-info': analytics.filterSetting.facet===analytics.treemapLabels[1]}">{{analytics.treemapLabels[1]}}</label>
+                                <label class="btn btn-xs" ng-model="analytics.filterSetting.facet" btn-radio="analytics.treemapLabels[2]" ng-class="{ 'btn-info': analytics.filterSetting.facet===analytics.treemapLabels[2]}">{{analytics.treemapLabels[2]}}</label>
+                            </div>
+                        </div>
+                        <br>
+                        <tree-map facet="analytics.treemapLabels[1]" param1="analytics.filterSetting" param2="analytics.awardSelection" type="analytics.treemapType[0]" weight="analytics.treemapWeight[1]"></tree-map>
+                    </div>
+                    <div id="treemap" ng-if="analytics.filterSetting.facet===analytics.treemapLabels[2]">
+                        <div>
+                            <div class="btn-group">
+                                <label class="btn btn-xs" ng-model="analytics.filterSetting.facet" btn-radio="analytics.treemapLabels[0]" ng-class="{ 'btn-info': analytics.filterSetting.facet===analytics.treemapLabels[0]}">{{analytics.treemapLabels[0]}}</label>
+                                <label class="btn btn-xs" ng-model="analytics.filterSetting.facet" btn-radio="analytics.treemapLabels[1]" ng-class="{ 'btn-info': analytics.filterSetting.facet===analytics.treemapLabels[1]}">{{analytics.treemapLabels[1]}}</label>
+                                <label class="btn btn-xs" ng-model="analytics.filterSetting.facet" btn-radio="analytics.treemapLabels[2]" ng-class="{ 'btn-info': analytics.filterSetting.facet===analytics.treemapLabels[2]}">{{analytics.treemapLabels[2]}}</label>
+                            </div>
+                        </div>
+                        <br>
+                        <tree-map facet="analytics.treemapLabels[2]" param1="analytics.filterSetting" param2="analytics.awardSelection" type="analytics.treemapType[0]" weight="analytics.treemapWeight[1]"></tree-map>
+                    </div>
+                </div>
+
+                <!--<div id="metadataBox" class="col-sm-2 container-fluid"  ng-include="'/app/modules/treemap/views/metadata-box.html'" align="middle"></div>-->
+
+            </div>
+    </div>
+
+    <!--<tree-map2></tree-map2>-->
+</div>
