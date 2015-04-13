@@ -8,5 +8,6 @@ module.exports = {
   HOST: "129.100.19.193",
   USER: "root",
   PASSWORD: "rki#$2sd",
-  DATABASE : 'researchmap'
+  DATABASE : 'researchmap',
+	DATABASE2 : 'researchmap_new2'
 };
