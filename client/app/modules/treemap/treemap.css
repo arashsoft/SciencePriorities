@@ -5,13 +5,16 @@
     margin-top: 0px;
 }
 
-text {
+.treemap text {
     font: 9px sans-serif;
+		 pointer-events: none;
 }
 
-rect {
+.treemap rect {
     fill: none;
-    stroke: darkgray;
+		pointer-events: all;
+    cursor: pointer;
+    stroke: #EEEEEE;
 }
 
 #chart {
@@ -20,17 +23,9 @@ rect {
     background: #ddd;
 }
 
-text {
-    pointer-events: none;
-}
 
 .grandparent text {
     font-weight: bold;
-}
-
-rect {
-    fill: none;
-    stroke: #fff;
 }
 
 rect.parent,
@@ -63,11 +58,6 @@ rect.parent,
 
 
 /*new treemap css*/
-rect {
-    pointer-events: all;
-    cursor: pointer;
-    stroke: #EEEEEE;
-}
 
 .chart {
     display: block;

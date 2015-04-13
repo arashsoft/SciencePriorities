@@ -223,7 +223,7 @@ angular.module('sciencePriorities2App')
                     .text('Preparing the visual representation . . .')
                     .attr('transform', 'translate(' + 0 + ',' + 50 + ')')
                     .attr('id', 'waiting-text')
-                    .attr('class', 'loadingMessage');
+                    .attr('class', 'loadingMessage treemap');
 
                 if(scope.type == 'single') {
                     $.get("/jsonrequest2/treemapSelect/" + JSON.stringify(newAnalyticsSetting), function (jsonFile){
@@ -395,7 +395,7 @@ angular.module('sciencePriorities2App')
                     .style('fill', function(d) {
                         return color(d.parent.name);
                     })
-                    .attr('class', 'treemapCell')
+                    .attr('class', 'treemapCell treemap')
                     .on('mouseover', tip.show)
                     .on('mouseout', tip.hide)
                     .on('dblclick', function(d) {
@@ -457,6 +457,7 @@ angular.module('sciencePriorities2App')
                     })
                     .attr('dy', '.35em')
                     .attr('text-anchor', 'middle')
+										.attr('class','treemap')
                     .text(function(d) {
                         return d.name;
                     })
@@ -736,6 +737,7 @@ angular.module('sciencePriorities2App')
                     })
                     .attr("height", headerHeight);
                 parentEnterTransition.append("rect")
+										.attr("class","treemap")
                     .attr("width", function(d) {
                         return Math.max(0.01, d.dx);
                     })
@@ -754,7 +756,7 @@ angular.module('sciencePriorities2App')
                         d3.event.preventDefault();
                     });
                 parentEnterTransition.append('text')
-                    .attr("class", "label")
+                    .attr("class", "label treemap")
                     .attr("transform", "translate(3, 13)")
                     .attr("width", function(d) {
                         return Math.max(0.01, d.dx);
@@ -803,6 +805,7 @@ angular.module('sciencePriorities2App')
                     .append("svg")
                     .attr("class", "clip");
                 childEnterTransition.append("rect")
+										.classed("treemap",true)
                     .classed("background", true)
                     .style("fill", function(d) {
                         return color(d.parent.name);
@@ -869,6 +872,7 @@ angular.module('sciencePriorities2App')
                     })
                     .attr("dy", ".35em")
                     .attr("text-anchor", "middle")
+										.attr("class","treemap")
                     .style("display", "none")
                     .text(function(d) {
                         return d.name;
@@ -1082,7 +1086,7 @@ angular.module('sciencePriorities2App')
                             .text('Please select an award from either of the above treemaps.')
                             .attr('transform', 'translate(' + 0 + ',' + padding + ')')
                             .attr('id', 'update-text')
-                            .attr('class', 'message');
+                            .attr('class', 'message treemap');
                     }
                     else {
                         analysisSVGContainer.selectAll("#graph-root").remove().transition().duration(500).ease('elastic');
@@ -1095,7 +1099,7 @@ angular.module('sciencePriorities2App')
                             .text('Please choose one of the available analytics models.')
                             .attr('transform', 'translate(' + 0 + ',' + padding + ')')
                             .attr('id', 'update-text')
-                            .attr('class', 'message');
+                            .attr('class', 'message treemap');
                     }
                 }
                 else {
@@ -1111,7 +1115,7 @@ angular.module('sciencePriorities2App')
                             .text('Please select an award from either of the above treemaps.')
                             .attr('transform', 'translate(' + 0 + ',' + padding + ')')
                             .attr('id', 'update-text')
-                            .attr('class', 'message');
+                            .attr('class', 'message treemap');
                     }
                     else {
                         var selectedAwardID = scope.param2.selectedAwardID;
@@ -1126,7 +1130,7 @@ angular.module('sciencePriorities2App')
                             .text('Preparing the visual representation . . .')
                             .attr('transform', 'translate(' + 2.5*padding + ',' + 4*padding/5 + ')')
                             .attr('id', 'waiting-text')
-                            .attr('class', 'loadingMessage');
+                            .attr('class', 'loadingMessage treemap');
 
                         $.get('/jsonrequest2/awardAnalysisSelect/' + JSON.stringify(analysisObject) , function(analyzedAward){
                             /*analysisSVGContainer.selectAll("#graph-root").remove().transition().duration(500).ease('elastic');
@@ -1166,7 +1170,7 @@ angular.module('sciencePriorities2App')
                         .text('Please select an award from either of the above treemaps.')
                         .attr('transform', 'translate(' + 0 + ',' + padding + ')')
                         .attr('id', 'update-text')
-                        .attr('class', 'message');
+                        .attr('class', 'message treemap');
                 }
                 else {
                     if(analyticsSetting.model == '') {
@@ -1180,7 +1184,7 @@ angular.module('sciencePriorities2App')
                             .text('Please choose one of the available analytics models.')
                             .attr('transform', 'translate(' + 0 + ',' + padding + ')')
                             .attr('id', 'update-text')
-                            .attr('class', 'message');
+                            .attr('class', 'message treemap');
                     }
                     else {
                         var selectedAwardID = scope.param2.selectedAwardID;
@@ -1195,7 +1199,7 @@ angular.module('sciencePriorities2App')
                             .text('Preparing the visual representation . . .')
                             .attr('transform', 'translate(' + 2.5*padding + ',' + 4*padding/5 + ')')
                             .attr('id', 'waiting-text')
-                            .attr('class', 'loadingMessage');
+                            .attr('class', 'loadingMessage treemap');
 
 
                         $.get('/jsonrequest2/awardAnalysisSelect/' + JSON.stringify(analysisObject) , function(analyzedAward){
@@ -1506,7 +1510,7 @@ angular.module('sciencePriorities2App')
                         yearContainer.append('text')
                             .text(year)
                             .attr('id', 'yearBucket-'+year)
-                            .attr('class', 'awardInfo')
+                            .attr('class', 'awardInfo treemap')
                             .attr('transform', 'rotate(' + (-90) + ')');
 
                             //THE CONFIDENCE AXIS

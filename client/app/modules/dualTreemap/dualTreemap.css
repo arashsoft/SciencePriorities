@@ -10,11 +10,11 @@
     padding: 0px;
 }
 
-text {
+.dualTreemap text {
     font: 9px sans-serif;
 }
 
-rect {
+.dualTreemap rect {
     fill: none;
     stroke: darkgray;
 }
