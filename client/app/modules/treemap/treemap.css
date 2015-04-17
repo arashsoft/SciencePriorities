@@ -10,6 +10,11 @@
 		 pointer-events: none;
 }
 
+.treemaptext{
+	font: 9px sans-serif;
+	pointer-events: none;
+}
+
 .treemap rect {
     fill: none;
 		pointer-events: all;

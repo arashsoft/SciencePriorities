@@ -365,8 +365,8 @@ angular.module('sciencePriorities2App')
                         else if(scope.weight === 'Amount') {
                             return d.size;
                         }*/
-                        //return 1;
-                        return d.size;
+                        return 1;
+                        //return d.size;
                     });
 
                 var nodes = treemap.nodes(root)
@@ -457,7 +457,7 @@ angular.module('sciencePriorities2App')
                     })
                     .attr('dy', '.35em')
                     .attr('text-anchor', 'middle')
-										.attr('class','treemap')
+										.attr('class','treemaptext')
                     .text(function(d) {
                         return d.name;
                     })
@@ -756,7 +756,7 @@ angular.module('sciencePriorities2App')
                         d3.event.preventDefault();
                     });
                 parentEnterTransition.append('text')
-                    .attr("class", "label treemap")
+                    .attr("class", "label treemaptext")
                     .attr("transform", "translate(3, 13)")
                     .attr("width", function(d) {
                         return Math.max(0.01, d.dx);
