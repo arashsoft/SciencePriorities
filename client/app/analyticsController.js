@@ -1058,7 +1058,7 @@ angular.module('sciencePriorities2App')
 
             var margin = {top: 5, right: 5, bottom: 5, left: 5},
                 chartWidth = 1300,
-                chartHeight = 2500,
+                chartHeight = 3000,
                 padding = 50;
 
             //var awardKeywordColors = d3.scale.category20();
@@ -1203,8 +1203,6 @@ angular.module('sciencePriorities2App')
 
             //functions withing the scope of link
             function drawGraph2(analyticsAward, analyticsSetting, publicationsSelected) {
-                //analysisSVGContainer.selectAll('*').remove();
-
                 // constants and variables that determine the scales
                 //for award
                 var awardKeywords = analyticsAward._awardKeywords;
