@@ -1220,6 +1220,11 @@ angular.module('sciencePriorities2App')
 
                 /*///////////////////////////////////////////////////////////////////////////////*/
 
+                var authorCollaborationAnalysisArray = new Array();
+                var authorTopicComparisonArray = new Array();
+
+                /*///////////////////////////////////////////////////////////////////////////////*/
+
                 //clean the SVG
                 analysisSVGContainer.selectAll('*').remove().transition().duration(500).ease('elastic');
 
@@ -1695,15 +1700,51 @@ angular.module('sciencePriorities2App')
                                     if (a.author.toLowerCase() > b.author.toLowerCase()) {return 1;}
                                     return 0;
                                 }).forEach(function(tuple,index) {
+                                    var authorSymbolContextMenu = [
+                                        {
+                                            title: 'Add this author for further collaboration analysis',
+                                            action: function(elm, d, i) {
+                                                log(elm.id + ' added');
+                                                authorCollaborationAnalysisArray.push(elm.id);
+                                            }
+                                        },
+                                        {
+                                            title: 'Remove this author from further collaboration analysis',
+                                            action: function(elm, d, i) {
+                                                authorCollaborationAnalysisArray.splice(authorCollaborationAnalysisArray.indexOf(elm.id), 1);
+                                            }
+                                        },
+                                        {
+                                            title: '----------------------------------------',
+                                            action: function(elm, d, i) {
+
+                                            }
+                                        },
+                                        {
+                                            title: 'Add this author for further collaboration analysis',
+                                            action: function(elm, d, i) {
+                                                log(elm.id);
+                                                authorCollaborationAnalysisArray.push(elm.id);
+                                            }
+                                        },
+                                        {
+                                            title: 'Remove this author from further research topic comparison',
+                                            action: function(elm, d, i) {
+                                                authorTopicComparisonArray.splice(authorTopicComparisonArray.indexOf(elm.id), 1);                                            }
+                                        }
+                                    ];
                                     authorsContainer.append('g')
                                         .attr('id', 'legendContainer')
                                         .attr('transform', 'translate(' + (0) + ',' + (3*padding/5) + ')')
                                         .append('path')
                                         .attr('class', 'authorSymbol')
                                         .attr('stroke', 'darkgray')
-                                        .attr('id', tuple.author.replace(/[\. ]+/g, ''))
+                                        .attr('id', tuple.author.replace(/[\. ]+/g, ' '))
                                         .attr('d', d3.superformula().type(tuple.symbol).size(175))
-                                        .attr('transform', 'translate(' + (0) + ',' + (index*2*padding/5) + ')');
+                                        .attr('transform', 'translate(' + (0) + ',' + (index*2*padding/5) + ')')
+                                        .on('contextmenu', d3.contextMenu(authorSymbolContextMenu, function() {
+                                            d3.event.preventDefault();
+                                        }));
 
                                     authorsContainer.append('g')
                                         .attr('id', 'nameContainer')
@@ -1745,29 +1786,41 @@ angular.module('sciencePriorities2App')
                                         var flag = false;
                                         var authorSymbolContextMenu = [
                                             {
-                                                title: 'Show this author in the selected publications',
+                                                title: 'Add this author for further collaboration analysis',
                                                 action: function(elm, d, i) {
-                                                    //log(graphRootContainer.selectAll('circle.publicationCircle')[0]);
-                                                    graphRootContainer.selectAll('circle.publicationCircle')[0].forEach(function(publicationItem,elementIndex) {
-                                                        log(publicationItem.authors);
-                                                        //if(publicationItem.authors.contains());
-                                                    });
-                                                    //log(graphRootContainer.selectAll('circle.publicationCircle'));
+                                                    log(elm.id + ' added');
+                                                    authorCollaborationAnalysisArray.push(elm.id);
                                                 }
                                             },
                                             {
-                                                title: 'Show all publications of this author',
+                                                title: 'Remove this author from further collaboration analysis',
                                                 action: function(elm, d, i) {
-                                                    log(elm);
-                                                    log(d);
-                                                    log(i);
+                                                    authorCollaborationAnalysisArray.splice(authorCollaborationAnalysisArray.indexOf(elm.id), 1);
                                                 }
+                                            },
+                                            {
+                                                title: '----------------------------------------',
+                                                action: function(elm, d, i) {
+
+                                                }
+                                            },
+                                            {
+                                                title: 'Add this author for further collaboration analysis',
+                                                action: function(elm, d, i) {
+                                                    log(elm.id);
+                                                    authorCollaborationAnalysisArray.push(elm.id);
+                                                }
+                                            },
+                                            {
+                                                title: 'Remove this author from further research topic comparison',
+                                                action: function(elm, d, i) {
+                                                    authorTopicComparisonArray.splice(authorTopicComparisonArray.indexOf(elm.id), 1);                                            }
                                             }
                                         ];
                                         selectedPublication._location.container.append('path')
                                             .attr('d', d3.superformula().type(symbolTuple.symbol).size(175))
                                             .attr('class', 'authorSymbol')
-                                            .attr('id', symbolTuple.author.replace(/[\. ]+/g, ''))
+                                            .attr('id', symbolTuple.author.replace(/[\. ]+/g, ' '))
                                             .attr('stroke', 'darkgray')
                                             .attr('fill', 'gray')
                                             .attr('transform', 'translate(' + (((selectedPublication._location.x + publicationCircleRadius)+(padding/2.5)) + symbolIndex*padding/2.5) + ',' + (2+(selectedPublication._location.y)-publicationAxisHeight/2) + ')')
@@ -1840,24 +1893,42 @@ angular.module('sciencePriorities2App')
 
                                     selectedAuthorsContainer.append('button')
                                         .text('Remove', 'button').on('click', function(selectedAuthorTuple) { log(selectedAuthorTuple.author + 'clicked'); });
-
-                                    /*selectedAuthorsContainer.append('input')
-                                        .attr('type', 'button')
-                                        .attr('width', '5')
-                                        .attr('height', '5')
-                                        .attr('id', 'remove-'+selectedAuthorIndex)
-                                        .attr('class', 'button')
-                                        .attr('value', 'Remove');*/
                                 });
                             }
                         });
                     });
 
-
-
                     /*///////////////////////////////////////////////////////////////////////////////*/
 
+                    var furtherAuthorAnalysisContainer = analysisSVGContainer.append('g')
+                        .attr('id', 'furtherAuthorAnalysisContainer')
+                        .attr('transform', 'translate(' + 0 + ',' + (_.size(analyticsAward._relatedPublicationsList)*50*3) + ')');
 
+                    Object.observe(authorCollaborationAnalysisArray, function() {
+                        furtherAuthorAnalysisContainer.attr('height', function(authorCollaborationAnalysisArray, authorTopicComparisonArray) {
+                            if((_.size(authorCollaborationAnalysisArray) > 0) || (_.size(authorTopicComparisonArray) > 0)) {
+                                return 20;
+                            }
+                            else {
+                                return 500;
+                            }
+                        });
+
+                        d3.select('#furtherAuthorAnalysisContainer').selectAll('*').remove().transition().ease('elastic');
+                    });
+
+                    Object.observe(authorTopicComparisonArray, function() {
+                        furtherAuthorAnalysisContainer.attr('height', function(authorCollaborationAnalysisArray, authorTopicComparisonArray) {
+                            if((_.size(authorCollaborationAnalysisArray) > 0) || (_.size(authorTopicComparisonArray) > 0)) {
+                                return 20;
+                            }
+                            else {
+                                return 500;
+                            }
+                        });
+
+                        d3.select('#furtherAuthorAnalysisContainer').selectAll('*').remove().transition().ease('elastic');
+                    });
 
                     /*///////////////////////////////////////////////////////////////////////////////*/
 
