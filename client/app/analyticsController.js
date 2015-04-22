@@ -1902,7 +1902,9 @@ angular.module('sciencePriorities2App')
 
                     var furtherAuthorAnalysisContainer = analysisSVGContainer.append('g')
                         .attr('id', 'furtherAuthorAnalysisContainer')
-                        .attr('transform', 'translate(' + 0 + ',' + (_.size(analyticsAward._relatedPublicationsList)*50*3) + ')');
+                        .attr('transform', 'translate(' + 0 + ',' + (_.size(analyticsAward._relatedPublicationsList)*50*4) + ')');
+                    var topicVoronoi = d3.geom.voronoi().clipExtent([0,0], [500,500]);
+                    var voronoiColors = d3.scale.category10();
 
                     Object.observe(authorCollaborationAnalysisArray, function() {
                         furtherAuthorAnalysisContainer.attr('height', function(authorCollaborationAnalysisArray, authorTopicComparisonArray) {
@@ -1915,6 +1917,46 @@ angular.module('sciencePriorities2App')
                         });
 
                         d3.select('#furtherAuthorAnalysisContainer').selectAll('*').remove().transition().ease('elastic');
+
+                        /*furtherAuthorAnalysisContainer.selectAll('text')
+                            .data(authorCollaborationAnalysisArray)
+                            .enter()
+                            .append('text')
+                            .text(function(d,i) {
+                                return d;
+                            })
+                            .attr('transform', function(d,i) {
+                                return 'translate(' + (padding*(i+1)) + ',' + padding*(i+1) + ')';
+                            })
+                            .attr('id', 'waiting-text')
+                            .attr('class', 'loadingMessage');*/
+
+                        var vertices = d3.range(10).map(function(d) {
+                            return [Math.random() * 500, Math.random() * 500];
+                        });
+
+                        var path = furtherAuthorAnalysisContainer.append('g').selectAll('.dualTreemap path');
+                        furtherAuthorAnalysisContainer.selectAll('.dualTreemap circle')
+                            .data(vertices.slice(1))
+                            .enter()
+                            .append('circle')
+                            .attr('r',2.5)
+                            .attr('transform', function(d) { return 'translate(' + d + ')'; });
+                        redraw();
+
+                        function redraw() {
+                            path = path.data(voronoi(vertices), polygon);
+                            path.exit()
+                                .remove();
+                            path.enter()
+                                .append('path')
+                                .attr('d', polygon)
+                                .attr('fill', function(d, i) { return voronoiColors(i); })
+                        };
+
+                        function polygon(d) {
+                            return 'M'+ d.join('L')+'Z';
+                        }
                     });
 
                     Object.observe(authorTopicComparisonArray, function() {
@@ -1928,6 +1970,17 @@ angular.module('sciencePriorities2App')
                         });
 
                         d3.select('#furtherAuthorAnalysisContainer').selectAll('*').remove().transition().ease('elastic');
+
+                        /*furtherAuthorAnalysisContainer.selectAll('text')
+                            .data(authorCollaborationAnalysisArray)
+                            .enter()
+                            .append('text')
+                            .text(d)
+                            .attr('transform', function(d,i) {
+                                return 'translate(' + (padding*(i+1)) + ',' + padding*(i+1) + ')';
+                            })
+                            .attr('id', 'waiting-text')
+                            .attr('class', 'loadingMessage');*/
                     });
 
                     /*///////////////////////////////////////////////////////////////////////////////*/

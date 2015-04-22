@@ -9,5 +9,6 @@ module.exports = {
   USER: "root",
   PASSWORD: "rki#$2sd",
   DATABASE : 'researchmap',
-	DATABASE2 : 'researchmap_new2'
+  DATABASE2 : 'researchmap_new2',
+  DATABASE3 : 'researchmap_dev'
 };

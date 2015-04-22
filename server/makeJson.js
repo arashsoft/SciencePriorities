@@ -532,6 +532,7 @@ exports.makeDynamicJson = function(type, values1, callback){
 			user : mysqlConf.USER,
 			password : mysqlConf.PASSWORD,
 			database : mysqlConf.DATABASE2
+			//database : mysqlConf.DATABASE3
 		});
 
 		connection.connect(function(err) {
@@ -543,12 +544,13 @@ exports.makeDynamicJson = function(type, values1, callback){
 			}
 
 			//var queryText = "select A.ID as id, A.Title as name, A.Amount as size, A.Abstract as abstract, A.BeginDate as beginDate, A.EndDate as endDate, D.Name as departmentName, P.Name as programName, S.Name as sponsorName from ((((award as A inner join department as D on A.Department=D.ID) inner join program as P on A.Program=P.ID) inner join sponsor as S on P.Sponsor=S.ID) inner join faculty as F on D.Faculty=F.ID) inner join university as U on F.University=U.ID where U.ID=1 and F.ID=4 and A.Amount>0 and A.BeginDate != '0000-00-00' and A.BeginDate >= '"
-			var queryText = "select A.ID as id, A.Title as name, A.Amount as size, A.Abstract as abstract, A.BeginDate as beginDate, A.EndDate as endDate, D.Name as departmentName, P.Name as programName, S.Name as sponsorName from ((((((award_2 as A inner join award_professor as AP on A.ID=AP.Grant) inner join professor as PR on AP.Professor=PR.ID) inner join department as D on PR.Department_Primary=D.ID) inner join program as P on A.Program=P.ID) inner join sponsor as S on P.Sponsor=S.ID) inner join faculty as F on D.Faculty=F.ID) inner join university as U on F.University=U.ID where U.ID=1 and F.ID=4 and A.Amount>0 and A.BeginDate != '0000-00-00' and A.BeginDate >= '"
+			var queryText = "select A.ID as id, A.Title as name, A.Amount as size, A.Abstract as abstract, A.BeginDate as beginDate, A.EndDate as endDate, D.Name as departmentName, P.Name as programName, S.Name as sponsorName from ((((((award_2 as A inner join award_professor_2 as AP on A.ID=AP.Grant) inner join professor_2 as PR on AP.Professor=PR.ID) inner join department as D on PR.Department_Primary=D.ID) inner join program as P on A.Program=P.ID) inner join sponsor as S on P.Sponsor=S.ID) inner join faculty as F on D.Faculty=F.ID) inner join university as U on F.University=U.ID where U.ID=1 and F.ID=4 and A.Amount>0 and A.BeginDate != '0000-00-00' and A.BeginDate >= '"
 				 + values1.awardMinRange + "-00-00' and A.EndDate <= '"
 				 + values1.awardMaxRange + "-00-00' and A.Amount >= "
 				 + values1.awardMinAmount + " and A.Amount <= "
 				+ values1.awardMaxAmount;
 
+			//console.log(queryText);
 			connection.query(queryText, function(err,rows){
 				connection.end();
 				callback(rows);
@@ -561,6 +563,7 @@ exports.makeDynamicJson = function(type, values1, callback){
 			user : mysqlConf.USER,
 			password : mysqlConf.PASSWORD,
 			database : mysqlConf.DATABASE2
+			//database : mysqlConf.DATABASE3
 		});
 
 		var algorithms = ['Algorithm1', 'Algorithm2', 'Algorithm3'];
@@ -639,6 +642,7 @@ function award_relationship_extractor(proposal_ID, keyword_filter_array, name_fi
 		port : mysqlConf.PORT,
 		password : mysqlConf.PASSWORD,
 		database : mysqlConf.DATABASE2,
+		//database : mysqlConf.DATABASE3,
 		connectionLimit: 500
 	});
 
@@ -675,6 +679,7 @@ function award_relationship_extractor(proposal_ID, keyword_filter_array, name_fi
 				}
 				else {
 					var query_text = "SELECT * FROM award_2 WHERE ID=".concat(analyzed_award._awardID);
+					console.log(query_text);
 
 					pool.query(query_text, function(err, result) {
 						if(err) {
@@ -843,6 +848,12 @@ function award_relationship_extractor(proposal_ID, keyword_filter_array, name_fi
 								+" FROM (publication_author_2 INNER JOIN author_2 ON publication_author_2.Author=author_2.ID) INNER JOIN publication_2 ON publication_2.ID=publication_author_2.Publication"
 								+" WHERE publication_2.Year>=".concat(begin_date).concat(" AND publication_2.Year<=").concat(end_date).concat(" AND author_2.Professor_ID in ").concat(query_values);
 
+								//TODO new query for retrieving Elsevier publications
+							/*var query_text = "SELECT DISTINCT elsvr_publication_author2.elsvr_Publication, elsvr_publication_author2.elsvr_Author, elsvr_author2.Professor_ID, elsvr_publication2.year, elsvr_publication2.`dc:title`, elsvr_publication2.authkeywords, elsvr_publication2.idxterms"
+								+" FROM (elsvr_publication_author2 INNER JOIN elsvr_author2 ON elsvr_publication_author2.elsvr_Author=elsvr_author2.elsvr_ID) INNER JOIN elsvr_publication2 ON elsvr_publication2.`dc:identifier`=elsvr_publication_author2.elsvr_Publication"
+								+" WHERE elsvr_publication2.year>=".concat(begin_date).concat(" AND elsvr_publication2.year<=").concat(end_date).concat(" AND elsvr_author2.Professor_ID in ").concat(query_values);*/
+
+							//console.log(query_text);
 							pool.query(query_text, function(err, result) {
 								if(err) {
 									console.log(err);
@@ -904,6 +915,7 @@ function award_relationship_extractor(proposal_ID, keyword_filter_array, name_fi
 								+" FROM (publication_author_2 INNER JOIN author_2 ON publication_author_2.Author=author_2.ID) INNER JOIN publication_2 ON publication_2.ID=publication_author_2.Publication"
 								+" WHERE publication_2.Year>=".concat(begin_date).concat(" AND publication_2.Year<=").concat(end_date).concat(" AND author_2.Professor_ID in ").concat(query_values);
 
+							console.log(query_text);
 							pool.query(query_text, function(err, result) {
 								if(err) {
 									console.log(err);
