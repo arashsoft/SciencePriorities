@@ -748,7 +748,7 @@ angular.module('sciencePriorities2App')
             }, true);
 
             function drawFoamTree(treemapData, scope, foamTreeId) {
-                //log(treemapData);
+                log(treemapData);
                 var tooltip = (function(element) {
                     var tip = new Tooltip("Test", { auto: true });
                     var shown = false;
