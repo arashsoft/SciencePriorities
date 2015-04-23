@@ -7,13 +7,15 @@
 
             <div id="dualTreemapDiv" class="row container-fluid ">
                 <div id="leftTreemap" class="col-sm-5 container-fluid" style="border:1px solid black;">
-                    <h5 align="left"><b>{{analytics.treemapLabels[0]}}</b></h5>
-                    <tree-map facet="analytics.treemapLabels[0]" param1="analytics.filterSetting" param2="analytics.awardSelection" type="analytics.treemapType[1]"></tree-map>
+                    <h5 align="middle"><b>{{analytics.treemapLabels[0]}}</b></h5>
+                    <!--<tree-map facet ="analytics.treemapLabels[0]" param1="analytics.filterSetting" param2="analytics.awardSelection" type="analytics.treemapType[1]"></tree-map>-->
+                    <foam-tree facet="analytics.treemapLabels[0]" param1="analytics.filterSetting" param2="analytics.awardSelection" type="analytics.treemapType[0]" weight="analytics.treemapWeight[1]"></foam-tree>
                 </div>
 
                 <div id="rightTreemap" class="col-sm-5 container-fluid" style="border:1px solid black;">
-                    <h5 align="left"><b>{{analytics.treemapLabels[1]}}</b></h5>
-                    <tree-map facet="analytics.treemapLabels[1]" param1="analytics.filterSetting" param2="analytics.awardSelection" type="analytics.treemapType[1]"></tree-map>
+                    <h5 align="middle"><b>{{analytics.treemapLabels[2]}}</b></h5>
+                    <!--<tree-map facet="analytics.treemapLabels[2]" param1="analytics.filterSetting" param2="analytics.awardSelection" type="analytics.treemapType[2]"></tree-map>-->
+                    <foam-tree facet="analytics.treemapLabels[2]" param1="analytics.filterSetting" param2="analytics.awardSelection" type="analytics.treemapType[2]" weight="analytics.treemapWeight[1]"></foam-tree>
                 </div>
             </div>
         </div>
@@ -21,7 +23,7 @@
 
     <div class="row" style="background-color: #ffffff"><br></div>
 
-    <div class="row container-fluid " id="externalizationDiv>
+    <div class="row container-fluid " id="externalizationDiv">
         <div class="row">
             <div id="analyticsBox" class="col-xs-2 "  ng-include="'/app/modules/dualTreemap/views/analytics-box2.html'" align="middle"></div>
 

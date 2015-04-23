@@ -543,11 +543,40 @@ exports.makeDynamicJson = function(type, values1, callback){
 				return;
 			}
 
-			//var queryText = "select A.ID as id, A.Title as name, A.Amount as size, A.Abstract as abstract, A.BeginDate as beginDate, A.EndDate as endDate, D.Name as departmentName, P.Name as programName, S.Name as sponsorName from ((((award as A inner join department as D on A.Department=D.ID) inner join program as P on A.Program=P.ID) inner join sponsor as S on P.Sponsor=S.ID) inner join faculty as F on D.Faculty=F.ID) inner join university as U on F.University=U.ID where U.ID=1 and F.ID=4 and A.Amount>0 and A.BeginDate != '0000-00-00' and A.BeginDate >= '"
 			var queryText = "select A.ID as id, A.Title as name, A.Amount as size, A.Abstract as abstract, A.BeginDate as beginDate, A.EndDate as endDate, D.Name as departmentName, P.Name as programName, S.Name as sponsorName from ((((((award_2 as A inner join award_professor_2 as AP on A.ID=AP.Grant) inner join professor_2 as PR on AP.Professor=PR.ID) inner join department as D on PR.Department_Primary=D.ID) inner join program as P on A.Program=P.ID) inner join sponsor as S on P.Sponsor=S.ID) inner join faculty as F on D.Faculty=F.ID) inner join university as U on F.University=U.ID where U.ID=1 and F.ID=4 and A.Amount>0 and A.BeginDate != '0000-00-00' and A.BeginDate >= '"
 				 + values1.awardMinRange + "-00-00' and A.EndDate <= '"
 				 + values1.awardMaxRange + "-00-00' and A.Amount >= "
 				 + values1.awardMinAmount + " and A.Amount <= "
+				+ values1.awardMaxAmount;
+
+			//console.log(queryText);
+			connection.query(queryText, function(err,rows){
+				connection.end();
+				callback(rows);
+			});
+		}); // end of connection.connect()
+	}
+	else if (type == "foamTreeSelect"){
+		connection = mysql.createConnection({
+			host : mysqlConf.HOST,
+			user : mysqlConf.USER,
+			password : mysqlConf.PASSWORD,
+			database : mysqlConf.DATABASE2
+			//database : mysqlConf.DATABASE3
+		});
+
+		connection.connect(function(err) {
+			if (err) {
+				console.error('error connecting to mysql');
+				connection.end();
+				callback("mysql connection error");
+				return;
+			}
+
+			var queryText = "select A.ID as id, A.Title as label, A.Amount as size, A.Abstract as abstract, A.BeginDate as beginDate, A.EndDate as endDate, D.Name as departmentName, P.Name as programName, S.Name as sponsorName from ((((((award_2 as A inner join award_professor_2 as AP on A.ID=AP.Grant) inner join professor_2 as PR on AP.Professor=PR.ID) inner join department as D on PR.Department_Primary=D.ID) inner join program as P on A.Program=P.ID) inner join sponsor as S on P.Sponsor=S.ID) inner join faculty as F on D.Faculty=F.ID) inner join university as U on F.University=U.ID where U.ID=1 and F.ID=4 and A.Amount>0 and A.BeginDate != '0000-00-00' and A.BeginDate >= '"
+				+ values1.awardMinRange + "-00-00' and A.EndDate <= '"
+				+ values1.awardMaxRange + "-00-00' and A.Amount >= "
+				+ values1.awardMinAmount + " and A.Amount <= "
 				+ values1.awardMaxAmount;
 
 			//console.log(queryText);

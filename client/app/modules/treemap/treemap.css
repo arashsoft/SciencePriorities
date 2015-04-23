@@ -92,3 +92,10 @@ rect.parent,
     font-size: 11px;
     cursor: pointer
 }
+
+#treemap {
+    /*width: 1250px;*/
+    height: 850px;
+    max-width: 100%;
+    max-height: 100%;
+}

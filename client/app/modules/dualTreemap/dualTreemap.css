@@ -252,26 +252,16 @@ rect.authorsAxis {
     font-family: "sans-serif";
 }
 
-/*Voronoi*/
-.dualTreemap path {
-    stroke: #fff;
+#leftTreemap {
+    /*width: 625px;*/
+    height: 750px;
+    max-width: 50%;
+    max-height: 100%;
 }
 
-.dualTreemap path:first-child {
-    fill: yellow !important;
+#rightTreemap {
+    /*width: 625px;*/
+    height: 750px;
+    max-width: 50%;
+    max-height: 100%;
 }
-
-.dualTreemap circle {
-    fill: #000;
-    pointer-events: none;
-}
-
-.q0-9 { fill: rgb(197,27,125); }
-.q1-9 { fill: rgb(222,119,174); }
-.q2-9 { fill: rgb(241,182,218); }
-.q3-9 { fill: rgb(253,224,239); }
-.q4-9 { fill: rgb(247,247,247); }
-.q5-9 { fill: rgb(230,245,208); }
-.q6-9 { fill: rgb(184,225,134); }
-.q7-9 { fill: rgb(127,188,65); }
-.q8-9 { fill: rgb(77,146,33); }

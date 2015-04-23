@@ -1,9 +1,4 @@
 <div class="container-fluid"  ng-controller="AnalyticsCtrl as analytics">
-    <form ng-submit="update()">
-        <p>
-            <a href="http://www.billdwhite.com/wordpress/2012/12/16/d3-treemap-with-title-headers/">Replacement Dual Treemap</a>
-        </p>
-    </form>
     <div class="row container-fluid">
             <div class="row">
                 <div id="filtersBox" class="col-sm-3 container-fluid"  ng-include="'/app/modules/treemap/views/filters-box.html'" align="middle"></div>
@@ -19,7 +14,8 @@
                         </div>
                         <br>
                         <!--<tree-map facet="analytics.treemapLabels[0]" param1="analytics.filterSetting" param2="analytics.awardSelection"></tree-map>-->
-                        <tree-map facet="analytics.treemapLabels[0]" param1="analytics.filterSetting" param2="analytics.awardSelection" type="analytics.treemapType[0]" weight="analytics.treemapWeight[1]"></tree-map>
+                        <!--<tree-map facet="analytics.treemapLabels[0]" param1="analytics.filterSetting" param2="analytics.awardSelection" type="analytics.treemapType[0]" weight="analytics.treemapWeight[1]"></tree-map>-->
+                        <foam-tree facet="analytics.treemapLabels[0]" param1="analytics.filterSetting" param2="analytics.awardSelection" type="analytics.treemapType[0]" weight="analytics.treemapWeight[1]"></foam-tree>
                     </div>
                     <div id="treemap" ng-if="analytics.filterSetting.facet===analytics.treemapLabels[1]">
                         <div>

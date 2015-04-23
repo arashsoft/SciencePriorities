@@ -577,82 +577,193 @@ angular.module('sciencePriorities2App')
     }
 );
 
+//foam-tree directive
 angular.module('sciencePriorities2App')
-    .directive('treeMap2', function () {
-        var treemapDirective = {};
-        treemapDirective.restrict = 'E';
-        treemapDirective.scope= {
-            param1: '=',
+    .directive('foamTree', function () {
+        var foamTreeDirective = {};
+        foamTreeDirective.restrict = 'E';
+        foamTreeDirective.scope= {
             facet: '=',
-            param2: '='
+            param1: '=',
+            param2: '=',
+            type: '='
+            //weight: '='
         };
-        treemapDirective.link = function (scope, element, attr) {
-            // constants
-            var treemapWidth = element.parent().width()*0.995;
-            var treemapHeight = 750;
-            var xscale = d3.scale.linear().range([0, treemapWidth]).clamp(true);
-            var yscale = d3.scale.linear().range([0, treemapHeight]).clamp(true);
-            var color = d3.scale.category20c();
-            var headerHeight = 15;
-            var headerColor = "#666666";
-            var transitionDuration = 250;
-            var root;
-            var node;
-            var treemap;
-
-            var treemapSVGContainer = d3.select(element[0])
-                .append("svg:svg")
-                .attr("width", treemapWidth)
-                .attr("height", treemapHeight)
-                .append("svg:g");
-
-            var tip = d3.tip()
-                .attr('class', 'd3-tip')
-                .offset([-10, 0])
-                .html(function(d) {
-                    var tipContainer =
-                        "<strong>Award Title: </strong><span style='color:inherit'>" + d.name + "</span>" +
-                        "<br>" +
-                        "<strong>Award Amount: </strong><span style='color:inherit'>$" + d.size + "</span>" +
-                        "<br>" +
-                        "<strong>Department: </strong><span style='color:inherit'>" + d.departmentName + "</span>" +
-                        "<br>" +
-                        "<strong>Sponsor: </strong><span style='color:inherit'>" + d.sponsorName + "</span>" +
-                        "<br>" +
-                        "<strong>Program: </strong><span style='color:inherit'>" + d.programName + "</span>" +
-                        "<br>" +
-                        "<strong>Award Period: </strong><span style='color:inherit'>" + d.beginDate.slice(0, 10) + ' - ' + d.endDate.slice(0, 10) +"</span>";
-
-                    return tipContainer;
-                });
-
-
-            treemapSVGContainer.call(tip);
-
+        foamTreeDirective.link = function (scope, element, attr) {
             scope.$watchCollection('param1', function(newAnalyticsSetting) {
-                treemapSVGContainer.selectAll("*").remove().transition().ease('elastic');
+                /*if(scope.type == 'single') {
+                    $.get("/jsonrequest2/foamTreeSelect/" + JSON.stringify(newAnalyticsSetting), function (jsonFile){
+                        //get the list of distinct departments, sponsors, and programs, to create the modified treemap data
+                        var treemap_data = new Array();    //an array that will hold three different versions of the data based on departments, sponsors, and programs
 
-                treemapSVGContainer.append('text')
-                    .text('Preparing the visual representation . . .')
-                    .attr('transform', 'translate(' + 0 + ',' + 50 + ')')
-                    .attr('id', 'waiting-text')
-                    .attr('class', 'loadingMessage');
+                        var treemap_dept = new Object();    //one of the three different versions, organized based on departments
+                        //treemap_dept.name = 'UWO-Faculty of Science';
+                        treemap_dept.label = 'UWO-Faculty of Science';
+                        //treemap_dept.children = new Array();
+                        treemap_dept.groups = new Array();
 
-                $.get("/jsonrequest2/treemapSelect/" + JSON.stringify(newAnalyticsSetting), function (jsonFile){
+                        var treemap_spnsr = new Object();    //one of the three different versions, organized based on sponsors
+                        //treemap_spnsr.name = 'UWO-Faculty of Science';
+                        treemap_spnsr.label = 'UWO-Faculty of Science';
+                        //treemap_spnsr.children = new Array();
+                        treemap_spnsr.groups = new Array();
+
+                        var treemap_prgrm = new Object();    //one of the three different versions, organized based on programs
+                        //treemap_prgrm.name = 'UWO-Faculty of Science';
+                        treemap_prgrm.label = 'UWO-Faculty of Science';
+                        //treemap_prgrm.children = new Array();
+                        treemap_prgrm.groups = new Array();
+
+                        //get the unique list of departments, sponsors, and programs
+                        var departments_uniq = _.uniq(_.pluck(jsonFile, 'departmentName'));
+                        var sponsors_uniq = _.uniq(_.pluck(jsonFile, 'sponsorName'));
+                        var programs_uniq = _.uniq(_.pluck(jsonFile, 'programName'));
+
+                        //organize the awards accordingly
+                        var department_temp = _.groupBy(jsonFile, function(award) { return award.departmentName});
+                        var sponsor_temp = _.groupBy(jsonFile, function(award) { return award.sponsorName});
+                        var program_temp = _.groupBy(jsonFile, function(award) { return award.programName});
+
+                        departments_uniq.forEach(function(dept) {
+                            var dept_temp = new Object();
+                            //dept_temp.name = dept;
+                            dept_temp.label = dept;
+                            //dept_temp.children = department_temp[dept];
+                            dept_temp.groups = department_temp[dept];
+                            //treemap_dept.children.push(dept_temp);
+                            treemap_dept.groups.push(dept_temp);
+                        });
+
+                        sponsors_uniq.forEach(function(spnsr) {
+                            var spnsr_temp = new Object();
+                            //spnsr_temp.name = spnsr;
+                            spnsr_temp.label = spnsr;
+                            //spnsr_temp.children = sponsor_temp[spnsr];
+                            spnsr_temp.groups = sponsor_temp[spnsr];
+                            //treemap_spnsr.children.push(spnsr_temp);
+                            treemap_spnsr.groups.push(spnsr_temp);
+                        });
+
+                        programs_uniq.forEach(function(prgrm) {
+                            var prgrm_temp = new Object();
+                            //prgrm_temp.name = prgrm;
+                            prgrm_temp.label = prgrm;
+                            //prgrm_temp.children = program_temp[prgrm];
+                            prgrm_temp.groups = program_temp[prgrm];
+                            //treemap_prgrm.children.push(prgrm_temp);
+                            treemap_prgrm.groups.push(prgrm_temp);
+                        });
+
+                        treemap_data = [treemap_dept, treemap_spnsr, treemap_prgrm];
+
+                        if(scope.facet === "Departments") {
+                            drawFoamTree(treemap_data[0], scope);
+                        }
+                        else if(scope.facet === "Sponsors") {
+                            drawFoamTree(treemap_data[1], scope);
+                        }
+                        else if(scope.facet === "Programs") {
+                            drawFoamTree(treemap_data[2], scope);
+                        }
+                    });
+                }
+                else if(scope.type == 'dual') {
+                    $.get("/jsonrequest2/foamTreeSelect/" + JSON.stringify(newAnalyticsSetting), function (jsonFile){
+                        //get the list of distinct departments, sponsors, and programs, to create the modified treemap data
+                        var treemap_data = new Array();    //an array that will hold three different versions of the data based on departments, sponsors, and programs
+
+                        var treemap_dept = new Object();    //one of the three different versions, organized based on departments
+                        //treemap_dept.name = 'UWO-Faculty of Science';
+                        treemap_dept.label = 'UWO-Faculty of Science';
+                        //treemap_dept.children = new Array();
+                        treemap_dept.groups = new Array();
+
+                        var treemap_spnsr = new Object();    //one of the three different versions, organized based on sponsors
+                        //treemap_spnsr.name = 'UWO-Faculty of Science';
+                        treemap_spnsr.label = 'UWO-Faculty of Science';
+                        //treemap_spnsr.children = new Array();
+                        treemap_spnsr.groups = new Array();
+
+                        var treemap_prgrm = new Object();    //one of the three different versions, organized based on programs
+                        //treemap_prgrm.name = 'UWO-Faculty of Science';
+                        treemap_prgrm.label = 'UWO-Faculty of Science';
+                        //treemap_prgrm.children = new Array();
+                        treemap_prgrm.groups = new Array();
+
+                        //get the unique list of departments, sponsors, and programs
+                        var departments_uniq = _.uniq(_.pluck(jsonFile, 'departmentName'));
+                        var sponsors_uniq = _.uniq(_.pluck(jsonFile, 'sponsorName'));
+                        var programs_uniq = _.uniq(_.pluck(jsonFile, 'programName'));
+
+                        //organize the awards accordingly
+                        var department_temp = _.groupBy(jsonFile, function(award) { return award.departmentName});
+                        var sponsor_temp = _.groupBy(jsonFile, function(award) { return award.sponsorName});
+                        var program_temp = _.groupBy(jsonFile, function(award) { return award.programName});
+
+                        departments_uniq.forEach(function(dept) {
+                            var dept_temp = new Object();
+                            //dept_temp.name = dept;
+                            dept_temp.label = dept;
+                            //dept_temp.children = department_temp[dept];
+                            dept_temp.groups = department_temp[dept];
+                            //treemap_dept.children.push(dept_temp);
+                            treemap_dept.groups.push(dept_temp);
+                        });
+
+                        sponsors_uniq.forEach(function(spnsr) {
+                            var spnsr_temp = new Object();
+                            //spnsr_temp.name = spnsr;
+                            spnsr_temp.label = spnsr;
+                            //spnsr_temp.children = sponsor_temp[spnsr];
+                            spnsr_temp.groups = sponsor_temp[spnsr];
+                            //treemap_spnsr.children.push(spnsr_temp);
+                            treemap_spnsr.groups.push(spnsr_temp);
+                        });
+
+                        programs_uniq.forEach(function(prgrm) {
+                            var prgrm_temp = new Object();
+                            //prgrm_temp.name = prgrm;
+                            prgrm_temp.label = prgrm;
+                            //prgrm_temp.children = program_temp[prgrm];
+                            prgrm_temp.groups = program_temp[prgrm];
+                            //treemap_prgrm.children.push(prgrm_temp);
+                            treemap_prgrm.groups.push(prgrm_temp);
+                        });
+
+                        treemap_data = [treemap_dept, treemap_spnsr, treemap_prgrm];
+
+                        if(scope.facet === "Departments") {
+                            drawFoamTree(treemap_data[0], scope);
+                        }
+                        else if(scope.facet === "Sponsors") {
+                            drawFoamTree(treemap_data[1], scope);
+                        }
+                        else if(scope.facet === "Programs") {
+                            drawFoamTree(treemap_data[2], scope);
+                        }
+                    });
+                }*/
+                $.get("/jsonrequest2/foamTreeSelect/" + JSON.stringify(newAnalyticsSetting), function (jsonFile){
                     //get the list of distinct departments, sponsors, and programs, to create the modified treemap data
                     var treemap_data = new Array();    //an array that will hold three different versions of the data based on departments, sponsors, and programs
 
                     var treemap_dept = new Object();    //one of the three different versions, organized based on departments
-                    treemap_dept.name = 'UWO-Faculty of Science';
-                    treemap_dept.children = new Array();
+                    //treemap_dept.name = 'UWO-Faculty of Science';
+                    treemap_dept.label = 'UWO-Faculty of Science';
+                    //treemap_dept.children = new Array();
+                    treemap_dept.groups = new Array();
 
                     var treemap_spnsr = new Object();    //one of the three different versions, organized based on sponsors
-                    treemap_spnsr.name = 'UWO-Faculty of Science';
-                    treemap_spnsr.children = new Array();
+                    //treemap_spnsr.name = 'UWO-Faculty of Science';
+                    treemap_spnsr.label = 'UWO-Faculty of Science';
+                    //treemap_spnsr.children = new Array();
+                    treemap_spnsr.groups = new Array();
 
                     var treemap_prgrm = new Object();    //one of the three different versions, organized based on programs
-                    treemap_prgrm.name = 'UWO-Faculty of Science';
-                    treemap_prgrm.children = new Array();
+                    //treemap_prgrm.name = 'UWO-Faculty of Science';
+                    treemap_prgrm.label = 'UWO-Faculty of Science';
+                    //treemap_prgrm.children = new Array();
+                    treemap_prgrm.groups = new Array();
 
                     //get the unique list of departments, sponsors, and programs
                     var departments_uniq = _.uniq(_.pluck(jsonFile, 'departmentName'));
@@ -666,376 +777,79 @@ angular.module('sciencePriorities2App')
 
                     departments_uniq.forEach(function(dept) {
                         var dept_temp = new Object();
-                        dept_temp.name = dept;
-                        dept_temp.children = department_temp[dept];
-                        treemap_dept.children.push(dept_temp);
+                        //dept_temp.name = dept;
+                        dept_temp.label = dept;
+                        //dept_temp.children = department_temp[dept];
+                        dept_temp.groups = department_temp[dept];
+                        //treemap_dept.children.push(dept_temp);
+                        treemap_dept.groups.push(dept_temp);
                     });
 
                     sponsors_uniq.forEach(function(spnsr) {
                         var spnsr_temp = new Object();
-                        spnsr_temp.name = spnsr;
-                        spnsr_temp.children = sponsor_temp[spnsr];
-                        treemap_spnsr.children.push(spnsr_temp);
+                        //spnsr_temp.name = spnsr;
+                        spnsr_temp.label = spnsr;
+                        //spnsr_temp.children = sponsor_temp[spnsr];
+                        spnsr_temp.groups = sponsor_temp[spnsr];
+                        //treemap_spnsr.children.push(spnsr_temp);
+                        treemap_spnsr.groups.push(spnsr_temp);
                     });
 
                     programs_uniq.forEach(function(prgrm) {
                         var prgrm_temp = new Object();
-                        prgrm_temp.name = prgrm;
-                        prgrm_temp.children = program_temp[prgrm];
-                        treemap_prgrm.children.push(prgrm_temp);
+                        //prgrm_temp.name = prgrm;
+                        prgrm_temp.label = prgrm;
+                        //prgrm_temp.children = program_temp[prgrm];
+                        prgrm_temp.groups = program_temp[prgrm];
+                        //treemap_prgrm.children.push(prgrm_temp);
+                        treemap_prgrm.groups.push(prgrm_temp);
                     });
 
                     treemap_data = [treemap_dept, treemap_spnsr, treemap_prgrm];
 
                     if(scope.facet === "Departments") {
-                        drawTreemap(treemap_data[0], scope);
+                        drawFoamTree(treemap_data[0], scope);
                     }
                     else if(scope.facet === "Sponsors") {
-                        drawTreemap(treemap_data[1], scope);
+                        drawFoamTree(treemap_data[1], scope);
                     }
                     else if(scope.facet === "Programs") {
-                        drawTreemap(treemap_data[2], scope);
+                        drawFoamTree(treemap_data[2], scope);
                     }
                 });
+
             }, true);
 
-            function drawTreemap(treemapData, scope) {
-                node = root = treemapData;
-                var selectedAward = -1;
-
-                treemap = d3.layout.treemap()
-                    .round(false)
-                    .size([treemapWidth, treemapHeight])
-                    .sticky(true)
-                    .value(function(d) {
-                        return d.size;
-                    });
-
-                var nodes = treemap.nodes(root);
-
-                var children = nodes.filter(function(d) {
-                    return !d.children;
+            function drawFoamTree(treemapData, scope) {
+                var foamtree = new CarrotSearchFoamTree({
+                    id: 'treemap',
+                    dataObject: {
+                        groups: [
+                            treemapData
+                        ]
+                    },
+                    layout: 'ordered',
+                    groupBorderRadius: 0.15,
+                    groupBorderWidth: 1.75,
+                    groupInsetWidth: 16,
+                    groupSelectionOutlineWidth: 8,
+                    groupStrokeWidth: 1.5,
+                    parentFillOpacity: 0.8,
+                    rolloutEasing: "squareInOut",
+                    rolloutScalingStrength: -0.3,
+                    rolloutRotationStrength: 0,
+                    pullbackEasing: "squareInOut",
+                    pullbackDuration: 2000,
+                    pullbackScalingStrength: -0.3,
+                    pullbackRotationStrength: 0,
+                    pullbackPolygonDelay: 0.1,
+                    titleBarFontFamily: "Oxygen",
+                    attributionPosition: 45
                 });
-                var parents = nodes.filter(function(d) {
-                    return d.children;
-                });
-
-                d3.selectAll('.loadingMessage').remove().transition().ease('elastic');
-
-                // create parent cells
-                var parentCells = treemapSVGContainer.selectAll("g.cell.parent")
-                    .data(parents, function(d) {
-                        return "p-" + d.name;
-                    });
-                var parentEnterTransition = parentCells.enter()
-                    .append("g")
-                    .attr("class", "cell parent")
-                    .append("svg")
-                    .attr("class", "clip")
-                    .attr("width", function(d) {
-                        return Math.max(0.01, d.dx);
-                    })
-                    .attr("height", headerHeight);
-                parentEnterTransition.append("rect")
-										.attr("class","treemap")
-                    .attr("width", function(d) {
-                        return Math.max(0.01, d.dx);
-                    })
-                    .attr("height", headerHeight)
-                    .style("fill", headerColor)
-                    .on("click", function(d) {
-                        zoom(d);
-                    })
-                    .on('dblclick', function(d) {
-                        //stop showing browser menu
-                        d3.event.preventDefault();
-                    })
-
-                    .on('contextmenu', function(d) {
-                        //stop showing browser menu
-                        d3.event.preventDefault();
-                    });
-                parentEnterTransition.append('text')
-                    .attr("class", "label treemaptext")
-                    .attr("transform", "translate(3, 13)")
-                    .attr("width", function(d) {
-                        return Math.max(0.01, d.dx);
-                    })
-                    .attr("height", headerHeight)
-                    .text(function(d) {
-                        return d.name;
-                    });
-                // update transition
-                var parentUpdateTransition = parentCells.transition().duration(transitionDuration);
-                parentUpdateTransition.select(".cell")
-                    .attr("transform", function(d) {
-                        return "translate(" + d.dx + "," + d.y + ")";
-                    });
-                parentUpdateTransition.select("rect")
-                    .attr("width", function(d) {
-                        return Math.max(0.01, d.dx);
-                    })
-                    .attr("height", headerHeight)
-                    .style("fill", headerColor);
-                parentUpdateTransition.select(".label")
-                    .attr("transform", "translate(3, 13)")
-                    .attr("width", function(d) {
-                        return Math.max(0.01, d.dx);
-                    })
-                    .attr("height", headerHeight)
-                    .text(function(d) {
-                        return d.name;
-                    });
-                // remove transition
-                parentCells.exit()
-                    .remove();
-
-                // create children cells
-                var childrenCells = treemapSVGContainer.selectAll("g.cell.child")
-                    .data(children, function(d) {
-                        return "c-" + d.name;
-                    });
-                // enter transition
-                var childEnterTransition = childrenCells.enter()
-                    .append("g")
-                    .attr("class", "cell child")
-                    .on("click", function(d) {
-                        zoom(node === d.parent ? root : d.parent);
-                    })
-                    .append("svg")
-                    .attr("class", "clip");
-                childEnterTransition.append("rect")
-										.classed("treemap",true)
-                    .classed("background", true)
-                    .style("fill", function(d) {
-                        return color(d.parent.name);
-                    })
-                    .on('mouseover', tip.show)
-                    .on('mouseout', tip.hide)
-                    .on('dblclick', function(d) {
-                        //stop showing browser menu
-                        d3.event.preventDefault();
-
-                        return zoom(node === d.parent ? root : d.parent);
-                    })
-                    .on('click', function(d) {
-                        if(scope.type === 'dual') {
-                            d3.selectAll('.treemapCell').style('stroke', 'white');
-                            d3.selectAll('.treemapCell').style('stroke-dasharray', '0,0');
-
-                            if(!scope.param2.awardSelected) {
-                                scope.param2.awardSelected = true;
-                                scope.param2.selectedAwardID = d.id;
-
-                                d3.select(this).style('stroke', 'black');
-                                d3.select(this).style('stroke-dasharray', '5,5');
-                            }
-                            else {
-                                if (scope.param2.selectedAwardID === d.id) {
-                                    scope.param2.awardSelected = false;
-                                    scope.param2.selectedAwardID = -1;
-
-                                    d3.select(this).style('stroke', 'white');
-                                    d3.select(this).style('stroke-dasharray', '0,0');
-                                }
-                                else {
-                                    //alert('You can only select one award at a time.');
-                                    scope.param2.selectedAwardID = d.id;
-
-                                    d3.select(this).style('stroke', 'black');
-                                    d3.select(this).style('stroke-dasharray', '5,5');
-                                }
-                            }
-
-                            //stop showing browser menu
-                            d3.event.preventDefault();
-                        }
-                        else if(scope.type === 'single') {
-                            d3.select(this).style('stroke', 'white');
-                            d3.select(this).style('stroke-dasharray', '0,0');
-
-                            //stop showing browser menu
-                            d3.event.preventDefault();
-                        }
-                    })
-                    .on('contextmenu', function(d) {
-                        //stop showing browser menu
-                        d3.event.preventDefault();
-                    });
-                childEnterTransition.append('text')
-                    .attr("class", "label")
-                    .attr('x', function(d) {
-                        return d.dx / 2;
-                    })
-                    .attr('y', function(d) {
-                        return d.dy / 2;
-                    })
-                    .attr("dy", ".35em")
-                    .attr("text-anchor", "middle")
-										.attr("class","treemap")
-                    .style("display", "none")
-                    .text(function(d) {
-                        return d.name;
-                    });
-                // update transition
-                var childUpdateTransition = childrenCells.transition().duration(transitionDuration);
-                childUpdateTransition.select(".cell")
-                    .attr("transform", function(d) {
-                        return "translate(" + d.x + "," + d.y + ")";
-                    });
-                childUpdateTransition.select("rect")
-                    .attr("width", function(d) {
-                        return Math.max(0.01, d.dx);
-                    })
-                    .attr("height", function(d) {
-                        return d.dy;
-                    })
-                    .style("fill", function(d) {
-                        return color(d.parent.name);
-                    });
-                childUpdateTransition.select(".label")
-                    .attr('x', function(d) {
-                        return d.dx / 2;
-                    })
-                    .attr('y', function(d) {
-                        return d.dy / 2;
-                    })
-                    .attr("dy", ".35em")
-                    .attr("text-anchor", "middle")
-                    .style("display", "none")
-                    .text(function(d) {
-                        return d.name;
-                    });
-
-                // exit transition
-                childrenCells.exit()
-                    .remove();
-
-                d3.select("select").on("change", function() {
-                    treemap
-                        .value(this.size)
-                        .nodes(root);
-                    zoom(node);
-                });
-
-                zoom(node);
             };
-
-
-            //and another one
-            function textHeight(d) {
-                var ky = treemapHeight / d.dy;
-                yscale.domain([d.y, d.y + d.dy]);
-                return (ky * d.dy) / headerHeight;
-            }
-
-            function getRGBComponents(color) {
-                var r = color.substring(1, 3);
-                var g = color.substring(3, 5);
-                var b = color.substring(5, 7);
-                return {
-                    R: parseInt(r, 16),
-                    G: parseInt(g, 16),
-                    B: parseInt(b, 16)
-                };
-            }
-
-
-            function idealTextColor(bgColor) {
-                var nThreshold = 105;
-                var components = getRGBComponents(bgColor);
-                var bgDelta = (components.R * 0.299) + (components.G * 0.587) + (components.B * 0.114);
-                return ((255 - bgDelta) < nThreshold) ? "#000000" : "#ffffff";
-            }
-
-
-            function zoom(d) {
-                treemap
-                    .padding([headerHeight / (treemapHeight / d.dy), 0, 0, 0])
-                    .nodes(d);
-
-                // moving the next two lines above treemap layout messes up padding of zoom result
-                var kx = treemapWidth / d.dx;
-                var ky = treemapHeight / d.dy;
-                var level = d;
-
-                xscale.domain([d.x, d.x + d.dx]);
-                yscale.domain([d.y, d.y + d.dy]);
-
-                if (node != level) {
-                    treemapSVGContainer.selectAll(".cell.child .label")
-                        .style("display", "none");
-                }
-
-                var zoomTransition = treemapSVGContainer.selectAll("g.cell").transition().duration(transitionDuration)
-                    .attr("transform", function(d) {
-                        return "translate(" + xscale(d.x) + "," + yscale(d.y) + ")";
-                    })
-                    .each("start", function() {
-                        d3.select(this).select("label")
-                            .style("display", "none");
-                    })
-                    .each("end", function(d, i) {
-                        if (!i && (level !== self.root)) {
-                            treemapSVGContainer.selectAll(".cell.child")
-                                .filter(function(d) {
-                                    return d.parent === self.node; // only get the children for selected group
-                                })
-                                .select(".label")
-                                .style("display", "")
-                                .style("fill", function(d) {
-                                    return idealTextColor(color(d.parent.name));
-                                });
-                        }
-                    });
-
-                zoomTransition.select(".clip")
-                    .attr("width", function(d) {
-                        return Math.max(0.01, (kx * d.dx));
-                    })
-                    .attr("height", function(d) {
-                        return d.children ? headerHeight : Math.max(0.01, (ky * d.dy));
-                    });
-
-                zoomTransition.select(".label")
-                    .attr("width", function(d) {
-                        return Math.max(0.01, (kx * d.dx));
-                    })
-                    .attr("height", function(d) {
-                        return d.children ? headerHeight : Math.max(0.01, (ky * d.dy));
-                    })
-                    .text(function(d) {
-                        return d.name;
-                    });
-
-                zoomTransition.select(".child .label")
-                    .attr("x", function(d) {
-                        return kx * d.dx / 2;
-                    })
-                    .attr("y", function(d) {
-                        return ky * d.dy / 2;
-                    });
-
-                zoomTransition.select("rect")
-                    .attr("width", function(d) {
-                        return Math.max(0.01, (kx * d.dx));
-                    })
-                    .attr("height", function(d) {
-                        return d.children ? headerHeight : Math.max(0.01, (ky * d.dy));
-                    })
-                    .style("fill", function(d) {
-                        return d.children ? headerColor : color(d.parent.name);
-                    });
-
-                node = d;
-
-                if (d3.event) {
-                    d3.event.stopPropagation();
-                }
-            }
         };
 
-        return treemapDirective;
+        return foamTreeDirective;
     }
 );
 
