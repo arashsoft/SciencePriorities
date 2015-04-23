@@ -591,7 +591,7 @@ angular.module('sciencePriorities2App')
         };
         foamTreeDirective.link = function (scope, element, attr) {
             scope.$watchCollection('param1', function(newAnalyticsSetting) {
-                /*if(scope.type == 'single') {
+                if(scope.type == 'single') {
                     $.get("/jsonrequest2/foamTreeSelect/" + JSON.stringify(newAnalyticsSetting), function (jsonFile){
                         //get the list of distinct departments, sponsors, and programs, to create the modified treemap data
                         var treemap_data = new Array();    //an array that will hold three different versions of the data based on departments, sponsors, and programs
@@ -657,13 +657,13 @@ angular.module('sciencePriorities2App')
                         treemap_data = [treemap_dept, treemap_spnsr, treemap_prgrm];
 
                         if(scope.facet === "Departments") {
-                            drawFoamTree(treemap_data[0], scope);
+                            drawFoamTree(treemap_data[0], scope, 'treemap');
                         }
                         else if(scope.facet === "Sponsors") {
-                            drawFoamTree(treemap_data[1], scope);
+                            drawFoamTree(treemap_data[1], scope, 'treemap');
                         }
                         else if(scope.facet === "Programs") {
-                            drawFoamTree(treemap_data[2], scope);
+                            drawFoamTree(treemap_data[2], scope, 'treemap');
                         }
                     });
                 }
@@ -674,19 +674,19 @@ angular.module('sciencePriorities2App')
 
                         var treemap_dept = new Object();    //one of the three different versions, organized based on departments
                         //treemap_dept.name = 'UWO-Faculty of Science';
-                        treemap_dept.label = 'UWO-Faculty of Science';
+                        treemap_dept.label = 'UWO-Faculty of Science Awards';
                         //treemap_dept.children = new Array();
                         treemap_dept.groups = new Array();
 
                         var treemap_spnsr = new Object();    //one of the three different versions, organized based on sponsors
                         //treemap_spnsr.name = 'UWO-Faculty of Science';
-                        treemap_spnsr.label = 'UWO-Faculty of Science';
+                        treemap_spnsr.label = 'UWO-Faculty of Science Awards';
                         //treemap_spnsr.children = new Array();
                         treemap_spnsr.groups = new Array();
 
                         var treemap_prgrm = new Object();    //one of the three different versions, organized based on programs
                         //treemap_prgrm.name = 'UWO-Faculty of Science';
-                        treemap_prgrm.label = 'UWO-Faculty of Science';
+                        treemap_prgrm.label = 'UWO-Faculty of Science Awards';
                         //treemap_prgrm.children = new Array();
                         treemap_prgrm.groups = new Array();
 
@@ -733,103 +733,29 @@ angular.module('sciencePriorities2App')
                         treemap_data = [treemap_dept, treemap_spnsr, treemap_prgrm];
 
                         if(scope.facet === "Departments") {
-                            drawFoamTree(treemap_data[0], scope);
+                            drawFoamTree(treemap_data[0], scope, 'leftTreemap');
                         }
                         else if(scope.facet === "Sponsors") {
-                            drawFoamTree(treemap_data[1], scope);
+                            alert('Wrong facet was chosen!');
+                            drawFoamTree(treemap_data[1], scope, 'treemap');
                         }
                         else if(scope.facet === "Programs") {
-                            drawFoamTree(treemap_data[2], scope);
+                            drawFoamTree(treemap_data[2], scope, 'rightTreemap');
                         }
                     });
-                }*/
-                $.get("/jsonrequest2/foamTreeSelect/" + JSON.stringify(newAnalyticsSetting), function (jsonFile){
-                    //get the list of distinct departments, sponsors, and programs, to create the modified treemap data
-                    var treemap_data = new Array();    //an array that will hold three different versions of the data based on departments, sponsors, and programs
-
-                    var treemap_dept = new Object();    //one of the three different versions, organized based on departments
-                    //treemap_dept.name = 'UWO-Faculty of Science';
-                    treemap_dept.label = 'UWO-Faculty of Science Awards';
-                    //treemap_dept.children = new Array();
-                    treemap_dept.groups = new Array();
-
-                    var treemap_spnsr = new Object();    //one of the three different versions, organized based on sponsors
-                    //treemap_spnsr.name = 'UWO-Faculty of Science';
-                    treemap_spnsr.label = 'UWO-Faculty of Science Awards';
-                    //treemap_spnsr.children = new Array();
-                    treemap_spnsr.groups = new Array();
-
-                    var treemap_prgrm = new Object();    //one of the three different versions, organized based on programs
-                    //treemap_prgrm.name = 'UWO-Faculty of Science';
-                    treemap_prgrm.label = 'UWO-Faculty of Science Awards';
-                    //treemap_prgrm.children = new Array();
-                    treemap_prgrm.groups = new Array();
-
-                    //get the unique list of departments, sponsors, and programs
-                    var departments_uniq = _.uniq(_.pluck(jsonFile, 'departmentName'));
-                    var sponsors_uniq = _.uniq(_.pluck(jsonFile, 'sponsorName'));
-                    var programs_uniq = _.uniq(_.pluck(jsonFile, 'programName'));
-
-                    //organize the awards accordingly
-                    var department_temp = _.groupBy(jsonFile, function(award) { return award.departmentName});
-                    var sponsor_temp = _.groupBy(jsonFile, function(award) { return award.sponsorName});
-                    var program_temp = _.groupBy(jsonFile, function(award) { return award.programName});
-
-                    departments_uniq.forEach(function(dept) {
-                        var dept_temp = new Object();
-                        //dept_temp.name = dept;
-                        dept_temp.label = dept;
-                        //dept_temp.children = department_temp[dept];
-                        dept_temp.groups = department_temp[dept];
-                        //treemap_dept.children.push(dept_temp);
-                        treemap_dept.groups.push(dept_temp);
-                    });
-
-                    sponsors_uniq.forEach(function(spnsr) {
-                        var spnsr_temp = new Object();
-                        //spnsr_temp.name = spnsr;
-                        spnsr_temp.label = spnsr;
-                        //spnsr_temp.children = sponsor_temp[spnsr];
-                        spnsr_temp.groups = sponsor_temp[spnsr];
-                        //treemap_spnsr.children.push(spnsr_temp);
-                        treemap_spnsr.groups.push(spnsr_temp);
-                    });
-
-                    programs_uniq.forEach(function(prgrm) {
-                        var prgrm_temp = new Object();
-                        //prgrm_temp.name = prgrm;
-                        prgrm_temp.label = prgrm;
-                        //prgrm_temp.children = program_temp[prgrm];
-                        prgrm_temp.groups = program_temp[prgrm];
-                        //treemap_prgrm.children.push(prgrm_temp);
-                        treemap_prgrm.groups.push(prgrm_temp);
-                    });
-
-                    treemap_data = [treemap_dept, treemap_spnsr, treemap_prgrm];
-
-                    if(scope.facet === "Departments") {
-                        drawFoamTree(treemap_data[0], scope);
-                    }
-                    else if(scope.facet === "Sponsors") {
-                        drawFoamTree(treemap_data[1], scope);
-                    }
-                    else if(scope.facet === "Programs") {
-                        drawFoamTree(treemap_data[2], scope);
-                    }
-                });
+                }
 
             }, true);
 
-            function drawFoamTree(treemapData, scope) {
-                log(treemapData);
+            function drawFoamTree(treemapData, scope, foamTreeId) {
                 var foamtree = new CarrotSearchFoamTree({
-                    id: 'treemap',
+                    id: foamTreeId,
                     dataObject: {
                         label: 'UWO-Faculty of Science Awards',
                         groups: treemapData.groups
                     },
                     layout: 'ordered',
-                    rainbowEndColor: "hsla(360, 100%, 55%, 1)",
+                    //rainbowEndColor: "hsla(360, 100%, 55%, 1)",
                     groupBorderRadius: 0.15,
                     groupBorderWidth: 1.75,
                     groupInsetWidth: 16,
@@ -847,6 +773,7 @@ angular.module('sciencePriorities2App')
                     titleBarFontFamily: "Oxygen",
                     attributionPosition: 45
                 });
+                CarrotSearchFoamTree.hints(foamtree);
             };
         };
 
