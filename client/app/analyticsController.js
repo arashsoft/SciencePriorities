@@ -748,12 +748,90 @@ angular.module('sciencePriorities2App')
             }, true);
 
             function drawFoamTree(treemapData, scope, foamTreeId) {
+                //log(treemapData);
+                var tooltip = (function(element) {
+                    var tip = new Tooltip("Test", { auto: true });
+                    var shown = false;
+                    var timeout;
+                    var lastShownPageX, lastShownPageY;
+                    var pageX, pageY;
+                    var currentGroup;
+
+                    function hide() {
+                        tip.hide();
+                        shown = false;
+                    }
+
+                    function show() {
+                        if (currentGroup && currentGroup.label) {
+                            var tipText = "";
+                            if(_.size(currentGroup.groups) > 0) {
+                                tipText = currentGroup.label + " has <br />" +
+                                "<strong>" + _.size(currentGroup.groups) + "</strong> elements within";
+                            }
+                            else {
+                                tipText = "<strong> ID: <strong>" + currentGroup.id + "<br />" +
+                                "<strong> Title: <strong>" + currentGroup.label + "<br />" +
+                                "<strong> Begin Date: <strong>" + currentGroup.beginDate + "<br />" +
+                                "<strong> End Date: <strong>" + currentGroup.endDate + "<br />" +
+                                "<strong> Amount: <strong>" + currentGroup.size + "<br />" +
+                                "<strong> Department: <strong>" + currentGroup.departmentName + "<br />" +
+                                "<strong> Program: <strong>" + currentGroup.programName + "<br />" +
+                                "<strong> Sponsor: <strong>" + currentGroup.sponsorName;
+                            }
+                            tip.content(tipText);
+                            tip.position(pageX, pageY);
+                            tip.show();
+                            lastShownPageX = pageX;
+                            lastShownPageY = pageY;
+                            shown = true;
+                        }
+                    }
+
+                    function group(g) {
+                        currentGroup = g;
+                    }
+
+                    // Register a mouse move listener that will show and hide the tooltip.
+                    document.body.addEventListener("mousemove", function(e) {
+                        pageX = e.pageX;
+                        pageY = e.pageY;
+
+                        // Hide if the mouse pointer gets farther than 10px from the last tooltip location
+                        if (shown && Math.sqrt(Math.pow(pageX - lastShownPageX, 2) + Math.pow(pageY - lastShownPageY, 2)) > 10) {
+                            hide();
+                        }
+
+                        // Show the tooltip after the pointer stops for some time
+                        window.clearTimeout(timeout);
+                        timeout = window.setTimeout(show, 500)
+                    });
+
+                    return {
+                        group: group,
+                        hide: hide
+                    };
+                })(document.getElementById("tooltip"));
                 var foamtree = new CarrotSearchFoamTree({
                     id: foamTreeId,
                     dataObject: {
                         label: 'UWO-Faculty of Science Awards',
                         groups: treemapData.groups
                     },
+                    pixelRatio: window.devicePixelRatio || 1,
+                    onGroupHover: function (event) {
+                        // Tell the tooltip which group is currently hovered on
+                        tooltip.group(event.group);
+                    },
+
+                    // Hide the tooltip on zoom, open/close and expose
+                    onGroupMouseWheel: tooltip.hide,
+                    onGroupExposureChanging: tooltip.hide,
+                    onGroupOpenOrCloseChanging: tooltip.hide,
+
+                    // Never display the title bar
+                    maxLabelSizeForTitleBar: 0,
+
                     layout: 'ordered',
                     //rainbowEndColor: "hsla(360, 100%, 55%, 1)",
                     groupBorderRadius: 0.15,
