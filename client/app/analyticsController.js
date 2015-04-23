@@ -749,19 +749,19 @@ angular.module('sciencePriorities2App')
 
                     var treemap_dept = new Object();    //one of the three different versions, organized based on departments
                     //treemap_dept.name = 'UWO-Faculty of Science';
-                    treemap_dept.label = 'UWO-Faculty of Science';
+                    treemap_dept.label = 'UWO-Faculty of Science Awards';
                     //treemap_dept.children = new Array();
                     treemap_dept.groups = new Array();
 
                     var treemap_spnsr = new Object();    //one of the three different versions, organized based on sponsors
                     //treemap_spnsr.name = 'UWO-Faculty of Science';
-                    treemap_spnsr.label = 'UWO-Faculty of Science';
+                    treemap_spnsr.label = 'UWO-Faculty of Science Awards';
                     //treemap_spnsr.children = new Array();
                     treemap_spnsr.groups = new Array();
 
                     var treemap_prgrm = new Object();    //one of the three different versions, organized based on programs
                     //treemap_prgrm.name = 'UWO-Faculty of Science';
-                    treemap_prgrm.label = 'UWO-Faculty of Science';
+                    treemap_prgrm.label = 'UWO-Faculty of Science Awards';
                     //treemap_prgrm.children = new Array();
                     treemap_prgrm.groups = new Array();
 
@@ -821,14 +821,15 @@ angular.module('sciencePriorities2App')
             }, true);
 
             function drawFoamTree(treemapData, scope) {
+                log(treemapData);
                 var foamtree = new CarrotSearchFoamTree({
                     id: 'treemap',
                     dataObject: {
-                        groups: [
-                            treemapData
-                        ]
+                        label: 'UWO-Faculty of Science Awards',
+                        groups: treemapData.groups
                     },
                     layout: 'ordered',
+                    rainbowEndColor: "hsla(360, 100%, 55%, 1)",
                     groupBorderRadius: 0.15,
                     groupBorderWidth: 1.75,
                     groupInsetWidth: 16,
