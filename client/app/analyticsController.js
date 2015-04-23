@@ -736,7 +736,7 @@ angular.module('sciencePriorities2App')
                             drawFoamTree(treemap_data[0], scope, 'leftTreemap');
                         }
                         else if(scope.facet === "Sponsors") {
-                            alert('Wrong facet was chosen!');
+                            log('Wrong facet was chosen!');
                             drawFoamTree(treemap_data[1], scope, 'treemap');
                         }
                         else if(scope.facet === "Programs") {
